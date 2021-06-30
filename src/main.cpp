@@ -1,6 +1,9 @@
-#include <iostream>
+#include "gameboy.h"
 
 int main()
 {
-    std::cout << "Shatter Emulator\n";
+    Gameboy gb;
+    gb.start();
+
+    return 0;
 }

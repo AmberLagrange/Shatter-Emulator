@@ -1,46 +1,72 @@
 SHELL := /bin/bash
 
 #App name
-EXE ?= shatter
-EXT := .exe
+EXE ?= shatter.exe
 
 #Executables
-RM := rm
+RM 		:= rm
 MKDIR_P := mkdir -p
-
-#Directories
-OBJDIR ?= ./obj
-SRCDIR ?= ./src
-INCDIR ?= ./include
-BUILDIR ?= ./build
-
-DIRS := $(OBJDIR) $(BUILDIR)
-
-SRCS := $(wildcard $(SRCDIR)/*.cpp) #Get all cpp files in SRCDIR
-OBJS := $(SRCS:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o) #.o file for each .cpp file
-DEPS := $(OBJS:%.o=%.d)
 
 #Compiler and flags
 CXX ?= g++
-CXXFLAGS ?= -g -Wall -Wextra -Werror -I$(INCDIR) -MMD -MP
+CXXFLAGS ?= -Wall -Wextra -Werror -I$(INCDIR) -MMD -MP 
+CXXFLAGS += -std=c++17
+CXXFLAGS += -DEXE_NAME=\"$(EXE)\"
 
 #Libraries
-LIBS := 
+LDFLAGS :=
 
-.PHONY: clean
+#Directories
+INCDIR  ?= ./include
+SRCDIR  ?= ./src
+OBJDIR  ?= ./obj
+BUILDIR ?= ./build
 
-#Main executable
-$(EXE): $(OBJS)
-	$(CXX) $(OBJS) -o $(BUILDIR)/$(EXE)$(EXT) $(LIBS)
+#Files
+SRCS := $(wildcard $(SRCDIR)/*.cpp)
+OBJS := $(SRCS:$(SRCDIR)/%.cpp=%.o)
+DEPS := $(OBJS:%.o=%.d)
 
-#Each .o file required 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+.PHONY: all clean release debug mkdir remake
+
+all: mkdir release
+
+#Release build settings
+RELDIR  ?= release
+RELOBJS := $(addprefix $(OBJDIR)/$(RELDIR)/, $(OBJS))
+RELDEPS := $(RELOBJS:%.o=%.d)
+release: CXXFLAGS += -DNDEBUG
+
+#Debug build settings
+DBGDIR  ?= debug
+DBGOBJS := $(addprefix $(OBJDIR)/$(DBGDIR)/, $(OBJS))
+DBGDEPS := $(DBGOBJS:%.o=%.d)
+debug: CXXFLAGS += -g
+
+#Release target
+release: $(RELOBJS)
+	$(CXX) $(RELOBJS) -o $(BUILDIR)/$(RELDIR)/$(EXE)$(LDFLAGS)
+
+$(OBJDIR)/$(RELDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
+#Debug target
+debug: mkdir $(DBGOBJS)
+	$(CXX) $(DBGOBJS) -o $(BUILDIR)/$(DBGDIR)/$(EXE) $(LDFLAGS)
+
+$(OBJDIR)/$(DBGDIR)/%.o: $(SRCDIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
+#Other targets
+remake: clean all
+
 clean:
-	$(RM) -r $(OBJDIR)
-	$(RM) -r $(BUILDIR)
+	$(RM) -rf $(BUILDIR)
+	$(RM) -rf $(OBJDIR)
 
--include $(DEPS)
+mkdir:
+	$(MKDIR_P) $(BUILDIR) $(BUILDIR)/$(RELDIR) $(BUILDIR)/$(DBGDIR)
+	$(MKDIR_P) $(OBJDIR)  $(OBJDIR)/$(RELDIR)  $(OBJDIR)/$(DBGDIR)
 
-$(info $(shell $(MKDIR_P) $(DIRS)))
+-include $(RELDEPS)
+-include $(DBGDEPS)
