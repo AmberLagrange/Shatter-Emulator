@@ -8,21 +8,74 @@
     #define INSTRUCTION(mnemonic, op, length, cyclesBranch, cyclesNoBranch) { op, length, cyclesBranch, cyclesNoBranch }
 #endif
 
+//Opcode Helpers
+
+void Instruction::opcodeDec(Gameboy* gb, u8& reg)
+{
+    reg--;
+    gb->m_CPU.isFlagSet(CPU::Flags::Carry) ? gb->m_CPU.setFlags(CPU::Flags::Carry) : gb->m_CPU.clearFlags();
+    gb->m_CPU.toggleZeroFromVal(reg);
+    gb->m_CPU.toggleFlag(CPU::Flags::Negative);
+    if((reg & 0x0f) == 0x0f) gb->m_CPU.toggleFlag(CPU::Flags::HalfCarry);   
+}
+
+void Instruction::opcodeLoadu8(Gameboy* gb, u8& reg)
+{
+    reg = gb->read(gb->m_CPU.m_Registers.PC++);
+}
+
+void Instruction::opcodeXOR(Gameboy* gb, const u8& val)
+{
+    gb->m_CPU.m_Registers.A ^= val;
+    gb->m_CPU.clearFlags();
+    gb->m_CPU.toggleZeroFromVal(gb->m_CPU.m_Registers.A);
+}
+
+void Instruction::opcodeJP(Gameboy* gb, bool condition)
+{
+    u8 low  = gb->read(gb->m_CPU.m_Registers.PC++);
+    u8 high = gb->read(gb->m_CPU.m_Registers.PC++);
+    u16 address = static_cast<u16>(high) << 8 | static_cast<u16>(low);
+
+    if(condition)
+    {
+        gb->m_CPU.m_Registers.PC = address;
+        LOG("Jumped to 0x" << std::setw(4) << std::setfill('0') << std::hex << gb->m_CPU.m_Registers.PC << ".");
+    }
+    else
+    {
+        LOG("Did not jump.");
+    }
+}
+
+void Instruction::opcodeJPOffset(Gameboy* gb, bool condition)
+{
+    i8 offset = gb->read(gb->m_CPU.m_Registers.PC++);
+    u16 address = gb->m_CPU.m_Registers.PC + offset;
+
+    if(condition)
+    {
+        gb->m_CPU.m_Registers.PC = address;
+        LOG("Jumped to 0x" << std::setw(4) << std::setfill('0') << std::hex << gb->m_CPU.m_Registers.PC << ".");
+    }
+    else
+    {
+        LOG("Did not jump.");
+    }
+}
+
+//Opcodes
+
 //0x00
 
 void Instruction::op00([[maybe_unused]] Gameboy* gb)
 {
-
+    
 }
 
 void Instruction::op05(Gameboy* gb)
 {
-    gb->m_CPU.m_Registers.B--;
-
-    gb->m_CPU.isFlagSet(CPU::Flags::Carry) ? gb->m_CPU.setFlags(CPU::Flags::Carry) : gb->m_CPU.clearFlags();
-    gb->m_CPU.toggleZeroFromVal(gb->m_CPU.m_Registers.B);
-    gb->m_CPU.toggleFlag(CPU::Flags::Negative);
-    if((gb->m_CPU.m_Registers.B & 0x0f) == 0x0f) gb->m_CPU.toggleFlag(CPU::Flags::HalfCarry);
+    opcodeDec(gb, gb->m_CPU.m_Registers.B);
 
     LOG("Decremented B to 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.B) << ".");
     LOG("Flags Updated to 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.F) << ".");
@@ -30,13 +83,23 @@ void Instruction::op05(Gameboy* gb)
 
 void Instruction::op06(Gameboy* gb)
 {
-    gb->m_CPU.m_Registers.B = gb->read(gb->m_CPU.m_Registers.PC++);
+    opcodeLoadu8(gb, gb->m_CPU.m_Registers.B);
+
     LOG("Stored 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.B) << " into register B.");
 }
 
-void Instruction::op0e(Gameboy* gb)
+void Instruction::op0d(Gameboy* gb)
 {
-    gb->m_CPU.m_Registers.C = gb->read(gb->m_CPU.m_Registers.PC++);
+    opcodeDec(gb, gb->m_CPU.m_Registers.C);
+
+    LOG("Decremented C to 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.B) << ".");
+    LOG("Flags Updated to 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.F) << ".");
+}
+
+void Instruction::op05(Gameboy* gb)
+{
+    opcodeLoadu8(gb, gb->m_CPU.m_Registers.C);
+
     LOG("Stored 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.C) << " into register C.");
 }
 
@@ -44,11 +107,17 @@ void Instruction::op0e(Gameboy* gb)
 
 //0x20
 
+void Instruction::op20(Gameboy* gb)
+{
+    opcodeJPOffset(gb, !gb->m_CPU.isFlagSet(CPU::Flags::Zero));
+}
+
 void Instruction::op21(Gameboy* gb)
 {
     u8 low  = gb->read(gb->m_CPU.m_Registers.PC++);
     u8 high = gb->read(gb->m_CPU.m_Registers.PC++);
     gb->m_CPU.m_Registers.HL = static_cast<u16>(high) << 8 | static_cast<u16>(low);
+
     LOG("Loaded 0x" << std::setw(4) << std::setfill('0') << std::hex << gb->m_CPU.m_Registers.HL << " into HL.");
 }
 
@@ -76,9 +145,7 @@ void Instruction::op32(Gameboy* gb)
 
 void Instruction::opAF(Gameboy* gb)
 {
-    gb->m_CPU.m_Registers.A ^= gb->m_CPU.m_Registers.A;
-    gb->m_CPU.clearFlags();
-    gb->m_CPU.toggleZeroFromVal(gb->m_CPU.m_Registers.A);
+    opcodeXOR(gb, gb->m_CPU.m_Registers.A);
     LOG("A XOR'd with A. Value 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.A) << " stored.");
     LOG("Flags Updated to 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.F) << ".");
 }
@@ -89,10 +156,7 @@ void Instruction::opAF(Gameboy* gb)
 
 void Instruction::opC3(Gameboy* gb)
 {
-    u8 low  = gb->read(gb->m_CPU.m_Registers.PC++);
-    u8 high = gb->read(gb->m_CPU.m_Registers.PC++);
-    gb->m_CPU.m_Registers.PC = static_cast<u16>(high) << 8 | static_cast<u16>(low);
-    LOG("Jumped to: 0x" << std::setw(4) << std::setfill('0') << std::hex << gb->m_CPU.m_Registers.PC << ".");
+    opcodeJP(gb, true);
 }
 
 //0xD0
@@ -117,7 +181,7 @@ const Instruction Instruction::instructions[0x100] =
     INSTRUCTION("LD A,(BC)",        NULL, 1,  8,  8),
     INSTRUCTION("DEC BC",           NULL, 1,  8,  8),
     INSTRUCTION("INC C",            NULL, 1,  4,  4),
-    INSTRUCTION("DEC C",            NULL, 1,  4,  4),
+    INSTRUCTION("DEC C",            Instruction::op0d, 1,  4,  4),
     INSTRUCTION("LD C,u8",          Instruction::op0e, 2,  8,  8),
     INSTRUCTION("RRCA",             NULL, 1,  4,  4),
 
@@ -140,7 +204,7 @@ const Instruction Instruction::instructions[0x100] =
     INSTRUCTION("RRA",              NULL, 1,  4,  4),
 
     //0x20
-    INSTRUCTION("JR NZ,i8",         NULL, 2, 12,  8),
+    INSTRUCTION("JR NZ,i8",         Instruction::op20, 2, 12,  8),
     INSTRUCTION("LD HL,u16",        Instruction::op21, 3, 12, 12),
     INSTRUCTION("LD (HL+),A",       NULL, 1,  8,  8),
     INSTRUCTION("INC HL",           NULL, 1,  8,  8),

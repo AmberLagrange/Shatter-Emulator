@@ -14,8 +14,8 @@ class MMU
 
         void load(const char* path);
 
-        u8 read(u16 address);
-        u8 write(u16 address, u8 val);
+        u8 read(const u16& address);
+        u8 write(const u16& address, const u8& val);
     private:
         void reset();
 

@@ -18,8 +18,8 @@ class Gameboy
         void load(const char* path);
         void start();
 
-        u8 read(u16 address);
-        u8 write(u16 address, u8 val);
+        u8 read(const u16& address);
+        u8 write(const u16& address, const u8& val);
     private:
         CPU m_CPU;
         MMU m_MMU;

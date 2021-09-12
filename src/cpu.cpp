@@ -44,32 +44,32 @@ void CPU::clearFlags()
     setFlags(CPU::Flags::None);
 }
 
-void CPU::setFlags(Flags flag)
+void CPU::setFlags(const Flags& flag)
 {
     m_Registers.F = flag;
 }
 
-void CPU::toggleFlag(Flags flag)
+void CPU::toggleFlag(const Flags& flag)
 {
     m_Registers.F |= flag;
 }
 
-void CPU::untoggleFlag(Flags flag)
+void CPU::untoggleFlag(const Flags& flag)
 {
     m_Registers.F &= ~flag;
 }
 
-void CPU::flipFlag(Flags flag)
+void CPU::flipFlag(const Flags& flag)
 {
     m_Registers.F ^= flag;
 }
 
-bool CPU::isFlagSet(Flags flag)
+bool CPU::isFlagSet(const Flags& flag)
 {
     return m_Registers.F & flag;
 }
 
-void CPU::toggleZeroFromVal(u8 val)
+void CPU::toggleZeroFromVal(const u8& val)
 {
     if(!val) toggleFlag(CPU::Flags::Zero);
 }

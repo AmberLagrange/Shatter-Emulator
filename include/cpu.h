@@ -82,12 +82,12 @@ class CPU
         void reset();
 
         void clearFlags();
-        void setFlags(Flags flag);
-        void toggleFlag(Flags flag);
-        void untoggleFlag(Flags flag);
-        void flipFlag(Flags flag);
-        bool isFlagSet(Flags flag);
-        void toggleZeroFromVal(u8 val);
+        void setFlags(const Flags& flag);
+        void toggleFlag(const Flags& flag);
+        void untoggleFlag(const Flags& flag);
+        void flipFlag(const Flags& flag);
+        bool isFlagSet(const Flags& flag);
+        void toggleZeroFromVal(const u8& val);
 
         Gameboy* m_Gameboy;
         Registers m_Registers;

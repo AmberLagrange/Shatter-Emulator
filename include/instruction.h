@@ -20,19 +20,33 @@ struct Instruction
     static const Instruction instructions[0x100];
     static const Instruction instructionsCB[0x100];
 
-    //opcodes
+    //Opcode Helpers
+
+    static void opcodeInc(Gameboy* gb, u8& reg);
+    static void opcodeDec(Gameboy* gb, u8& reg);
+    
+    static void opcodeLoadu8(Gameboy* gb, u8& reg);
+
+    static void opcodeXOR(Gameboy* gb, const u8& val);
+
+    static void opcodeJP(Gameboy* gb, bool condition);
+    static void opcodeJPOffset(Gameboy* gb, bool condition);
+
+    //Opcodes
 
     //0x00
 
     static void op00(Gameboy* gb);
     static void op05(Gameboy* gb);
     static void op06(Gameboy* gb);
+    static void op0d(Gameboy* gb);
     static void op0e(Gameboy* gb);
 
     //0x10
 
     //0x20
 
+    static void op20(Gameboy* gb);
     static void op21(Gameboy* gb);
 
     //0x30

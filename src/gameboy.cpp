@@ -15,18 +15,18 @@ void Gameboy::start()
 {
     LOG("Staring Gameboy\n");
 
-    for(int i = 0; i < 0x200; ++i)
+    for(;;)
     {
         m_CPU.tick();
     }
 }
 
-u8 Gameboy::read(u16 address)
+u8 Gameboy::read(const u16& address)
 {
     return m_MMU.read(address);
 }
 
-u8 Gameboy::write(u16 address, u8 val)
+u8 Gameboy::write(const u16& address, const u8& val)
 {
     return m_MMU.write(address, val);
 }
