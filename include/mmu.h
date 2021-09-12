@@ -14,11 +14,8 @@ class MMU
 
         void load(const char* path);
 
-        u8 read8(u16 address);
-        u8 write8(u16 address, u8 val);
-
-        u16 read16(u16 address);
-        u16 write16(u16 address, u16 val);
+        u8 read(u16 address);
+        u8 write(u16 address, u8 val);
     private:
         void reset();
 
@@ -26,4 +23,6 @@ class MMU
 
         Cartridge m_Rom;
         u8 m_VRAM[0x2000];
+        u8 m_RAMBANK[0x2000];
+        u8 m_RAM[0x2000];
 };

@@ -15,11 +15,50 @@ void Instruction::op00([[maybe_unused]] Gameboy* gb)
 
 }
 
+void Instruction::op05(Gameboy* gb)
+{
+    gb->m_CPU.m_Registers.B--;
+
+    gb->m_CPU.isFlagSet(CPU::Flags::Carry) ? gb->m_CPU.setFlags(CPU::Flags::Carry) : gb->m_CPU.clearFlags();
+    gb->m_CPU.toggleZeroFromVal(gb->m_CPU.m_Registers.B);
+    gb->m_CPU.toggleFlag(CPU::Flags::Negative);
+    if((gb->m_CPU.m_Registers.B & 0x0f) == 0x0f) gb->m_CPU.toggleFlag(CPU::Flags::HalfCarry);
+
+    LOG("Decremented B to 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.B) << ".");
+    LOG("Flags Updated to 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.F) << ".");
+}
+
+void Instruction::op06(Gameboy* gb)
+{
+    gb->m_CPU.m_Registers.B = gb->read(gb->m_CPU.m_Registers.PC++);
+    LOG("Stored 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.B) << " into register B.");
+}
+
+void Instruction::op0e(Gameboy* gb)
+{
+    gb->m_CPU.m_Registers.C = gb->read(gb->m_CPU.m_Registers.PC++);
+    LOG("Stored 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.C) << " into register C.");
+}
+
 //0x10
 
 //0x20
 
+void Instruction::op21(Gameboy* gb)
+{
+    u8 low  = gb->read(gb->m_CPU.m_Registers.PC++);
+    u8 high = gb->read(gb->m_CPU.m_Registers.PC++);
+    gb->m_CPU.m_Registers.HL = static_cast<u16>(high) << 8 | static_cast<u16>(low);
+    LOG("Loaded 0x" << std::setw(4) << std::setfill('0') << std::hex << gb->m_CPU.m_Registers.HL << " into HL.");
+}
+
 //0x30
+
+void Instruction::op32(Gameboy* gb)
+{
+    gb->write(gb->m_CPU.m_Registers.HL--, gb->m_CPU.m_Registers.A);
+    LOG("Wrote " << static_cast<u16>(gb->m_CPU.m_Registers.A) << " at memory address " << (gb->m_CPU.m_Registers.HL + 1));
+}
 
 //0x40
 
@@ -35,14 +74,25 @@ void Instruction::op00([[maybe_unused]] Gameboy* gb)
 
 //0xA0
 
+void Instruction::opAF(Gameboy* gb)
+{
+    gb->m_CPU.m_Registers.A ^= gb->m_CPU.m_Registers.A;
+    gb->m_CPU.clearFlags();
+    gb->m_CPU.toggleZeroFromVal(gb->m_CPU.m_Registers.A);
+    LOG("A XOR'd with A. Value 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.A) << " stored.");
+    LOG("Flags Updated to 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.F) << ".");
+}
+
 //0xB0
 
 //0xC0
 
 void Instruction::opC3(Gameboy* gb)
 {
-    gb->m_CPU.m_Registers.PC = gb->read16(gb->m_CPU.m_Registers.PC);
-    LOG("Jumped to: 0x" << std::setw(4) << std::setfill('0') << std::hex << gb->m_CPU.m_Registers.PC);
+    u8 low  = gb->read(gb->m_CPU.m_Registers.PC++);
+    u8 high = gb->read(gb->m_CPU.m_Registers.PC++);
+    gb->m_CPU.m_Registers.PC = static_cast<u16>(high) << 8 | static_cast<u16>(low);
+    LOG("Jumped to: 0x" << std::setw(4) << std::setfill('0') << std::hex << gb->m_CPU.m_Registers.PC << ".");
 }
 
 //0xD0
@@ -59,8 +109,8 @@ const Instruction Instruction::instructions[0x100] =
     INSTRUCTION("LD (BC),A",        NULL, 1,  8,  8),
     INSTRUCTION("INC BC",           NULL, 1,  8,  8),
     INSTRUCTION("INC B",            NULL, 1,  4,  4),
-    INSTRUCTION("DEC B",            NULL, 1,  4,  4),
-    INSTRUCTION("LD B,u8",          NULL, 2,  8,  8),
+    INSTRUCTION("DEC B",            Instruction::op05, 1,  4,  4),
+    INSTRUCTION("LD B,u8",          Instruction::op06, 2,  8,  8),
     INSTRUCTION("RLCA",             NULL, 1,  4,  4),
     INSTRUCTION("LD (u16),SP",      NULL, 3, 20, 20),
     INSTRUCTION("ADD HL,BC",        NULL, 1,  8,  8),
@@ -68,7 +118,7 @@ const Instruction Instruction::instructions[0x100] =
     INSTRUCTION("DEC BC",           NULL, 1,  8,  8),
     INSTRUCTION("INC C",            NULL, 1,  4,  4),
     INSTRUCTION("DEC C",            NULL, 1,  4,  4),
-    INSTRUCTION("LD C,u8",          NULL, 2,  8,  8),
+    INSTRUCTION("LD C,u8",          Instruction::op0e, 2,  8,  8),
     INSTRUCTION("RRCA",             NULL, 1,  4,  4),
 
     //0x10
@@ -91,7 +141,7 @@ const Instruction Instruction::instructions[0x100] =
 
     //0x20
     INSTRUCTION("JR NZ,i8",         NULL, 2, 12,  8),
-    INSTRUCTION("LD HL,u16",        NULL, 3, 12, 12),
+    INSTRUCTION("LD HL,u16",        Instruction::op21, 3, 12, 12),
     INSTRUCTION("LD (HL+),A",       NULL, 1,  8,  8),
     INSTRUCTION("INC HL",           NULL, 1,  8,  8),
     INSTRUCTION("INC H",            NULL, 1,  4,  4),
@@ -110,7 +160,7 @@ const Instruction Instruction::instructions[0x100] =
     //0x30
     INSTRUCTION("JR NC,i8",         NULL, 2, 12,  8),
     INSTRUCTION("LD SP,u16",        NULL, 3, 12, 12),
-    INSTRUCTION("LD (HL-),A",       NULL, 1,  8,  8),
+    INSTRUCTION("LD (HL-),A",       Instruction::op32, 1,  8,  8),
     INSTRUCTION("INC SP",           NULL, 1,  8,  8),
     INSTRUCTION("INC (HL)",         NULL, 1, 12, 12),
     INSTRUCTION("DEC (HL)",         NULL, 1, 12, 12),
@@ -249,7 +299,7 @@ const Instruction Instruction::instructions[0x100] =
     INSTRUCTION("XOR A,H",          NULL, 1,  4,  4),
     INSTRUCTION("XOR A,L",          NULL, 1,  4,  4),
     INSTRUCTION("XOR A,(HL)",       NULL, 1,  8,  8),
-    INSTRUCTION("XOR A,A",          NULL, 1,  4,  4),
+    INSTRUCTION("XOR A,A",          Instruction::opAF, 1,  4,  4),
 
     //0xB0
     INSTRUCTION("OR A,B",           NULL, 1,  4,  4),

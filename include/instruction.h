@@ -25,12 +25,19 @@ struct Instruction
     //0x00
 
     static void op00(Gameboy* gb);
+    static void op05(Gameboy* gb);
+    static void op06(Gameboy* gb);
+    static void op0e(Gameboy* gb);
 
     //0x10
 
     //0x20
 
+    static void op21(Gameboy* gb);
+
     //0x30
+
+    static void op32(Gameboy* gb);
 
     //0x40
 
@@ -45,6 +52,8 @@ struct Instruction
     //0x90
 
     //0xA0
+
+    static void opAF(Gameboy* gb);
 
     //0xB0
 

@@ -13,28 +13,20 @@ void Gameboy::load(const char* path)
 
 void Gameboy::start()
 {
+    LOG("Staring Gameboy\n");
+
     for(int i = 0; i < 0x200; ++i)
     {
         m_CPU.tick();
     }
 }
 
-u8 Gameboy::read8(u16 address)
+u8 Gameboy::read(u16 address)
 {
-    return m_MMU.read8(address);
+    return m_MMU.read(address);
 }
 
-u8 Gameboy::write8(u16 address, u8 val)
+u8 Gameboy::write(u16 address, u8 val)
 {
-    return m_MMU.write8(address, val);
-}
-
-u16 Gameboy::read16(u16 address)
-{
-    return m_MMU.read16(address);
-}
-
-u16 Gameboy::write16(u16 address, u16 val)
-{
-    return m_MMU.write16(address, val);
+    return m_MMU.write(address, val);
 }

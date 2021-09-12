@@ -23,10 +23,7 @@ u8 Cartridge::read8(u16 address)
     return m_Rom1[address - 0x4000];
 }
 
-u16 Cartridge::read16(u16 address)
-{
-    return (read8(address) | read8(address + 1) << 8);
-}
+#ifndef NDEBUG
 
 void Cartridge::dump()
 {
@@ -34,17 +31,26 @@ void Cartridge::dump()
     {
         for(u16 j = 0; j < 0x10; ++j)
         {
-            std::cout << std::setw(2) << std::setfill('0') << std::hex << (int)m_Rom0[i * 0x10 + j] << ' ';
+            LOG(std::setw(2) << std::setfill('0') << std::hex << (int)m_Rom0[i * 0x10 + j] << ' ');
         }
-        std::cout << "\n";
+        LOG("");
     }
 
     for(u16 i = 0; i < 0x400; ++i)
     {
         for(u16 j = 0; j < 0x10; ++j)
         {
-            std::cout << std::setw(2) << std::setfill('0') << std::hex << (int)m_Rom1[i * 0x10 + j] << ' ';
+            LOG(std::setw(2) << std::setfill('0') << std::hex << (int)m_Rom1[i * 0x10 + j] << ' ');
         }
-        std::cout << "\n";
+        LOG("");
     }
 }
+
+#else
+
+void Cartridge::dump()
+{
+    
+}
+
+#endif

@@ -11,26 +11,20 @@ void MMU::load(const char* path)
     m_Rom.load(path);
 }
 
-u8 MMU::read8(u16 address)
+u8 MMU::read(u16 address)
 {
     if(address < 0x8000) return m_Rom.read8(address);
-    return 0xab;
+    if(address < 0xA000) return m_VRAM[address - 0x8000];
+    if(address < 0xC000) return m_RAMBANK[address - 0xA000];
+    if(address < 0xE000) return m_RAM[address - 0xC000];
+    return 0x00;
 }
 
-u8 MMU::write8(u16 address, u8 val)
+u8 MMU::write(u16 address, u8 val)
 {
     if(address < 0x8000) return 0x00;
-    return val;
-}
-
-u16 MMU::read16(u16 address)
-{
-    if(address < 0x8000) return m_Rom.read16(address);
-    return 0xabab;
-}
-
-u16 MMU::write16(u16 address, u16 val)
-{
-    if(address < 0x8000) return 0x0000;
+    else if(address < 0xA000) m_VRAM[address - 0x8000] = val;
+    else if(address < 0xC000) m_RAMBANK[address - 0xA000] = val;
+    else if(address < 0xE000) m_RAM[address - 0xC000] = val;
     return val;
 }

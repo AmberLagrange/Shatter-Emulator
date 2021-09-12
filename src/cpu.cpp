@@ -10,8 +10,8 @@ CPU::CPU(Gameboy* gb)
 
 void CPU::tick()
 {
-    Instruction instruction = Instruction::instructions[m_Gameboy->read8(m_Registers.PC++)];
-    ASSERT(instruction.op, "Opcode 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Gameboy->read8(m_Registers.PC - 1)) << ": " << instruction.mnemonic);
+    Instruction instruction = Instruction::instructions[m_Gameboy->read(m_Registers.PC++)];
+    ASSERT(instruction.op, "Opcode 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Gameboy->read(m_Registers.PC - 1)) << ": " << instruction.mnemonic);
     LOG(instruction.mnemonic);
     instruction.op(m_Gameboy);
 }
@@ -37,4 +37,39 @@ void CPU::reset()
 
     m_Registers.PC = 0x0100;
     LOG("\tPC Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.PC);
+}
+
+void CPU::clearFlags()
+{
+    setFlags(CPU::Flags::None);
+}
+
+void CPU::setFlags(Flags flag)
+{
+    m_Registers.F = flag;
+}
+
+void CPU::toggleFlag(Flags flag)
+{
+    m_Registers.F |= flag;
+}
+
+void CPU::untoggleFlag(Flags flag)
+{
+    m_Registers.F &= ~flag;
+}
+
+void CPU::flipFlag(Flags flag)
+{
+    m_Registers.F ^= flag;
+}
+
+bool CPU::isFlagSet(Flags flag)
+{
+    return m_Registers.F & flag;
+}
+
+void CPU::toggleZeroFromVal(u8 val)
+{
+    if(!val) toggleFlag(CPU::Flags::Zero);
 }

@@ -13,7 +13,6 @@ class Cartridge
         void load(const char* path);
 
         u8 read8(u16 address);
-        u16 read16(u16 address);
 
         void dump();
     private:
