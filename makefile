@@ -9,7 +9,8 @@ MKDIR_P := mkdir -p
 
 #Compiler and flags
 CXX ?= g++
-CXXFLAGS ?= -Wall -Wextra -Werror -I$(INCDIR) -MMD -MP 
+CXXFLAGS ?= -Wall -Wextra -I$(INCDIR) -MMD -MP 
+#CXXFLAGS += -Werror
 CXXFLAGS += -std=c++17
 CXXFLAGS += -DEXE_NAME=\"$(EXE)\"
 

@@ -75,12 +75,32 @@ void Instruction::opcodeJPOffset(Gameboy* gb, bool condition)
 
 //0x00
 
-void Instruction::op00([[maybe_unused]] Gameboy* gb)
+void Instruction::op00([[maybe_unused]] Gameboy* gb) // NOP
 {
-    
+
 }
 
-void Instruction::op05(Gameboy* gb)
+void Instruction::op01(Gameboy* gb) // LD BC,u16
+{
+
+}
+
+void Instruction::op02(Gameboy* gb) // LD (BC),A
+{
+
+}
+
+void Instruction::op03(Gameboy* gb) // INC BC
+{
+
+}
+
+void Instruction::op04(Gameboy* gb) // INC B
+{
+
+}
+
+void Instruction::op05(Gameboy* gb) // DEC B
 {
     opcodeDec(gb, gb->m_CPU.m_Registers.B);
 
@@ -88,14 +108,44 @@ void Instruction::op05(Gameboy* gb)
     LOG("Flags Updated to 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.F) << ".");
 }
 
-void Instruction::op06(Gameboy* gb)
+void Instruction::op06(Gameboy* gb) // LD B,u8
 {
     opcodeLoadu8(gb, gb->m_CPU.m_Registers.B);
 
     LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.B) << " into register B.");
 }
 
-void Instruction::op0d(Gameboy* gb)
+void Instruction::op07(Gameboy* gb) // RLCA
+{
+
+}
+
+void Instruction::op08(Gameboy* gb) // LD (u16),SP
+{
+
+}
+
+void Instruction::op09(Gameboy* gb) // ADD HL,BC
+{
+
+}
+
+void Instruction::op0A(Gameboy* gb) // LD A,(BC)
+{
+
+}
+
+void Instruction::op0B(Gameboy* gb) // DEC BC
+{
+
+}
+
+void Instruction::op0C(Gameboy* gb) // INC C
+{
+
+}
+
+void Instruction::op0D(Gameboy* gb) // DEC C
 {
     opcodeDec(gb, gb->m_CPU.m_Registers.C);
 
@@ -103,23 +153,108 @@ void Instruction::op0d(Gameboy* gb)
     LOG("Flags Updated to 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.F) << ".");
 }
 
-void Instruction::op0E(Gameboy* gb)
+void Instruction::op0E(Gameboy* gb) // LD C,u8
 {
     opcodeLoadu8(gb, gb->m_CPU.m_Registers.C);
 
     LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.C) << " into register C.");
 }
 
+void Instruction::op0F(Gameboy* gb) // RRCA
+{
+
+}
+
 //0x10
+
+void Instruction::op10(Gameboy* gb) // STOP
+{
+
+}
+
+void Instruction::op11(Gameboy* gb) // LD DE,u16
+{
+
+}
+
+void Instruction::op12(Gameboy* gb) // LD (DE),A
+{
+
+}
+
+void Instruction::op13(Gameboy* gb) // INC DE
+{
+
+}
+
+void Instruction::op14(Gameboy* gb) // INC D
+{
+
+}
+
+void Instruction::op15(Gameboy* gb) // DEC D
+{
+
+}
+
+void Instruction::op16(Gameboy* gb) // LD D,u8
+{
+
+}
+
+void Instruction::op17(Gameboy* gb) // RLA
+{
+
+}
+
+void Instruction::op18(Gameboy* gb) // JR i8
+{
+
+}
+
+void Instruction::op19(Gameboy* gb) // ADD HL,DE
+{
+
+}
+
+void Instruction::op1A(Gameboy* gb) // LD A,(DE)
+{
+
+}
+
+void Instruction::op1B(Gameboy* gb) // DEC DE
+{
+
+}
+
+void Instruction::op1C(Gameboy* gb) // INC E
+{
+
+}
+
+void Instruction::op1D(Gameboy* gb) // DEC E
+{
+
+}
+
+void Instruction::op1E(Gameboy* gb) // LD E,u8
+{
+
+}
+
+void Instruction::op1F(Gameboy* gb) // RRA
+{
+
+}
 
 //0x20
 
-void Instruction::op20(Gameboy* gb)
+void Instruction::op20(Gameboy* gb) // JR NZ,i8
 {
     opcodeJPOffset(gb, !gb->m_CPU.isFlagSet(CPU::Flag::Zero));
 }
 
-void Instruction::op21(Gameboy* gb)
+void Instruction::op21(Gameboy* gb) // LD HL,u16
 {
     u8 low  = gb->read(gb->m_CPU.m_Registers.PC++);
     u8 high = gb->read(gb->m_CPU.m_Registers.PC++);
@@ -128,35 +263,731 @@ void Instruction::op21(Gameboy* gb)
     LOG("Loaded 0x" << std::setw(4) << std::setfill('0') << std::hex << gb->m_CPU.m_Registers.HL << " into HL.");
 }
 
+void Instruction::op22(Gameboy* gb) // LD (HL+),A
+{
+
+}
+
+void Instruction::op23(Gameboy* gb) // INC HL
+{
+
+}
+
+void Instruction::op24(Gameboy* gb) // INC H
+{
+
+}
+
+void Instruction::op25(Gameboy* gb) // DEC H
+{
+
+}
+
+void Instruction::op26(Gameboy* gb) // LD H,u8
+{
+
+}
+
+void Instruction::op27(Gameboy* gb) // DAA
+{
+
+}
+
+void Instruction::op28(Gameboy* gb) // JR Z,i8
+{
+
+}
+
+void Instruction::op29(Gameboy* gb) // ADD HL,HL
+{
+
+}
+
+void Instruction::op2A(Gameboy* gb) // LD A,(HL+)
+{
+
+}
+
+void Instruction::op2B(Gameboy* gb) // DEC HL
+{
+
+}
+
+void Instruction::op2C(Gameboy* gb) // INC L
+{
+
+}
+
+void Instruction::op2D(Gameboy* gb) // DEC L
+{
+
+}
+
+void Instruction::op2E(Gameboy* gb) // LD L,u8
+{
+
+}
+
+void Instruction::op2F(Gameboy* gb) // CPL
+{
+
+}
+
 //0x30
 
-void Instruction::op32(Gameboy* gb)
+void Instruction::op30(Gameboy* gb) // JR NC,i8
+{
+
+}
+
+void Instruction::op31(Gameboy* gb) // LD SP,u16
+{
+
+}
+
+void Instruction::op32(Gameboy* gb) // LD (HL-),A
 {
     gb->write(gb->m_CPU.m_Registers.HL--, gb->m_CPU.m_Registers.A);
     LOG("Wrote " << static_cast<u16>(gb->m_CPU.m_Registers.A) << " at memory address " << (gb->m_CPU.m_Registers.HL + 1));
 }
 
-void Instruction::op3E(Gameboy* gb)
+void Instruction::op33(Gameboy* gb) // INC SP
+{
+
+}
+
+void Instruction::op34(Gameboy* gb) // INC (HL)
+{
+
+}
+
+void Instruction::op35(Gameboy* gb) // DEC (HL)
+{
+
+}
+
+void Instruction::op36(Gameboy* gb) // LD (HL),u8
+{
+
+}
+
+void Instruction::op37(Gameboy* gb) // SCF
+{
+
+}
+
+void Instruction::op38(Gameboy* gb) // JR C,i8
+{
+
+}
+
+void Instruction::op39(Gameboy* gb) // ADD HL,SP
+{
+
+}
+
+void Instruction::op3A(Gameboy* gb) // LD A,(HL-)
+{
+
+}
+
+void Instruction::op3B(Gameboy* gb) // DEC SP
+{
+
+}
+
+void Instruction::op3C(Gameboy* gb) // INC A
+{
+
+}
+
+void Instruction::op3D(Gameboy* gb) // DEC A
+{
+
+}
+
+void Instruction::op3E(Gameboy* gb) // LD A,u8
 {
     u8 val = gb->m_CPU.m_Registers.PC++;
     opcodeLoadA(gb, val);
 }
 
+void Instruction::op3F(Gameboy* gb) // CCF
+{
+
+}
+
 //0x40
+
+void Instruction::op40(Gameboy* gb) // LD B,B
+{
+
+}
+
+void Instruction::op41(Gameboy* gb) // LD B,C
+{
+
+}
+
+void Instruction::op42(Gameboy* gb) // LD B,D
+{
+
+}
+
+void Instruction::op43(Gameboy* gb) // LD B,E
+{
+
+}
+
+void Instruction::op44(Gameboy* gb) // LD B,H
+{
+
+}
+
+void Instruction::op45(Gameboy* gb) // LD B,L
+{
+
+}
+
+void Instruction::op46(Gameboy* gb) // LD B,(HL)
+{
+
+}
+
+void Instruction::op47(Gameboy* gb) // LD B,A
+{
+
+}
+
+void Instruction::op48(Gameboy* gb) // LD C,B
+{
+
+}
+
+void Instruction::op49(Gameboy* gb) // LD C,C
+{
+
+}
+
+void Instruction::op4A(Gameboy* gb) // LD C,D
+{
+
+}
+
+void Instruction::op4B(Gameboy* gb) // LD C,E
+{
+
+}
+
+void Instruction::op4C(Gameboy* gb) // LD C,H
+{
+
+}
+
+void Instruction::op4D(Gameboy* gb) // LD C,L
+{
+
+}
+
+void Instruction::op4E(Gameboy* gb) // LD C,(HL)
+{
+
+}
+
+void Instruction::op4F(Gameboy* gb) // LD C,A
+{
+
+}
 
 //0x50
 
+void Instruction::op50(Gameboy* gb) // LD D,B
+{
+
+}
+
+void Instruction::op51(Gameboy* gb) // LD D,C
+{
+
+}
+
+void Instruction::op52(Gameboy* gb) // LD D,D
+{
+
+}
+
+void Instruction::op53(Gameboy* gb) // LD D,E
+{
+
+}
+
+void Instruction::op54(Gameboy* gb) // LD D,H
+{
+
+}
+
+void Instruction::op55(Gameboy* gb) // LD D,L
+{
+
+}
+
+void Instruction::op56(Gameboy* gb) // LD D,(HL)
+{
+
+}
+
+void Instruction::op57(Gameboy* gb) // LD D,A
+{
+
+}
+
+void Instruction::op58(Gameboy* gb) // LD E,B
+{
+
+}
+
+void Instruction::op59(Gameboy* gb) // LD E,C
+{
+
+}
+
+void Instruction::op5A(Gameboy* gb) // LD E,D
+{
+
+}
+
+void Instruction::op5B(Gameboy* gb) // LD E,E
+{
+
+}
+
+void Instruction::op5C(Gameboy* gb) // LD E,H
+{
+
+}
+
+void Instruction::op5D(Gameboy* gb) // LD E,L
+{
+
+}
+
+void Instruction::op5E(Gameboy* gb) // LD E,(HL)
+{
+
+}
+
+void Instruction::op5F(Gameboy* gb) // LD E,A
+{
+
+}
+
 //0x60
+
+void Instruction::op60(Gameboy* gb) // LD H,B
+{
+
+}
+
+void Instruction::op61(Gameboy* gb) // LD H,C
+{
+
+}
+
+void Instruction::op62(Gameboy* gb) // LD H,D
+{
+
+}
+
+void Instruction::op63(Gameboy* gb) // LD H,E
+{
+
+}
+
+void Instruction::op64(Gameboy* gb) // LD H,H
+{
+
+}
+
+void Instruction::op65(Gameboy* gb) // LD H,L
+{
+
+}
+
+void Instruction::op66(Gameboy* gb) // LD H,(HL)
+{
+
+}
+
+void Instruction::op67(Gameboy* gb) // LD H,A
+{
+
+}
+
+void Instruction::op68(Gameboy* gb) // LD L,B
+{
+
+}
+
+void Instruction::op69(Gameboy* gb) // LD L,C
+{
+
+}
+
+void Instruction::op6A(Gameboy* gb) // LD L,D
+{
+
+}
+
+void Instruction::op6B(Gameboy* gb) // LD L,E
+{
+
+}
+
+void Instruction::op6C(Gameboy* gb) // LD L,H
+{
+
+}
+
+void Instruction::op6D(Gameboy* gb) // LD L,L
+{
+
+}
+
+void Instruction::op6E(Gameboy* gb) // LD L,(HL)
+{
+
+}
+
+void Instruction::op6F(Gameboy* gb) // LD L,A
+{
+
+}
 
 //0x70
 
+void Instruction::op70(Gameboy* gb) // LD (HL),B
+{
+
+}
+
+void Instruction::op71(Gameboy* gb) // LD (HL),C
+{
+
+}
+
+void Instruction::op72(Gameboy* gb) // LD (HL),D
+{
+
+}
+
+void Instruction::op73(Gameboy* gb) // LD (HL),E
+{
+
+}
+
+void Instruction::op74(Gameboy* gb) // LD (HL),H
+{
+
+}
+
+void Instruction::op75(Gameboy* gb) // LD (HL),L
+{
+
+}
+
+void Instruction::op76(Gameboy* gb) // HALT
+{
+
+}
+
+void Instruction::op77(Gameboy* gb) // LD (HL),A
+{
+
+}
+
+void Instruction::op78(Gameboy* gb) // LD A,B
+{
+
+}
+
+void Instruction::op79(Gameboy* gb) // LD A,C
+{
+
+}
+
+void Instruction::op7A(Gameboy* gb) // LD A,D
+{
+
+}
+
+void Instruction::op7B(Gameboy* gb) // LD A,E
+{
+
+}
+
+void Instruction::op7C(Gameboy* gb) // LD A,H
+{
+
+}
+
+void Instruction::op7D(Gameboy* gb) // LD A,L
+{
+
+}
+
+void Instruction::op7E(Gameboy* gb) // LD A,(HL)
+{
+
+}
+
+void Instruction::op7F(Gameboy* gb) // LD A,A
+{
+
+}
+
 //0x80
+
+void Instruction::op80(Gameboy* gb) // ADD A,B
+{
+
+}
+
+void Instruction::op81(Gameboy* gb) // ADD A,C
+{
+
+}
+
+void Instruction::op82(Gameboy* gb) // ADD A,D
+{
+
+}
+
+void Instruction::op83(Gameboy* gb) // ADD A,E
+{
+
+}
+
+void Instruction::op84(Gameboy* gb) // ADD A,H
+{
+
+}
+
+void Instruction::op85(Gameboy* gb) // ADD A,L
+{
+
+}
+
+void Instruction::op86(Gameboy* gb) // ADD A,(HL)
+{
+
+}
+
+void Instruction::op87(Gameboy* gb) // ADD A,A
+{
+
+}
+
+void Instruction::op88(Gameboy* gb) // ADC A,B
+{
+
+}
+
+void Instruction::op89(Gameboy* gb) // ADC A,C
+{
+
+}
+
+void Instruction::op8A(Gameboy* gb) // ADC A,D
+{
+
+}
+
+void Instruction::op8B(Gameboy* gb) // ADC A,E
+{
+
+}
+
+void Instruction::op8C(Gameboy* gb) // ADC A,H
+{
+
+}
+
+void Instruction::op8D(Gameboy* gb) // ADC A,L
+{
+
+}
+
+void Instruction::op8E(Gameboy* gb) // ADC A,(HL)
+{
+
+}
+
+void Instruction::op8F(Gameboy* gb) // ADC A,A
+{
+
+}
 
 //0x90
 
+void Instruction::op90(Gameboy* gb) // SUB A,B
+{
+
+}
+
+void Instruction::op91(Gameboy* gb) // SUB A,C
+{
+
+}
+
+void Instruction::op92(Gameboy* gb) // SUB A,D
+{
+
+}
+
+void Instruction::op93(Gameboy* gb) // SUB A,E
+{
+
+}
+
+void Instruction::op94(Gameboy* gb) // SUB A,H
+{
+
+}
+
+void Instruction::op95(Gameboy* gb) // SUB A,L
+{
+
+}
+
+void Instruction::op96(Gameboy* gb) // SUB A,(HL)
+{
+
+}
+
+void Instruction::op97(Gameboy* gb) // SUB A,A
+{
+
+}
+
+void Instruction::op98(Gameboy* gb) // SBC A,B
+{
+
+}
+
+void Instruction::op99(Gameboy* gb) // SBC A,C
+{
+
+}
+
+void Instruction::op9A(Gameboy* gb) // SBC A,D
+{
+
+}
+
+void Instruction::op9B(Gameboy* gb) // SBC A,E
+{
+
+}
+
+void Instruction::op9C(Gameboy* gb) // SBC A,H
+{
+
+}
+
+void Instruction::op9D(Gameboy* gb) // SBC A,L
+{
+
+}
+
+void Instruction::op9E(Gameboy* gb) // SBC A,(HL)
+{
+
+}
+
+void Instruction::op9F(Gameboy* gb) // SBC A,A
+{
+
+}
+
 //0xA0
 
-void Instruction::opAF(Gameboy* gb)
+void Instruction::opA0(Gameboy* gb) // AND A,B
+{
+
+}
+
+void Instruction::opA1(Gameboy* gb) // AND A,C
+{
+
+}
+
+void Instruction::opA2(Gameboy* gb) // AND A,D
+{
+
+}
+
+void Instruction::opA3(Gameboy* gb) // AND A,E
+{
+
+}
+
+void Instruction::opA4(Gameboy* gb) // AND A,H
+{
+
+}
+
+void Instruction::opA5(Gameboy* gb) // AND A,L
+{
+
+}
+
+void Instruction::opA6(Gameboy* gb) // AND A,(HL)
+{
+
+}
+
+void Instruction::opA7(Gameboy* gb) // AND A,A
+{
+
+}
+
+void Instruction::opA8(Gameboy* gb) // XOR A,B
+{
+
+}
+
+void Instruction::opA9(Gameboy* gb) // XOR A,C
+{
+
+}
+
+void Instruction::opAA(Gameboy* gb) // XOR A,D
+{
+
+}
+
+void Instruction::opAB(Gameboy* gb) // XOR A,E
+{
+
+}
+
+void Instruction::opAC(Gameboy* gb) // XOR A,H
+{
+
+}
+
+void Instruction::opAD(Gameboy* gb) // XOR A,L
+{
+
+}
+
+void Instruction::opAE(Gameboy* gb) // XOR A,(HL)
+{
+
+}
+
+
+void Instruction::opAF(Gameboy* gb) // XOR A,A
 {
     opcodeXOR(gb, gb->m_CPU.m_Registers.A);
     LOG("A XOR'd with A. Value 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.A) << " written.");
@@ -165,18 +996,254 @@ void Instruction::opAF(Gameboy* gb)
 
 //0xB0
 
+void Instruction::opB0(Gameboy* gb) // OR A,B
+{
+
+
+
+}
+void Instruction::opB1(Gameboy* gb) // OR A,C
+{
+
+}
+
+void Instruction::opB2(Gameboy* gb) // OR A,D
+{
+
+}
+
+void Instruction::opB3(Gameboy* gb) // OR A,E
+{
+
+}
+
+void Instruction::opB4(Gameboy* gb) // OR A,H
+{
+
+}
+
+void Instruction::opB5(Gameboy* gb) // OR A,L
+{
+
+}
+
+void Instruction::opB6(Gameboy* gb) // OR A,(HL)
+{
+
+}
+
+void Instruction::opB7(Gameboy* gb) // OR A,A
+{
+
+}
+
+void Instruction::opB8(Gameboy* gb) // CP A,B
+{
+
+}
+
+void Instruction::opB9(Gameboy* gb) // CP A,C
+{
+
+}
+
+void Instruction::opBA(Gameboy* gb) // CP A,D
+{
+
+}
+
+void Instruction::opBB(Gameboy* gb) // CP A,E
+{
+
+}
+
+void Instruction::opBC(Gameboy* gb) // CP A,H
+{
+
+}
+
+void Instruction::opBD(Gameboy* gb) // CP A,L
+{
+
+}
+
+void Instruction::opBE(Gameboy* gb) // CP A,(HL)
+{
+
+}
+
+void Instruction::opBF(Gameboy* gb) // CP A,A
+{
+
+}
+
 //0xC0
 
-void Instruction::opC3(Gameboy* gb)
+void Instruction::opC0(Gameboy* gb) // RET NZ
+{
+
+}
+
+void Instruction::opC1(Gameboy* gb) // POP BC
+{
+
+}
+
+void Instruction::opC2(Gameboy* gb) // JP NZ,u16
+{
+
+}
+
+void Instruction::opC3(Gameboy* gb) // JP u16
 {
     opcodeJP(gb, true);
 }
 
+void Instruction::opC4(Gameboy* gb) // CALL NZ,u16
+{
+
+}
+
+void Instruction::opC5(Gameboy* gb) // PUSH BC
+{
+
+}
+
+void Instruction::opC6(Gameboy* gb) // ADD A,u8
+{
+
+}
+
+void Instruction::opC7(Gameboy* gb) // RST 00h
+{
+
+}
+
+void Instruction::opC8(Gameboy* gb) // RET Z
+{
+
+}
+
+void Instruction::opC9(Gameboy* gb) // RET
+{
+
+}
+
+void Instruction::opCA(Gameboy* gb) // JP Z,u16
+{
+
+}
+
+void Instruction::opCB(Gameboy* gb) // PREFIX CB
+{
+
+}
+
+void Instruction::opCC(Gameboy* gb) // CALL Z,u16
+{
+
+}
+
+void Instruction::opCD(Gameboy* gb) // CALL u16
+{
+
+}
+
+void Instruction::opCE(Gameboy* gb) // ADC A,u8
+{
+
+}
+
+void Instruction::opCF(Gameboy* gb) // RST 08h
+{
+
+}
+
 //0xD0
+
+void Instruction::opD0(Gameboy* gb) // RET NC
+{
+
+}
+
+void Instruction::opD1(Gameboy* gb) // POP DE
+{
+
+}
+
+void Instruction::opD2(Gameboy* gb) // JP NC,u16
+{
+
+}
+
+void Instruction::opD3(Gameboy* gb) // UNUSED
+{
+
+}
+
+void Instruction::opD4(Gameboy* gb) // CALL NC,u16
+{
+
+}
+
+void Instruction::opD5(Gameboy* gb) // PUSH DE
+{
+
+}
+
+void Instruction::opD6(Gameboy* gb) // SUB A,u8
+{
+
+}
+
+void Instruction::opD7(Gameboy* gb) // RST 10h
+{
+
+}
+
+void Instruction::opD8(Gameboy* gb) // RET C
+{
+
+}
+
+void Instruction::opD9(Gameboy* gb) // RETI
+{
+
+}
+
+void Instruction::opDA(Gameboy* gb) // JP C,u16
+{
+
+}
+
+void Instruction::opDB(Gameboy* gb) // UNUSED
+{
+
+}
+
+void Instruction::opDC(Gameboy* gb) // CALL C,u16
+{
+
+}
+
+void Instruction::opDD(Gameboy* gb) // UNUSED
+{
+
+}
+
+void Instruction::opDE(Gameboy* gb) // SBC A,u8
+{
+
+}
+
+void Instruction::opDF(Gameboy* gb) // RST 18h
+{
+
+}
 
 //0xE0
 
-void Instruction::opE0(Gameboy* gb)
+void Instruction::opE0(Gameboy* gb) // LD (FF00+u8),A
 {
     u8 offset = gb->m_CPU.m_Registers.PC++;
     u16 address = 0xFF00 | offset;
@@ -186,9 +1253,84 @@ void Instruction::opE0(Gameboy* gb)
     LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.A) << " at address 0x" << address << ".");
 }
 
+void Instruction::opE1(Gameboy* gb) // POP HL
+{
+
+}
+
+void Instruction::opE2(Gameboy* gb) // LD (FF00+C),A
+{
+
+}
+
+void Instruction::opE3(Gameboy* gb) // UNUSED
+{
+
+}
+
+void Instruction::opE4(Gameboy* gb) // UNUSED
+{
+
+}
+
+void Instruction::opE5(Gameboy* gb) // PUSH HL
+{
+
+}
+
+void Instruction::opE6(Gameboy* gb) // AND A,u8
+{
+
+}
+
+void Instruction::opE7(Gameboy* gb) // RST 20h
+{
+
+}
+
+void Instruction::opE8(Gameboy* gb) // ADD SP,i8
+{
+
+}
+
+void Instruction::opE9(Gameboy* gb) // JP HL
+{
+
+}
+
+void Instruction::opEA(Gameboy* gb) // LD (u16),A
+{
+
+}
+
+void Instruction::opEB(Gameboy* gb) // UNUSED
+{
+
+}
+
+void Instruction::opEC(Gameboy* gb) // UNUSED
+{
+
+}
+
+void Instruction::opED(Gameboy* gb) // UNUSED
+{
+
+}
+
+void Instruction::opEE(Gameboy* gb) // XOR A,u8
+{
+
+}
+
+void Instruction::opEF(Gameboy* gb) // RST 28h
+{
+
+}
+
 //0xF0
 
-void Instruction::opF0(Gameboy* gb)
+void Instruction::opF0(Gameboy* gb) // LD A,(FF00+u8)
 {
     u8 offset = gb->m_CPU.m_Registers.PC++;
     u16 address = 0xFF00 | offset;
@@ -197,19 +1339,86 @@ void Instruction::opF0(Gameboy* gb)
     opcodeLoadA(gb, val);
 }
 
-void Instruction::opF3(Gameboy* gb)
+void Instruction::opF1(Gameboy* gb) // POP AF
+{
+
+}
+
+void Instruction::opF2(Gameboy* gb) // LD A,(FF00+C)
+{
+
+}
+
+void Instruction::opF3(Gameboy* gb) // DI
 {
     gb->m_CPU.m_InterruptEnabled = false;
 
     LOG("Disabled Interrupts.");
 }
 
-void Instruction::opFB(Gameboy* gb)
+void Instruction::opF4(Gameboy* gb) // UNUSED
+{
+
+}
+
+void Instruction::opF5(Gameboy* gb) // PUSH AF
+{
+
+}
+
+void Instruction::opF6(Gameboy* gb) // OR A,u8
+{
+
+}
+
+void Instruction::opF7(Gameboy* gb) // RST 30h
+{
+
+}
+
+void Instruction::opF8(Gameboy* gb) // LD HL,SP+i8
+{
+
+}
+
+void Instruction::opF9(Gameboy* gb) // LD SP,HL
+{
+
+}
+
+void Instruction::opFA(Gameboy* gb) // LD A,(u16)
+{
+
+}
+
+void Instruction::opFB(Gameboy* gb) // EI
 {
     gb->m_CPU.m_InterruptEnabled = true;
 
     LOG("Enabled Interrupts.");
 }
+
+void Instruction::opFC(Gameboy* gb) // UNUSED
+{
+
+}
+
+void Instruction::opFD(Gameboy* gb) // UNUSED
+{
+
+}
+
+void Instruction::opFE(Gameboy* gb) // CP A,u8
+{
+
+}
+
+void Instruction::opFF(Gameboy* gb) // RST 38h
+{
+
+}
+
+//--------------------------------------Opcode Table--------------------------------------//
 
 const Instruction Instruction::instructions[0x100] = 
 {
@@ -227,7 +1436,7 @@ const Instruction Instruction::instructions[0x100] =
     INSTRUCTION("LD A,(BC)",        NULL, 1,  8,  8),
     INSTRUCTION("DEC BC",           NULL, 1,  8,  8),
     INSTRUCTION("INC C",            NULL, 1,  4,  4),
-    INSTRUCTION("DEC C",            Instruction::op0d, 1,  4,  4),
+    INSTRUCTION("DEC C",            Instruction::op0D, 1,  4,  4),
     INSTRUCTION("LD C,u8",          Instruction::op0E, 2,  8,  8),
     INSTRUCTION("RRCA",             NULL, 1,  4,  4),
 
