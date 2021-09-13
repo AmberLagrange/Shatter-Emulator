@@ -13,10 +13,10 @@
 void Instruction::opcodeDec(Gameboy* gb, u8& reg)
 {
     reg--;
-    gb->m_CPU.isFlagSet(CPU::Flags::Carry) ? gb->m_CPU.setFlags(CPU::Flags::Carry) : gb->m_CPU.clearFlags();
-    gb->m_CPU.toggleZeroFromVal(reg);
-    gb->m_CPU.toggleFlag(CPU::Flags::Negative);
-    if((reg & 0x0f) == 0x0f) gb->m_CPU.toggleFlag(CPU::Flags::HalfCarry);   
+    gb->m_CPU.clearFlag(CPU::Flag::Zero | CPU::Flag::Negative | CPU::Flag::HalfCarry);
+    gb->m_CPU.setZeroFromVal(reg);
+    gb->m_CPU.setFlag(CPU::Flag::Negative);
+    if((reg & 0x0f) == 0x0f) gb->m_CPU.setFlag(CPU::Flag::HalfCarry);   
 }
 
 void Instruction::opcodeLoadu8(Gameboy* gb, u8& reg)
@@ -34,8 +34,8 @@ void Instruction::opcodeLoadA(Gameboy* gb, const u8& val)
 void Instruction::opcodeXOR(Gameboy* gb, const u8& val)
 {
     gb->m_CPU.m_Registers.A ^= val;
-    gb->m_CPU.clearFlags();
-    gb->m_CPU.toggleZeroFromVal(gb->m_CPU.m_Registers.A);
+    gb->m_CPU.clearAllFlags();
+    gb->m_CPU.setZeroFromVal(gb->m_CPU.m_Registers.A);
 }
 
 void Instruction::opcodeJP(Gameboy* gb, bool condition)
@@ -116,7 +116,7 @@ void Instruction::op0E(Gameboy* gb)
 
 void Instruction::op20(Gameboy* gb)
 {
-    opcodeJPOffset(gb, !gb->m_CPU.isFlagSet(CPU::Flags::Zero));
+    opcodeJPOffset(gb, !gb->m_CPU.isFlagSet(CPU::Flag::Zero));
 }
 
 void Instruction::op21(Gameboy* gb)

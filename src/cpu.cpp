@@ -50,37 +50,32 @@ void CPU::handleInterrupts()
     
 }
 
-void CPU::clearFlags()
-{
-    setFlags(CPU::Flags::None);
-}
-
-void CPU::setFlags(const Flags& flag)
-{
-    m_Registers.F = flag;
-}
-
-void CPU::toggleFlag(const Flags& flag)
+void CPU::setFlag(const CPU::Flag& flag)
 {
     m_Registers.F |= flag;
 }
 
-void CPU::untoggleFlag(const Flags& flag)
+void CPU::clearFlag(const CPU::Flag& flag)
 {
     m_Registers.F &= ~flag;
 }
 
-void CPU::flipFlag(const Flags& flag)
+void CPU::flipFlag(const CPU::Flag& flag)
 {
     m_Registers.F ^= flag;
 }
 
-bool CPU::isFlagSet(const Flags& flag)
+bool CPU::isFlagSet(const CPU::Flag& flag)
 {
     return m_Registers.F & flag;
 }
 
-void CPU::toggleZeroFromVal(const u8& val)
+void CPU::clearAllFlags()
 {
-    if(!val) toggleFlag(CPU::Flags::Zero);
+    clearFlag(CPU::Flag::Zero | CPU::Flag::Negative | CPU::Flag::HalfCarry | CPU::Flag::Carry);
+}
+
+void CPU::setZeroFromVal(const u8& val)
+{
+    if(!val) setFlag(CPU::Flag::Zero);
 }

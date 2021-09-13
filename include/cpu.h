@@ -23,13 +23,12 @@ class CPU
         CPU(Gameboy* gb);
         void tick();
 
-    enum Flags
+    enum Flag
     {
-        Zero = 1 << 7,
-        Negative = 1 << 6,
-        HalfCarry = 1 << 5,
-        Carry = 1 << 4,
-        None = 0
+        Zero        = 0b10000000,
+        Negative    = 0b01000000,
+        HalfCarry   = 0b00100000,
+        Carry       = 0b00010000
     };
 
     private:
@@ -82,13 +81,13 @@ class CPU
         void reset();
         void handleInterrupts();
 
-        void clearFlags();
-        void setFlags(const Flags& flag);
-        void toggleFlag(const Flags& flag);
-        void untoggleFlag(const Flags& flag);
-        void flipFlag(const Flags& flag);
-        bool isFlagSet(const Flags& flag);
-        void toggleZeroFromVal(const u8& val);
+        void setFlag(const Flag& flag);
+        void clearFlag(const Flag& flag);
+        void flipFlag(const Flag& flag);
+        bool isFlagSet(const Flag& flag);
+
+        void clearAllFlags();
+        void setZeroFromVal(const u8& val);
 
         Gameboy* m_Gameboy;
         Registers m_Registers;
@@ -96,3 +95,8 @@ class CPU
 
         friend Instruction;
 };
+
+inline CPU::Flag operator|(const CPU::Flag& flag1, const CPU::Flag& flag2)
+{
+    return static_cast<CPU::Flag>(static_cast<int>(flag1) | static_cast<int>(flag2));
+}
