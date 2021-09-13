@@ -26,7 +26,6 @@ struct Instruction
     static void opcodeDec(Gameboy* gb, u8& reg);
     
     static void opcodeLoadu8(Gameboy* gb, u8& reg);
-    static void opcodeLoadA(Gameboy* gb, const u8& val);
 
     static void opcodeXOR(Gameboy* gb, const u8& val);
 

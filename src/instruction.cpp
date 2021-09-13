@@ -8,6 +8,34 @@
     #define INSTRUCTION(mnemonic, op, length, cyclesBranch, cyclesNoBranch) { op, length, cyclesBranch, cyclesNoBranch }
 #endif
 
+//--------------------------------------Log Helper Macros--------------------------------------//
+
+#define LOG_A_REG() LOG("A Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.A) << ".")
+#define LOG_F_REG() LOG("F Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.F) << ".")
+#define LOG_B_REG() LOG("B Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.B) << ".")
+#define LOG_C_REG() LOG("C Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.C) << ".")
+#define LOG_D_REG() LOG("D Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.D) << ".")
+#define LOG_E_REG() LOG("E Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.E) << ".")
+#define LOG_H_REG() LOG("H Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.H) << ".")
+#define LOG_L_REG() LOG("F Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.F) << ".")
+#define LOG_FLAGS() LOG("Flags updated to: "        << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.F) << ".")
+
+#define LOG_AF_REG() LOG("AF Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.AF) << ".")
+#define LOG_BC_REG() LOG("BC Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.BC) << ".")
+#define LOG_DE_REG() LOG("DE Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.DE) << ".")
+#define LOG_HL_REG() LOG("HL Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.HL) << ".")
+
+#define LOG_WRITE(val, addr) LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(val) << " to address 0x" << std::setw(4) << addr << ".")
+
+#define LOG_JP(addr) LOG("Jumped to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(addr) << ".");
+#define LOG_NJP() LOG("Did not jump.");
+
+#define LOG_RET(addr) LOG("Returned to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(addr) << ".");
+#define LOG_NRET() LOG("Did not return.");
+
+#define LOG_DI() LOG("Disabled Interrupts.")
+#define LOG_EI() LOG("Enabled Interrupts.")
+
 //--------------------------------------Opcode Helpers--------------------------------------//
 
 void Instruction::opcodeDec(Gameboy* gb, u8& reg)
@@ -24,13 +52,6 @@ void Instruction::opcodeLoadu8(Gameboy* gb, u8& reg)
     reg = gb->read(gb->m_CPU.m_Registers.PC++);
 }
 
-void Instruction::opcodeLoadA(Gameboy* gb, const u8& val)
-{
-    gb->m_CPU.m_Registers.A = val;
-
-    LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.A) << " into register A.");
-}
-
 void Instruction::opcodeXOR(Gameboy* gb, const u8& val)
 {
     gb->m_CPU.m_Registers.A ^= val;
@@ -42,32 +63,32 @@ void Instruction::opcodeJP(Gameboy* gb, bool condition)
 {
     u8 low  = gb->read(gb->m_CPU.m_Registers.PC++);
     u8 high = gb->read(gb->m_CPU.m_Registers.PC++);
-    u16 address = static_cast<u16>(high) << 8 | static_cast<u16>(low);
+    u16 addr = static_cast<u16>(high) << 8 | static_cast<u16>(low);
 
     if(condition)
     {
-        gb->m_CPU.m_Registers.PC = address;
-        LOG("Jumped to 0x" << std::setw(4) << std::setfill('0') << std::hex << gb->m_CPU.m_Registers.PC << ".");
+        gb->m_CPU.m_Registers.PC = addr;
+        LOG_JP(addr);
     }
     else
     {
-        LOG("Did not jump.");
+        LOG_NJP();
     }
 }
 
 void Instruction::opcodeJPOffset(Gameboy* gb, bool condition)
 {
     i8 offset = gb->read(gb->m_CPU.m_Registers.PC++);
-    u16 address = gb->m_CPU.m_Registers.PC + offset;
+    u16 addr = gb->m_CPU.m_Registers.PC + offset;
 
     if(condition)
     {
-        gb->m_CPU.m_Registers.PC = address;
-        LOG("Jumped to 0x" << std::setw(4) << std::setfill('0') << std::hex << gb->m_CPU.m_Registers.PC << ".");
+        gb->m_CPU.m_Registers.PC = addr;
+        LOG_JP(addr);
     }
     else
     {
-        LOG("Did not jump.");
+        LOG_NJP();
     }
 }
 
@@ -104,15 +125,15 @@ void Instruction::op05(Gameboy* gb) // DEC B
 {
     opcodeDec(gb, gb->m_CPU.m_Registers.B);
 
-    LOG("Decremented B to 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.B) << ".");
-    LOG("Flags Updated to 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.F) << ".");
+    LOG_B_REG();
+    LOG_FLAGS();
 }
 
 void Instruction::op06(Gameboy* gb) // LD B,u8
 {
     opcodeLoadu8(gb, gb->m_CPU.m_Registers.B);
 
-    LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.B) << " into register B.");
+    LOG_B_REG();
 }
 
 void Instruction::op07(Gameboy* gb) // RLCA
@@ -149,15 +170,15 @@ void Instruction::op0D(Gameboy* gb) // DEC C
 {
     opcodeDec(gb, gb->m_CPU.m_Registers.C);
 
-    LOG("Decremented C to 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.B) << ".");
-    LOG("Flags Updated to 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.F) << ".");
+    LOG_C_REG();
+    LOG_FLAGS();
 }
 
 void Instruction::op0E(Gameboy* gb) // LD C,u8
 {
     opcodeLoadu8(gb, gb->m_CPU.m_Registers.C);
 
-    LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.C) << " into register C.");
+    LOG_C_REG();
 }
 
 void Instruction::op0F(Gameboy* gb) // RRCA
@@ -260,7 +281,7 @@ void Instruction::op21(Gameboy* gb) // LD HL,u16
     u8 high = gb->read(gb->m_CPU.m_Registers.PC++);
     gb->m_CPU.m_Registers.HL = static_cast<u16>(high) << 8 | static_cast<u16>(low);
 
-    LOG("Loaded 0x" << std::setw(4) << std::setfill('0') << std::hex << gb->m_CPU.m_Registers.HL << " into HL.");
+    LOG_HL_REG();
 }
 
 void Instruction::op22(Gameboy* gb) // LD (HL+),A
@@ -348,7 +369,7 @@ void Instruction::op31(Gameboy* gb) // LD SP,u16
 void Instruction::op32(Gameboy* gb) // LD (HL-),A
 {
     gb->write(gb->m_CPU.m_Registers.HL--, gb->m_CPU.m_Registers.A);
-    LOG("Wrote " << static_cast<u16>(gb->m_CPU.m_Registers.A) << " at memory address " << (gb->m_CPU.m_Registers.HL + 1));
+    LOG_WRITE(static_cast<u16>(gb->m_CPU.m_Registers.A), (gb->m_CPU.m_Registers.HL + 1));
 }
 
 void Instruction::op33(Gameboy* gb) // INC SP
@@ -408,8 +429,8 @@ void Instruction::op3D(Gameboy* gb) // DEC A
 
 void Instruction::op3E(Gameboy* gb) // LD A,u8
 {
-    u8 val = gb->m_CPU.m_Registers.PC++;
-    opcodeLoadA(gb, val);
+    gb->m_CPU.m_Registers.A = gb->m_CPU.m_Registers.PC++;
+    LOG_A_REG();
 }
 
 void Instruction::op3F(Gameboy* gb) // CCF
@@ -990,8 +1011,9 @@ void Instruction::opAE(Gameboy* gb) // XOR A,(HL)
 void Instruction::opAF(Gameboy* gb) // XOR A,A
 {
     opcodeXOR(gb, gb->m_CPU.m_Registers.A);
-    LOG("A XOR'd with A. Value 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.A) << " written.");
-    LOG("Flags Updated to 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.F) << ".");
+
+    LOG_A_REG();
+    LOG_FLAGS();
 }
 
 //0xB0
@@ -1246,11 +1268,10 @@ void Instruction::opDF(Gameboy* gb) // RST 18h
 void Instruction::opE0(Gameboy* gb) // LD (FF00+u8),A
 {
     u8 offset = gb->m_CPU.m_Registers.PC++;
-    u16 address = 0xFF00 | offset;
+    u16 addr = 0xFF00 | offset;
+    gb->write(addr, gb->m_CPU.m_Registers.A);
 
-    gb->write(address, gb->m_CPU.m_Registers.A);
-
-    LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.A) << " at address 0x" << address << ".");
+    LOG_WRITE(gb->m_CPU.m_Registers.A, addr);
 }
 
 void Instruction::opE1(Gameboy* gb) // POP HL
@@ -1333,10 +1354,10 @@ void Instruction::opEF(Gameboy* gb) // RST 28h
 void Instruction::opF0(Gameboy* gb) // LD A,(FF00+u8)
 {
     u8 offset = gb->m_CPU.m_Registers.PC++;
-    u16 address = 0xFF00 | offset;
-    u8 val = gb->read(address);
+    u16 addr = 0xFF00 | offset;
+    gb->m_CPU.m_Registers.A = gb->read(addr);
 
-    opcodeLoadA(gb, val);
+    LOG_A_REG();
 }
 
 void Instruction::opF1(Gameboy* gb) // POP AF
@@ -1353,7 +1374,7 @@ void Instruction::opF3(Gameboy* gb) // DI
 {
     gb->m_CPU.m_InterruptEnabled = false;
 
-    LOG("Disabled Interrupts.");
+    LOG_DI();
 }
 
 void Instruction::opF4(Gameboy* gb) // UNUSED
@@ -1395,7 +1416,7 @@ void Instruction::opFB(Gameboy* gb) // EI
 {
     gb->m_CPU.m_InterruptEnabled = true;
 
-    LOG("Enabled Interrupts.");
+    LOG_EI();
 }
 
 void Instruction::opFC(Gameboy* gb) // UNUSED
