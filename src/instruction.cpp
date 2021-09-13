@@ -24,8 +24,9 @@
 #define LOG_BC_REG() LOG("BC Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.BC) << ".")
 #define LOG_DE_REG() LOG("DE Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.DE) << ".")
 #define LOG_HL_REG() LOG("HL Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.HL) << ".")
+#define LOG_SP_REG() LOG("SP Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.SP) << ".")
 
-#define LOG_WRITE(val, addr) LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(val) << " to address 0x" << std::setw(4) << addr << ".")
+#define LOG_WRITE(addr, val) LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(val) << " to address 0x" << std::setw(4) << addr << ".")
 
 #define LOG_JP(addr) LOG("Jumped to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(addr) << ".");
 #define LOG_NJP() LOG("Did not jump.");
@@ -38,7 +39,12 @@
 
 //--------------------------------------Opcode Helpers--------------------------------------//
 
-void Instruction::opcodeDec(Gameboy* gb, u8& reg)
+void Instruction::opcodeINC(Gameboy* gb, u8& reg)
+{
+
+}
+
+void Instruction::opcodeDEC(Gameboy* gb, u8& reg)
 {
     reg--;
     gb->m_CPU.clearFlag(CPU::Flag::Zero | CPU::Flag::Negative | CPU::Flag::HalfCarry);
@@ -47,9 +53,29 @@ void Instruction::opcodeDec(Gameboy* gb, u8& reg)
     if((reg & 0x0f) == 0x0f) gb->m_CPU.setFlag(CPU::Flag::HalfCarry);   
 }
 
-void Instruction::opcodeLoadu8(Gameboy* gb, u8& reg)
+void Instruction::opcodeADD(Gameboy* gb, const u8& val)
 {
-    reg = gb->read(gb->m_CPU.m_Registers.PC++);
+
+}
+
+void Instruction::opcodeADC(Gameboy* gb, const u8& val)
+{
+
+}
+
+void Instruction::opcodeSUB(Gameboy* gb, const u8& val)
+{
+
+}
+
+void Instruction::opcodeSBC(Gameboy* gb, const u8& val)
+{
+
+}
+
+void Instruction::opcodeAND(Gameboy* gb, const u8& val)
+{
+
 }
 
 void Instruction::opcodeXOR(Gameboy* gb, const u8& val)
@@ -57,6 +83,16 @@ void Instruction::opcodeXOR(Gameboy* gb, const u8& val)
     gb->m_CPU.m_Registers.A ^= val;
     gb->m_CPU.clearAllFlags();
     gb->m_CPU.setZeroFromVal(gb->m_CPU.m_Registers.A);
+}
+
+void Instruction::opcodeOR(Gameboy* gb, const u8& val)
+{
+
+}
+
+void Instruction::opcodeCP(Gameboy* gb, const u8& val)
+{
+
 }
 
 void Instruction::opcodeJP(Gameboy* gb, bool condition)
@@ -76,7 +112,7 @@ void Instruction::opcodeJP(Gameboy* gb, bool condition)
     }
 }
 
-void Instruction::opcodeJPOffset(Gameboy* gb, bool condition)
+void Instruction::opcodeJR(Gameboy* gb, bool condition)
 {
     i8 offset = gb->read(gb->m_CPU.m_Registers.PC++);
     u16 addr = gb->m_CPU.m_Registers.PC + offset;
@@ -90,6 +126,26 @@ void Instruction::opcodeJPOffset(Gameboy* gb, bool condition)
     {
         LOG_NJP();
     }
+}
+
+void Instruction::opcodeCALL(Gameboy* gb, bool condition)
+{
+
+}
+
+void Instruction::opcodeRET(Gameboy* gb, bool condiiton)
+{
+    
+}
+
+void Instruction::opcodePUSH(Gameboy* gb, const u8& reg)
+{
+
+}
+
+void Instruction::opcodePOP(Gameboy* gb, u8& reg)
+{
+    
 }
 
 //--------------------------------------Opcodes--------------------------------------//
@@ -123,7 +179,7 @@ void Instruction::op04(Gameboy* gb) // INC B
 
 void Instruction::op05(Gameboy* gb) // DEC B
 {
-    opcodeDec(gb, gb->m_CPU.m_Registers.B);
+    opcodeDEC(gb, gb->m_CPU.m_Registers.B);
 
     LOG_B_REG();
     LOG_FLAGS();
@@ -131,7 +187,7 @@ void Instruction::op05(Gameboy* gb) // DEC B
 
 void Instruction::op06(Gameboy* gb) // LD B,u8
 {
-    opcodeLoadu8(gb, gb->m_CPU.m_Registers.B);
+    gb->m_CPU.m_Registers.B = gb->read(gb->m_CPU.m_Registers.PC++);
 
     LOG_B_REG();
 }
@@ -168,7 +224,7 @@ void Instruction::op0C(Gameboy* gb) // INC C
 
 void Instruction::op0D(Gameboy* gb) // DEC C
 {
-    opcodeDec(gb, gb->m_CPU.m_Registers.C);
+    opcodeDEC(gb, gb->m_CPU.m_Registers.C);
 
     LOG_C_REG();
     LOG_FLAGS();
@@ -176,7 +232,7 @@ void Instruction::op0D(Gameboy* gb) // DEC C
 
 void Instruction::op0E(Gameboy* gb) // LD C,u8
 {
-    opcodeLoadu8(gb, gb->m_CPU.m_Registers.C);
+    gb->m_CPU.m_Registers.C = gb->m_CPU.m_Registers.PC++;
 
     LOG_C_REG();
 }
@@ -272,7 +328,7 @@ void Instruction::op1F(Gameboy* gb) // RRA
 
 void Instruction::op20(Gameboy* gb) // JR NZ,i8
 {
-    opcodeJPOffset(gb, !gb->m_CPU.isFlagSet(CPU::Flag::Zero));
+    opcodeJR(gb, !gb->m_CPU.isFlagSet(CPU::Flag::Zero));
 }
 
 void Instruction::op21(Gameboy* gb) // LD HL,u16
@@ -369,7 +425,8 @@ void Instruction::op31(Gameboy* gb) // LD SP,u16
 void Instruction::op32(Gameboy* gb) // LD (HL-),A
 {
     gb->write(gb->m_CPU.m_Registers.HL--, gb->m_CPU.m_Registers.A);
-    LOG_WRITE(static_cast<u16>(gb->m_CPU.m_Registers.A), (gb->m_CPU.m_Registers.HL + 1));
+
+    LOG_WRITE(gb->m_CPU.m_Registers.HL + 1, gb->m_CPU.m_Registers.A);
 }
 
 void Instruction::op33(Gameboy* gb) // INC SP
@@ -430,6 +487,7 @@ void Instruction::op3D(Gameboy* gb) // DEC A
 void Instruction::op3E(Gameboy* gb) // LD A,u8
 {
     gb->m_CPU.m_Registers.A = gb->m_CPU.m_Registers.PC++;
+
     LOG_A_REG();
 }
 
@@ -1271,7 +1329,7 @@ void Instruction::opE0(Gameboy* gb) // LD (FF00+u8),A
     u16 addr = 0xFF00 | offset;
     gb->write(addr, gb->m_CPU.m_Registers.A);
 
-    LOG_WRITE(gb->m_CPU.m_Registers.A, addr);
+    LOG_WRITE(addr, gb->m_CPU.m_Registers.A);
 }
 
 void Instruction::opE1(Gameboy* gb) // POP HL

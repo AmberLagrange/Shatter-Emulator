@@ -22,15 +22,26 @@ struct Instruction
 
 //--------------------------------------Opcode Helpers--------------------------------------//
 
-    static void opcodeInc(Gameboy* gb, u8& reg);
-    static void opcodeDec(Gameboy* gb, u8& reg);
+    static void opcodeINC(Gameboy* gb, u8& reg);
+    static void opcodeDEC(Gameboy* gb, u8& reg);
     
-    static void opcodeLoadu8(Gameboy* gb, u8& reg);
-
+    static void opcodeADD(Gameboy* gb, const u8& val);
+    static void opcodeADC(Gameboy* gb, const u8& val);
+    static void opcodeSUB(Gameboy* gb, const u8& val);
+    static void opcodeSBC(Gameboy* gb, const u8& val);
+    static void opcodeAND(Gameboy* gb, const u8& val);
     static void opcodeXOR(Gameboy* gb, const u8& val);
+    static void opcodeOR(Gameboy* gb, const u8& val);
+    static void opcodeCP(Gameboy* gb, const u8& val);
 
     static void opcodeJP(Gameboy* gb, bool condition);
-    static void opcodeJPOffset(Gameboy* gb, bool condition);
+    static void opcodeJR(Gameboy* gb, bool condition);
+
+    static void opcodeCALL(Gameboy* gb, bool condition);
+    static void opcodeRET(Gameboy* gb, bool condiiton);
+
+    static void opcodePUSH(Gameboy* gb, const u8& reg);
+    static void opcodePOP(Gameboy* gb, u8& reg);
 
 //--------------------------------------Opcodes--------------------------------------//
 

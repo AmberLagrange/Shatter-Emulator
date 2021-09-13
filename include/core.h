@@ -9,7 +9,7 @@
         #define EXE_NAME "executible"
     #endif
 
-    #define ASSERT(x, msg)  if(!x)\
+    #define ASSERT(x, msg)  if(!x)                                                                  \
                             {                                                                       \
                                 ERROR(EXE_NAME << ": " << __FILE__ << ":" << __LINE__ << ": "       \
                                 << __PRETTY_FUNCTION__ << ": Assertion `" << #x << "' failed.");    \
