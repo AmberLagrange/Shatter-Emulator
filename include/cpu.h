@@ -80,6 +80,7 @@ class CPU
         };
 
         void reset();
+        void handleInterrupts();
 
         void clearFlags();
         void setFlags(const Flags& flag);
@@ -91,6 +92,7 @@ class CPU
 
         Gameboy* m_Gameboy;
         Registers m_Registers;
+        bool m_InterruptEnabled;
 
         friend Instruction;
 };

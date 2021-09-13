@@ -10,6 +10,7 @@ CPU::CPU(Gameboy* gb)
 
 void CPU::tick()
 {
+    handleInterrupts();
     Instruction instruction = Instruction::instructions[m_Gameboy->read(m_Registers.PC++)];
     ASSERT(instruction.op, "Opcode 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Gameboy->read(m_Registers.PC - 1)) << ": " << instruction.mnemonic);
     LOG(instruction.mnemonic);
@@ -37,6 +38,16 @@ void CPU::reset()
 
     m_Registers.PC = 0x0100;
     LOG("\tPC Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.PC);
+
+    m_InterruptEnabled = false;
+}
+
+void CPU::handleInterrupts()
+{
+    if(!m_InterruptEnabled)
+        return;
+
+    
 }
 
 void CPU::clearFlags()

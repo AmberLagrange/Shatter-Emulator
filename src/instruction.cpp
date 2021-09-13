@@ -8,7 +8,7 @@
     #define INSTRUCTION(mnemonic, op, length, cyclesBranch, cyclesNoBranch) { op, length, cyclesBranch, cyclesNoBranch }
 #endif
 
-//Opcode Helpers
+//--------------------------------------Opcode Helpers--------------------------------------//
 
 void Instruction::opcodeDec(Gameboy* gb, u8& reg)
 {
@@ -22,6 +22,13 @@ void Instruction::opcodeDec(Gameboy* gb, u8& reg)
 void Instruction::opcodeLoadu8(Gameboy* gb, u8& reg)
 {
     reg = gb->read(gb->m_CPU.m_Registers.PC++);
+}
+
+void Instruction::opcodeLoadA(Gameboy* gb, const u8& val)
+{
+    gb->m_CPU.m_Registers.A = val;
+
+    LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.A) << " into register A.");
 }
 
 void Instruction::opcodeXOR(Gameboy* gb, const u8& val)
@@ -64,7 +71,7 @@ void Instruction::opcodeJPOffset(Gameboy* gb, bool condition)
     }
 }
 
-//Opcodes
+//--------------------------------------Opcodes--------------------------------------//
 
 //0x00
 
@@ -85,7 +92,7 @@ void Instruction::op06(Gameboy* gb)
 {
     opcodeLoadu8(gb, gb->m_CPU.m_Registers.B);
 
-    LOG("Stored 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.B) << " into register B.");
+    LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.B) << " into register B.");
 }
 
 void Instruction::op0d(Gameboy* gb)
@@ -96,11 +103,11 @@ void Instruction::op0d(Gameboy* gb)
     LOG("Flags Updated to 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.F) << ".");
 }
 
-void Instruction::op05(Gameboy* gb)
+void Instruction::op0E(Gameboy* gb)
 {
     opcodeLoadu8(gb, gb->m_CPU.m_Registers.C);
 
-    LOG("Stored 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.C) << " into register C.");
+    LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.C) << " into register C.");
 }
 
 //0x10
@@ -129,6 +136,12 @@ void Instruction::op32(Gameboy* gb)
     LOG("Wrote " << static_cast<u16>(gb->m_CPU.m_Registers.A) << " at memory address " << (gb->m_CPU.m_Registers.HL + 1));
 }
 
+void Instruction::op3E(Gameboy* gb)
+{
+    u8 val = gb->m_CPU.m_Registers.PC++;
+    opcodeLoadA(gb, val);
+}
+
 //0x40
 
 //0x50
@@ -146,7 +159,7 @@ void Instruction::op32(Gameboy* gb)
 void Instruction::opAF(Gameboy* gb)
 {
     opcodeXOR(gb, gb->m_CPU.m_Registers.A);
-    LOG("A XOR'd with A. Value 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.A) << " stored.");
+    LOG("A XOR'd with A. Value 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.A) << " written.");
     LOG("Flags Updated to 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.F) << ".");
 }
 
@@ -163,7 +176,40 @@ void Instruction::opC3(Gameboy* gb)
 
 //0xE0
 
+void Instruction::opE0(Gameboy* gb)
+{
+    u8 offset = gb->m_CPU.m_Registers.PC++;
+    u16 address = 0xFF00 | offset;
+
+    gb->write(address, gb->m_CPU.m_Registers.A);
+
+    LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.A) << " at address 0x" << address << ".");
+}
+
 //0xF0
+
+void Instruction::opF0(Gameboy* gb)
+{
+    u8 offset = gb->m_CPU.m_Registers.PC++;
+    u16 address = 0xFF00 | offset;
+    u8 val = gb->read(address);
+
+    opcodeLoadA(gb, val);
+}
+
+void Instruction::opF3(Gameboy* gb)
+{
+    gb->m_CPU.m_InterruptEnabled = false;
+
+    LOG("Disabled Interrupts.");
+}
+
+void Instruction::opFB(Gameboy* gb)
+{
+    gb->m_CPU.m_InterruptEnabled = true;
+
+    LOG("Enabled Interrupts.");
+}
 
 const Instruction Instruction::instructions[0x100] = 
 {
@@ -182,7 +228,7 @@ const Instruction Instruction::instructions[0x100] =
     INSTRUCTION("DEC BC",           NULL, 1,  8,  8),
     INSTRUCTION("INC C",            NULL, 1,  4,  4),
     INSTRUCTION("DEC C",            Instruction::op0d, 1,  4,  4),
-    INSTRUCTION("LD C,u8",          Instruction::op0e, 2,  8,  8),
+    INSTRUCTION("LD C,u8",          Instruction::op0E, 2,  8,  8),
     INSTRUCTION("RRCA",             NULL, 1,  4,  4),
 
     //0x10
@@ -236,7 +282,7 @@ const Instruction Instruction::instructions[0x100] =
     INSTRUCTION("DEC SP",           NULL, 1,  8,  8),
     INSTRUCTION("INC A",            NULL, 1,  4,  4),
     INSTRUCTION("DEC A",            NULL, 1,  4,  4),
-    INSTRUCTION("LD A,u8",          NULL, 2,  8,  8),
+    INSTRUCTION("LD A,u8",          Instruction::op3E, 2,  8,  8),
     INSTRUCTION("CCF",              NULL, 1,  4,  4),
 
     //0x40
@@ -420,7 +466,7 @@ const Instruction Instruction::instructions[0x100] =
     INSTRUCTION("RST 18h",          NULL, 1, 16, 16),
 
     //0xE0
-    INSTRUCTION("LD (FF00+u8),A",   NULL, 2, 12, 12),
+    INSTRUCTION("LD (FF00+u8),A",   Instruction::opE0, 2, 12, 12),
     INSTRUCTION("POP HL",           NULL, 1, 12, 12),
     INSTRUCTION("LD (FF00+C),A",    NULL, 1,  8,  8),
     INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
@@ -438,10 +484,10 @@ const Instruction Instruction::instructions[0x100] =
     INSTRUCTION("RST 28h",          NULL, 1, 16, 16),
 
     //0xF0
-    INSTRUCTION("LD A,(FF00+u8)",   NULL, 2, 12, 12),
+    INSTRUCTION("LD A,(FF00+u8)",   Instruction::opF0, 2, 12, 12),
     INSTRUCTION("POP AF",           NULL, 1, 12, 12),
     INSTRUCTION("LD A,(FF00+C)",    NULL, 1,  8,  8),
-    INSTRUCTION("DI",               NULL, 1,  4,  4),
+    INSTRUCTION("DI",               Instruction::opF3, 1,  4,  4),
     INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
     INSTRUCTION("PUSH AF",          NULL, 1, 16, 16),
     INSTRUCTION("OR A,u8",          NULL, 2,  8,  8),
@@ -449,7 +495,7 @@ const Instruction Instruction::instructions[0x100] =
     INSTRUCTION("LD HL,SP+i8",      NULL, 2, 12, 12),
     INSTRUCTION("LD SP,HL",         NULL, 1,  8,  8),
     INSTRUCTION("LD A,(u16)",       NULL, 3, 16, 16),
-    INSTRUCTION("EI",               NULL, 1,  4,  4),
+    INSTRUCTION("EI",               Instruction::opFB, 1,  4,  4),
     INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
     INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
     INSTRUCTION("CP A,u8",          NULL, 2,  8,  8),
