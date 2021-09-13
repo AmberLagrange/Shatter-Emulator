@@ -15,7 +15,7 @@ CXXFLAGS += -std=c++17
 CXXFLAGS += -DEXE_NAME=\"$(EXE)\"
 
 #Libraries
-LDFLAGS :=
+LDFLAGS := -lSDL2main -lSDL2 
 
 #Directories
 INCDIR  ?= ./include
@@ -46,7 +46,7 @@ debug: CXXFLAGS += -g
 
 #Release target
 release: $(RELOBJS)
-	$(CXX) $(RELOBJS) -o $(BUILDIR)/$(RELDIR)/$(EXE)$(LDFLAGS)
+	$(CXX) $(RELOBJS) -o $(BUILDIR)/$(RELDIR)/$(EXE) $(LDFLAGS)
 
 $(OBJDIR)/$(RELDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -o $@ -c $<

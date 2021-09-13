@@ -26,5 +26,7 @@ class Gameboy
         GPU m_GPU;
         APU m_APU;
 
+        bool m_Running;
+
         friend Instruction;
 };

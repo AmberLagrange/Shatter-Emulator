@@ -47,9 +47,13 @@ void Instruction::opcodeINC(Gameboy* gb, u8& reg)
 void Instruction::opcodeDEC(Gameboy* gb, u8& reg)
 {
     reg--;
+
     gb->m_CPU.clearFlag(CPU::Flag::Zero | CPU::Flag::Negative | CPU::Flag::HalfCarry);
+
     gb->m_CPU.setZeroFromVal(reg);
+
     gb->m_CPU.setFlag(CPU::Flag::Negative);
+
     if((reg & 0x0f) == 0x0f) gb->m_CPU.setFlag(CPU::Flag::HalfCarry);   
 }
 
@@ -81,7 +85,9 @@ void Instruction::opcodeAND(Gameboy* gb, const u8& val)
 void Instruction::opcodeXOR(Gameboy* gb, const u8& val)
 {
     gb->m_CPU.m_Registers.A ^= val;
+
     gb->m_CPU.clearAllFlags();
+
     gb->m_CPU.setZeroFromVal(gb->m_CPU.m_Registers.A);
 }
 
@@ -92,6 +98,20 @@ void Instruction::opcodeOR(Gameboy* gb, const u8& val)
 
 void Instruction::opcodeCP(Gameboy* gb, const u8& val)
 {
+    const u8& a = gb->m_CPU.m_Registers.A;
+
+    gb->m_CPU.clearAllFlags();
+
+    gb->m_CPU.setFlag(CPU::Flag::Negative);
+
+    if(a < val)
+        gb->m_CPU.setFlag(CPU::Flag::Carry);
+
+    if(a == val)
+        gb->m_CPU.setFlag(CPU::Flag::Zero);
+
+    if((a & 0x0F) < ((a - val) & 0x0F))
+        gb->m_CPU.setFlag(CPU::Flag::HalfCarry);
 
 }
 
@@ -135,7 +155,7 @@ void Instruction::opcodeCALL(Gameboy* gb, bool condition)
 
 void Instruction::opcodeRET(Gameboy* gb, bool condiiton)
 {
-    
+
 }
 
 void Instruction::opcodePUSH(Gameboy* gb, const u8& reg)
@@ -1489,7 +1509,10 @@ void Instruction::opFD(Gameboy* gb) // UNUSED
 
 void Instruction::opFE(Gameboy* gb) // CP A,u8
 {
+    opcodeCP(gb, gb->m_CPU.m_Registers.PC++);
 
+    LOG_A_REG();
+    LOG_FLAGS();
 }
 
 void Instruction::opFF(Gameboy* gb) // RST 38h
@@ -1501,7 +1524,7 @@ void Instruction::opFF(Gameboy* gb) // RST 38h
 
 const Instruction Instruction::instructions[0x100] = 
 {
-    //0x0
+    //0x00
     INSTRUCTION("NOP",              Instruction::op00, 1,  4,  4),
     INSTRUCTION("LD BC,u16",        NULL, 3, 12, 12),
     INSTRUCTION("LD (BC),A",        NULL, 1,  8,  8),
@@ -1786,7 +1809,7 @@ const Instruction Instruction::instructions[0x100] =
     INSTRUCTION("EI",               Instruction::opFB, 1,  4,  4),
     INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
     INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
-    INSTRUCTION("CP A,u8",          NULL, 2,  8,  8),
+    INSTRUCTION("CP A,u8",          Instruction::opFE, 2,  8,  8),
     INSTRUCTION("RST 38h",          NULL, 1, 16, 16)
 };
 

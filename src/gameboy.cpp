@@ -1,7 +1,7 @@
 #include "gameboy.h"
 
 Gameboy::Gameboy()
-    : m_CPU(this), m_MMU(this), m_GPU(this), m_APU(this)
+    : m_CPU(this), m_MMU(this), m_GPU(this), m_APU(this), m_Running(true)
 {
     load("./roms/tetris.gb");
 }
@@ -15,9 +15,10 @@ void Gameboy::start()
 {
     LOG("Staring Gameboy\n");
 
-    for(;;)
+    while(m_Running)
     {
         m_CPU.tick();
+        m_Running = m_GPU.update();
     }
 }
 
