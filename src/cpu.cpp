@@ -39,15 +39,16 @@ void CPU::reset()
     m_Registers.PC = 0x0100;
     LOG("\tPC Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.PC);
 
-    m_InterruptEnabled = false;
+    m_IME = false;
 }
 
 void CPU::handleInterrupts()
 {
-    if(!m_InterruptEnabled)
+    if(!m_IME)
         return;
 
-    
+    u8 flags = m_Gameboy->read(0xFF0F);
+    m_IME = false;
 }
 
 void CPU::setFlag(const CPU::Flag& flag)

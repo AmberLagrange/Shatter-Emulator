@@ -1456,7 +1456,7 @@ void Instruction::opF2(Gameboy* gb) // LD A,(FF00+C)
 
 void Instruction::opF3(Gameboy* gb) // DI
 {
-    gb->m_CPU.m_InterruptEnabled = false;
+    gb->m_CPU.m_IME = false;
 
     LOG_DI();
 }
@@ -1498,7 +1498,7 @@ void Instruction::opFA(Gameboy* gb) // LD A,(u16)
 
 void Instruction::opFB(Gameboy* gb) // EI
 {
-    gb->m_CPU.m_InterruptEnabled = true;
+    gb->m_CPU.m_IME = true;
 
     LOG_EI();
 }

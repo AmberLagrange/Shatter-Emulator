@@ -28,12 +28,18 @@ class CPU
         Zero        = 0b10000000,
         Negative    = 0b01000000,
         HalfCarry   = 0b00100000,
-        Carry       = 0b00010000
+        Carry       = 0b00010000,
+        FlagNone    = 0b00000000
     };
 
     enum Interrupts
     {
-
+        VBlank      = 0b00000001,
+        LCD_STAT    = 0b00000010,
+        Timer       = 0b00000100,
+        Serial      = 0b00001000,
+        Joypad      = 0b00010000,
+        IntNone     = 0b00000000
     };
 
     private:
@@ -116,7 +122,7 @@ class CPU
 
         Gameboy* m_Gameboy;
         Registers m_Registers;
-        bool m_InterruptEnabled;
+        bool m_IME;
 
         friend Instruction;
 };
