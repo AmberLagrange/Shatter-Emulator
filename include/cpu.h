@@ -7,7 +7,7 @@
 /**
  * Flag Register
  * 7 6 5 4 3 2 1 0
- * Z N H C x x x x
+ * Z N H C 0 0 0 0
  * 
  * Z : Zero Flag
  * N : Subtract Flag
@@ -31,6 +31,11 @@ class CPU
         Carry       = 0b00010000
     };
 
+    enum Interrupts
+    {
+
+    };
+
     private:
         struct Registers
         {
@@ -38,8 +43,13 @@ class CPU
             {
                 struct
                 {
-                    u8 A;
-                    u8 F;
+                    #ifdef IS_BIG_ENDIAN
+                        u8 A;
+                        u8 F;
+                    #else
+                        u8 F;
+                        u8 A;
+                    #endif
                 };
                 u16 AF;
             };
@@ -48,8 +58,13 @@ class CPU
             {
                 struct
                 {
-                    u8 B;
-                    u8 C;
+                    #ifdef IS_BIG_ENDIAN
+                        u8 B;
+                        u8 C;
+                    #else
+                        u8 C;
+                        u8 B;
+                    #endif
                 };
                 u16 BC;
             };
@@ -58,8 +73,13 @@ class CPU
             {
                 struct
                 {
-                    u8 D;
-                    u8 E;
+                    #ifdef IS_BIG_ENDIAN
+                        u8 D;
+                        u8 E;
+                    #else
+                        u8 E;
+                        u8 D;
+                    #endif
                 };
                 u16 DE;
             };
@@ -68,8 +88,13 @@ class CPU
             {
                 struct
                 {
-                    u8 H;
-                    u8 L;
+                    #ifdef IS_BIG_ENDIAN
+                        u8 H;
+                        u8 L;
+                    #else
+                        u8 L;
+                        u8 H;
+                    #endif
                 };
                 u16 HL;
             };

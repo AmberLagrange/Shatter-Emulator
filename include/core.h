@@ -4,6 +4,12 @@
 
 #include "log.h"
 
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+    #define IS_BIG_ENDIAN
+#else
+    #define IS_LITTLE_ENDIAN
+#endif
+
 #ifndef NDEBUG
     #ifndef EXE_NAME
         #define EXE_NAME "executible"

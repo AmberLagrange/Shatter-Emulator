@@ -18,7 +18,13 @@
 #define LOG_E_REG() LOG("E Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.E) << ".")
 #define LOG_H_REG() LOG("H Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.H) << ".")
 #define LOG_L_REG() LOG("F Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.F) << ".")
-#define LOG_FLAGS() LOG("Flags updated to: "        << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.F) << ".")
+
+#define LOG_FLAGS() LOG("Flags updated to: "                                              \
+                        << ((gb->m_CPU.m_Registers.F & CPU::Flag::Zero)      ? "Z" : "_") \
+                        << ((gb->m_CPU.m_Registers.F & CPU::Flag::Negative)  ? "N" : "_") \
+                        << ((gb->m_CPU.m_Registers.F & CPU::Flag::HalfCarry) ? "H" : "_") \
+                        << ((gb->m_CPU.m_Registers.F & CPU::Flag::Carry)     ? "C" : "_") \
+                        << ".")
 
 #define LOG_AF_REG() LOG("AF Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.AF) << ".")
 #define LOG_BC_REG() LOG("BC Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.BC) << ".")

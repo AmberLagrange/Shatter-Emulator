@@ -6,14 +6,26 @@ GPU::GPU(Gameboy* gb)
     LOG("Initializing GPU!");
 
     SDL_Init(SDL_INIT_VIDEO);
-    m_Window = SDL_CreateWindow("Shatter Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 480, 432, SDL_WINDOW_SHOWN);
 
+    m_Window = SDL_CreateWindow("Shatter Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 480, 432, SDL_WINDOW_SHOWN);
     if(!m_Window)
     {
-        SDL_Log("Could not create window: %s", SDL_GetError());
+        LOG("Could not create window: " << SDL_GetError());
+    }
+    else
+    {
+        LOG("\tWindow Created.");
     }
 
     m_Renderer = SDL_CreateRenderer(m_Window, -1, SDL_RENDERER_ACCELERATED);
+    if(!m_Window)
+    {
+        LOG("Could not create renderer: " << SDL_GetError());
+    }
+    else
+    {
+        LOG("\tRenderer Created.");
+    }
 }
 
 GPU::~GPU()

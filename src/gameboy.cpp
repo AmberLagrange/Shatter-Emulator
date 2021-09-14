@@ -13,7 +13,7 @@ void Gameboy::load(const char* path)
 
 void Gameboy::start()
 {
-    LOG("Staring Gameboy\n");
+    LOG("Starting Gameboy\n");
 
     while(m_Running)
     {
