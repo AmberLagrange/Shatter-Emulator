@@ -7,9 +7,9 @@ class Gameboy;
 class PPU
 {
     public:
-        PPU(Gameboy* gb);
+        PPU(Gameboy& gb);
 
         void tick();
     private:
-        Gameboy* m_Gameboy;
+        Gameboy& m_Gameboy;
 };

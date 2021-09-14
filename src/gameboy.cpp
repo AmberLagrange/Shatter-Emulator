@@ -1,7 +1,7 @@
 #include "gameboy.h"
 
 Gameboy::Gameboy()
-    : m_CPU(this), m_MMU(this), m_PPU(this), m_APU(this), m_Screen(this), m_Running(true), m_Halted(false)
+    : m_CPU(*this), m_MMU(*this), m_PPU(*this), m_APU(*this), m_Screen(*this), m_Running(true), m_Halted(false)
 {
     load("./roms/tetris.gb");
 }

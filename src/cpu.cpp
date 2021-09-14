@@ -1,7 +1,7 @@
 #include "cpu.h"
 #include "gameboy.h"
 
-CPU::CPU(Gameboy* gb)
+CPU::CPU(Gameboy& gb)
     : m_Gameboy(gb)
 {
     LOG("Initializing CPU!");
@@ -11,8 +11,9 @@ CPU::CPU(Gameboy* gb)
 void CPU::tick()
 {
     handleInterrupts();
-    Instruction instruction = Instruction::instructions[m_Gameboy->read(m_Registers.PC++)];
-    ASSERT(instruction.op, "Opcode 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Gameboy->read(m_Registers.PC - 1)) << ": " << instruction.mnemonic);
+    Instruction instruction = Instruction::instructions[m_Gameboy.read(m_Registers.PC++)];
+    LOG(std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Gameboy.read(m_Registers.PC)));
+    ASSERT(instruction.op, "Opcode 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Gameboy.read(m_Registers.PC - 1)) << ": " << instruction.mnemonic);
     LOG(instruction.mnemonic);
     instruction.op(m_Gameboy);
 }
@@ -47,7 +48,7 @@ void CPU::handleInterrupts()
     if(!m_IME)
         return;
 
-    u8 flags = m_Gameboy->read(0xFF0F);
+    u8 flags = m_Gameboy.read(0xFF0F);
     m_IME = false;
 }
 

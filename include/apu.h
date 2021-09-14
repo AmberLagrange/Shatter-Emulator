@@ -7,7 +7,7 @@ class Gameboy;
 class APU
 {
     public:
-        APU(Gameboy* gb);
+        APU(Gameboy& gb);
     private:
-        Gameboy* m_Gameboy;
+        Gameboy& m_Gameboy;
 };

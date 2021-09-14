@@ -2,7 +2,7 @@
 
 #include "gameboy.h"
 
-Screen::Screen(Gameboy* gb)
+Screen::Screen(Gameboy& gb)
     : m_Gameboy(gb)
 {
     SDL_Init(SDL_INIT_VIDEO);
@@ -46,7 +46,7 @@ void Screen::update()
         switch(e.type)
         {
             case SDL_QUIT:
-                m_Gameboy->stop();
+                m_Gameboy.stop();
                 return;
         }
     }

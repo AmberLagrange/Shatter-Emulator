@@ -10,7 +10,7 @@ class Gameboy;
 class CPU
 {
     public:
-        CPU(Gameboy* gb);
+        CPU(Gameboy& gb);
         void tick();
 
     private:
@@ -91,7 +91,8 @@ class CPU
         void clearAllFlags();
         void setZeroFromVal(const u8& val);
 
-        Gameboy* m_Gameboy;
+        Gameboy& m_Gameboy;
+
         Registers m_Registers;
         bool m_IME;
 

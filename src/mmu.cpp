@@ -1,6 +1,6 @@
 #include "mmu.h"
 
-MMU::MMU(Gameboy* gb)
+MMU::MMU(Gameboy& gb)
     : m_Gameboy(gb)
 {
     LOG("Initializing MMU!");

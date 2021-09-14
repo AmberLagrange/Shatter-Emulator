@@ -31,7 +31,7 @@ void Cartridge::dump()
     {
         for(u16 j = 0; j < 0x10; ++j)
         {
-            LOG(std::setw(2) << std::setfill('0') << std::hex << (int)m_Rom0[i * 0x10 + j] << ' ');
+            LOG(std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Rom0[i * 0x10 + j]));
         }
         LOG("");
     }
