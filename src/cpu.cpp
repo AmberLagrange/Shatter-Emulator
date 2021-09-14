@@ -51,32 +51,32 @@ void CPU::handleInterrupts()
     m_IME = false;
 }
 
-void CPU::setFlag(const CPU::Flag& flag)
+void CPU::setFlag(const Flags::Register& flag)
 {
     m_Registers.F |= flag;
 }
 
-void CPU::clearFlag(const CPU::Flag& flag)
+void CPU::clearFlag(const Flags::Register& flag)
 {
     m_Registers.F &= ~flag;
 }
 
-void CPU::flipFlag(const CPU::Flag& flag)
+void CPU::flipFlag(const Flags::Register& flag)
 {
     m_Registers.F ^= flag;
 }
 
-bool CPU::isFlagSet(const CPU::Flag& flag)
+bool CPU::isFlagSet(const Flags::Register& flag)
 {
     return m_Registers.F & flag;
 }
 
 void CPU::clearAllFlags()
 {
-    clearFlag(CPU::Flag::Zero | CPU::Flag::Negative | CPU::Flag::HalfCarry | CPU::Flag::Carry);
+    clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry | Flags::Register::Carry);
 }
 
 void CPU::setZeroFromVal(const u8& val)
 {
-    if(!val) setFlag(CPU::Flag::Zero);
+    if(!val) setFlag(Flags::Register::Zero);
 }

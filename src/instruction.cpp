@@ -19,11 +19,11 @@
 #define LOG_H_REG() LOG("H Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.H) << ".")
 #define LOG_L_REG() LOG("F Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.F) << ".")
 
-#define LOG_FLAGS() LOG("Flags updated to: "                                              \
-                        << ((gb->m_CPU.m_Registers.F & CPU::Flag::Zero)      ? "Z" : "_") \
-                        << ((gb->m_CPU.m_Registers.F & CPU::Flag::Negative)  ? "N" : "_") \
-                        << ((gb->m_CPU.m_Registers.F & CPU::Flag::HalfCarry) ? "H" : "_") \
-                        << ((gb->m_CPU.m_Registers.F & CPU::Flag::Carry)     ? "C" : "_") \
+#define LOG_FLAGS() LOG("Flags updated to: "                                                    \
+                        << ((gb->m_CPU.m_Registers.F & Flags::Register::Zero)      ? "Z" : "_") \
+                        << ((gb->m_CPU.m_Registers.F & Flags::Register::Negative)  ? "N" : "_") \
+                        << ((gb->m_CPU.m_Registers.F & Flags::Register::HalfCarry) ? "H" : "_") \
+                        << ((gb->m_CPU.m_Registers.F & Flags::Register::Carry)     ? "C" : "_") \
                         << ".")
 
 #define LOG_AF_REG() LOG("AF Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(gb->m_CPU.m_Registers.AF) << ".")
@@ -54,13 +54,13 @@ void Instruction::opcodeDEC(Gameboy* gb, u8& reg)
 {
     reg--;
 
-    gb->m_CPU.clearFlag(CPU::Flag::Zero | CPU::Flag::Negative | CPU::Flag::HalfCarry);
+    gb->m_CPU.clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry);
 
     gb->m_CPU.setZeroFromVal(reg);
 
-    gb->m_CPU.setFlag(CPU::Flag::Negative);
+    gb->m_CPU.setFlag(Flags::Register::Negative);
 
-    if((reg & 0x0f) == 0x0f) gb->m_CPU.setFlag(CPU::Flag::HalfCarry);   
+    if((reg & 0x0f) == 0x0f) gb->m_CPU.setFlag(Flags::Register::HalfCarry);   
 }
 
 void Instruction::opcodeADD(Gameboy* gb, const u8& val)
@@ -108,16 +108,16 @@ void Instruction::opcodeCP(Gameboy* gb, const u8& val)
 
     gb->m_CPU.clearAllFlags();
 
-    gb->m_CPU.setFlag(CPU::Flag::Negative);
+    gb->m_CPU.setFlag(Flags::Register::Negative);
 
     if(a < val)
-        gb->m_CPU.setFlag(CPU::Flag::Carry);
+        gb->m_CPU.setFlag(Flags::Register::Carry);
 
     if(a == val)
-        gb->m_CPU.setFlag(CPU::Flag::Zero);
+        gb->m_CPU.setFlag(Flags::Register::Zero);
 
     if((a & 0x0F) < ((a - val) & 0x0F))
-        gb->m_CPU.setFlag(CPU::Flag::HalfCarry);
+        gb->m_CPU.setFlag(Flags::Register::HalfCarry);
 
 }
 
@@ -354,7 +354,7 @@ void Instruction::op1F(Gameboy* gb) // RRA
 
 void Instruction::op20(Gameboy* gb) // JR NZ,i8
 {
-    opcodeJR(gb, !gb->m_CPU.isFlagSet(CPU::Flag::Zero));
+    opcodeJR(gb, !gb->m_CPU.isFlagSet(Flags::Register::Zero));
 }
 
 void Instruction::op21(Gameboy* gb) // LD HL,u16
