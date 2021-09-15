@@ -1,7 +1,7 @@
 #include "gameboy.h"
 
 Gameboy::Gameboy()
-    : m_Screen(*this), m_Running(true), m_Halted(false)
+    : m_Screen(*this), m_Running(false), m_Halted(false)
 {
     m_CPU.setMMU(&m_MMU);
 }
@@ -14,6 +14,8 @@ void Gameboy::load(const char* path)
 void Gameboy::start()
 {
     LOG("Starting Gameboy\n");
+
+    m_Running = true;
 
     while(m_Running)
     {

@@ -25,6 +25,10 @@ class CPU
         inline void setZeroFromVal(const u8& val)           { if(!val) setFlag(Flags::Register::Zero); }
 
     private:
+        void reset();
+        void handleInterrupts();
+
+    private:
         struct Registers
         {
             union
@@ -90,16 +94,13 @@ class CPU
             u16 SP;
             u16 PC;
         };
-
-        void reset();
-        void handleInterrupts();
         
         MMU* m_MMU;
 
         Registers m_Registers;
         bool m_IME;
-    public:
 
+    public:
         //--------------------------------------Opcode Helpers--------------------------------------//
 
         void opcodeINC(u8& reg);

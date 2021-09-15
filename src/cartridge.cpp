@@ -17,7 +17,7 @@ void Cartridge::load(const char* path)
     std::copy(contents.begin() + 0x4000, contents.begin() + 0x8000, m_Rom1);
 }
 
-u8 Cartridge::read8(u16 address)
+u8 Cartridge::read(u16 address)
 {
     if(address < 0x4000) return m_Rom0[address];
     return m_Rom1[address - 0x4000];

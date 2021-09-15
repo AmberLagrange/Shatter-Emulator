@@ -18,7 +18,8 @@ class MMU
         u8 write(const u16& address, const u8& val);
     private:
         void reset();
-        
+
+    private:
         Cartridge m_Rom;
 
         u8 m_VRAM[0x2000];
