@@ -12,10 +12,32 @@ void MMU::load(const char* path)
 
 u8 MMU::read(const u16& address)
 {
-    if(address < 0x8000) return m_Rom.read(address);
-    if(address < 0xA000) return m_VRAM[address - 0x8000];
-    if(address < 0xC000) return m_RAMBANK[address - 0xA000];
-    if(address < 0xE000) return m_RAM[address - 0xC000];
+    if(address < 0x8000)
+    {
+        return m_Rom.read(address);
+    }
+
+    if(address < 0xA000)
+    {
+        return m_VRAM[address - 0x8000];
+    }
+
+    if(address < 0xC000)
+    {
+        return m_RAMBANK[address - 0xA000];
+    }
+
+    if(address < 0xE000)
+    {
+        return m_RAM[address - 0xC000];
+    }
+
+    if(address < 0xE000)
+    {
+        return m_RAM[address - 0xC000];
+    }
+
+    ERROR("Reading from unmapped memory address 0x" << std::setw(4) << std::setfill('0') << std::hex << address << ".");
     return 0x00;
 }
 
@@ -25,5 +47,9 @@ u8 MMU::write(const u16& address, const u8& val)
     else if(address < 0xA000) m_VRAM[address - 0x8000] = val;
     else if(address < 0xC000) m_RAMBANK[address - 0xA000] = val;
     else if(address < 0xE000) m_RAM[address - 0xC000] = val;
+    else if(address < 0xFE00) m_RAM[address - 0xC000] = val;
+
+    ERROR("Writing 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(val) << " to unmapped memory address 0x"
+                     << std::setw(4) << std::setfill('0') << std::hex << address << ".");
     return val;
 }

@@ -7,5 +7,5 @@ PPU::PPU()
 
 void PPU::tick(u8 cycles)
 {
-    
+
 }

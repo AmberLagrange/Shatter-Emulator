@@ -16,7 +16,15 @@ void CPU::opcodeRRC(u8& reg)
 
 void CPU::opcodeRL(u8& reg)
 {
+	u8 carry = isFlagSet(Flags::Register::Carry) ? 1 : 0;
+
+	clearAllFlags();
+
+	if(getBit(reg, 7)) setFlag(Flags::Register::Carry);
+
+	reg = (reg << 1) | carry;
 	
+	setZeroFromVal(reg);
 }
 
 void CPU::opcodeRR(u8& reg)
@@ -46,7 +54,13 @@ void CPU::opcodeSRL(u8& reg)
 
 void CPU::opcodeBIT(const u8& bit, u8& reg)
 {
-	
+	if((reg >> bit) & 0b00000001)
+        clearFlag(Flags::Register::Zero);
+    else
+        setFlag(Flags::Register::Zero);
+
+    clearFlag(Flags::Register::Negative);
+    setFlag(Flags::Register::HalfCarry);
 }
 
 void CPU::opcodeRES(const u8& bit, u8& reg)
@@ -580,112 +594,112 @@ void CPU::opcodeCB0x40() // BIT 0,B
 {
 	opcodeBIT(0, m_Registers.B);
 	
-	LOG_B_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x41() // BIT 0,C
 {
 	opcodeBIT(0, m_Registers.C);
 	
-	LOG_C_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x42() // BIT 0,D
 {
 	opcodeBIT(0, m_Registers.D);
 	
-	LOG_D_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x43() // BIT 0,E
 {
 	opcodeBIT(0, m_Registers.E);
 	
-	LOG_E_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x44() // BIT 0,H
 {
 	opcodeBIT(0, m_Registers.H);
 	
-	LOG_H_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x45() // BIT 0,L
 {
 	opcodeBIT(0, m_Registers.L);
 	
-	LOG_L_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x46() // BIT 0,(HL)
 {
 	opcodeBIT_HL(0);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x47() // BIT 0,A
 {
 	opcodeBIT(0, m_Registers.A);
 	
-	LOG_A_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x48() // BIT 1,B
 {
 	opcodeBIT(1, m_Registers.B);
 	
-	LOG_B_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x49() // BIT 1,C
 {
 	opcodeBIT(1, m_Registers.C);
 	
-	LOG_C_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x4A() // BIT 1,D
 {
 	opcodeBIT(1, m_Registers.D);
 	
-	LOG_D_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x4B() // BIT 1,E
 {
 	opcodeBIT(1, m_Registers.E);
 	
-	LOG_E_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x4C() // BIT 1,H
 {
 	opcodeBIT(1, m_Registers.H);
 	
-	LOG_H_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x4D() // BIT 1,L
 {
 	opcodeBIT(1, m_Registers.L);
 	
-	LOG_L_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x4E() // BIT 1,(HL)
 {
 	opcodeBIT_HL(1);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x4F() // BIT 1,A
 {
 	opcodeBIT(1, m_Registers.A);
 	
-	LOG_A_REG();
+	LOG_FLAGS();
 }
 
 //0x50
@@ -694,112 +708,112 @@ void CPU::opcodeCB0x50() // BIT 2,B
 {
 	opcodeBIT(2, m_Registers.B);
 	
-	LOG_B_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x51() // BIT 2,C
 {
 	opcodeBIT(2, m_Registers.C);
 	
-	LOG_C_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x52() // BIT 2,D
 {
 	opcodeBIT(2, m_Registers.D);
 	
-	LOG_D_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x53() // BIT 2,E
 {
 	opcodeBIT(2, m_Registers.E);
 	
-	LOG_E_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x54() // BIT 2,H
 {
 	opcodeBIT(2, m_Registers.H);
 	
-	LOG_H_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x55() // BIT 2,L
 {
 	opcodeBIT(2, m_Registers.L);
 	
-	LOG_L_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x56() // BIT 2,(HL)
 {
 	opcodeBIT_HL(2);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x57() // BIT 2,A
 {
 	opcodeBIT(2, m_Registers.A);
 	
-	LOG_A_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x58() // BIT 3,B
 {
 	opcodeBIT(3, m_Registers.B);
 	
-	LOG_B_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x59() // BIT 3,C
 {
 	opcodeBIT(3, m_Registers.C);
 	
-	LOG_C_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x5A() // BIT 3,D
 {
 	opcodeBIT(3, m_Registers.D);
 	
-	LOG_D_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x5B() // BIT 3,E
 {
 	opcodeBIT(3, m_Registers.E);
 	
-	LOG_E_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x5C() // BIT 3,H
 {
 	opcodeBIT(3, m_Registers.H);
 	
-	LOG_H_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x5D() // BIT 3,L
 {
 	opcodeBIT(3, m_Registers.L);
 	
-	LOG_L_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x5E() // BIT 3,(HL)
 {
 	opcodeBIT_HL(3);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x5F() // BIT 3,A
 {
 	opcodeBIT(3, m_Registers.A);
 	
-	LOG_A_REG();
+	LOG_FLAGS();
 }
 
 //0x60
@@ -808,112 +822,112 @@ void CPU::opcodeCB0x60() // BIT 4,B
 {
 	opcodeBIT(4, m_Registers.B);
 	
-	LOG_B_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x61() // BIT 4,C
 {
 	opcodeBIT(4, m_Registers.C);
 	
-	LOG_C_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x62() // BIT 4,D
 {
 	opcodeBIT(4, m_Registers.D);
 	
-	LOG_D_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x63() // BIT 4,E
 {
 	opcodeBIT(4, m_Registers.E);
 	
-	LOG_E_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x64() // BIT 4,H
 {
 	opcodeBIT(4, m_Registers.H);
 	
-	LOG_H_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x65() // BIT 4,L
 {
 	opcodeBIT(4, m_Registers.L);
 	
-	LOG_L_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x66() // BIT 4,(HL)
 {
 	opcodeBIT_HL(4);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x67() // BIT 4,A
 {
 	opcodeBIT(4, m_Registers.A);
 	
-	LOG_A_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x68() // BIT 5,B
 {
 	opcodeBIT(5, m_Registers.B);
 	
-	LOG_B_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x69() // BIT 5,C
 {
 	opcodeBIT(5, m_Registers.C);
 	
-	LOG_C_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x6A() // BIT 5,D
 {
 	opcodeBIT(5, m_Registers.D);
 	
-	LOG_D_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x6B() // BIT 5,E
 {
 	opcodeBIT(5, m_Registers.E);
 	
-	LOG_E_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x6C() // BIT 5,H
 {
 	opcodeBIT(5, m_Registers.H);
 	
-	LOG_H_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x6D() // BIT 5,L
 {
 	opcodeBIT(5, m_Registers.L);
 	
-	LOG_L_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x6E() // BIT 5,(HL)
 {
 	opcodeBIT_HL(5);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x6F() // BIT 5,A
 {
 	opcodeBIT(5, m_Registers.A);
 	
-	LOG_A_REG();
+	LOG_FLAGS();
 }
 
 //0x70
@@ -922,112 +936,112 @@ void CPU::opcodeCB0x70() // BIT 6,B
 {
 	opcodeBIT(6, m_Registers.B);
 	
-	LOG_B_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x71() // BIT 6,C
 {
 	opcodeBIT(6, m_Registers.C);
 	
-	LOG_C_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x72() // BIT 6,D
 {
 	opcodeBIT(6, m_Registers.D);
 	
-	LOG_D_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x73() // BIT 6,E
 {
 	opcodeBIT(6, m_Registers.E);
 	
-	LOG_E_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x74() // BIT 6,H
 {
 	opcodeBIT(6, m_Registers.H);
 	
-	LOG_H_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x75() // BIT 6,L
 {
 	opcodeBIT(6, m_Registers.L);
 	
-	LOG_L_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x76() // BIT 6,(HL)
 {
 	opcodeBIT_HL(6);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x77() // BIT 6,A
 {
 	opcodeBIT(6, m_Registers.A);
 	
-	LOG_A_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x78() // BIT 7,B
 {
 	opcodeBIT(7, m_Registers.B);
 	
-	LOG_B_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x79() // BIT 7,C
 {
 	opcodeBIT(7, m_Registers.C);
 	
-	LOG_C_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x7A() // BIT 7,D
 {
 	opcodeBIT(7, m_Registers.D);
 	
-	LOG_D_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x7B() // BIT 7,E
 {
 	opcodeBIT(7, m_Registers.E);
 	
-	LOG_E_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x7C() // BIT 7,H
 {
 	opcodeBIT(7, m_Registers.H);
 	
-	LOG_H_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x7D() // BIT 7,L
 {
 	opcodeBIT(7, m_Registers.L);
 	
-	LOG_L_REG();
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x7E() // BIT 7,(HL)
 {
 	opcodeBIT_HL(7);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_FLAGS();
 }
 
 void CPU::opcodeCB0x7F() // BIT 7,A
 {
 	opcodeBIT(7, m_Registers.A);
 	
-	LOG_A_REG();
+	LOG_FLAGS();
 }
 
 //0x80

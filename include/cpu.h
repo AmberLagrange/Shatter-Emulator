@@ -31,6 +31,16 @@
 
 #define LOG_WRITE(addr, val) LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(val) << " to address 0x" << std::setw(4) << addr << ".")
 
+#define LOG_PUSH() LOG("Pushed 0x" << std::setw(2) << std::setfill('0') << std::hex     \
+                                   << static_cast<u16>(m_MMU->read(m_Registers.SP    )) \
+                                   << std::setw(2) << std::setfill('0') << std::hex     \
+                                   << static_cast<u16>(m_MMU->read(m_Registers.SP + 1)) << " to the stack.")
+
+#define LOG_POP() LOG("Popped 0x" << std::setw(2) << std::setfill('0') << std::hex     \
+                                  << static_cast<u16>(m_MMU->read(m_Registers.SP - 1)) \
+                                  << std::setw(2) << std::setfill('0') << std::hex     \
+                                  << static_cast<u16>(m_MMU->read(m_Registers.SP - 2)) << " from the stack.")
+
 #define LOG_JP(addr) LOG("Jumped to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(addr) << ".");
 #define LOG_NJP() LOG("Did not jump.");
 
@@ -58,6 +68,8 @@ class CPU
 
         inline void clearAllFlags()                         { clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry | Flags::Register::Carry); }
         inline void setZeroFromVal(const u8& val)           { if(!val) setFlag(Flags::Register::Zero); }
+
+        inline static bool getBit(const u8& reg, const u8& bit) { return ((reg >> bit) & 0b00000001); }
 
     private:
         void reset();
@@ -137,6 +149,8 @@ class CPU
         bool m_Branched;
 
     public:
+        void pushStack(const u16& val);
+
         //--------------------------------------Opcode Helpers--------------------------------------//
 
         void opcodeINC(u8& reg);
@@ -439,7 +453,7 @@ class CPU
         void opcode0xC8(); // RET Z
         void opcode0xC9(); // RET
         void opcode0xCA(); // JP Z,u16
-        void opcode0xCB(); // PREFIX CB
+        // void opcode0xCB(); // PREFIX CB
         void opcode0xCC(); // CALL Z,u16
         void opcode0xCD(); // CALL u16
         void opcode0xCE(); // ADC A,u8
@@ -817,7 +831,7 @@ class CPU
             INSTRUCTION("LD BC,u16",        NULL, 3, 12, 12),
             INSTRUCTION("LD (BC),A",        NULL, 1,  8,  8),
             INSTRUCTION("INC BC",           NULL, 1,  8,  8),
-            INSTRUCTION("INC B",            NULL, 1,  4,  4),
+            INSTRUCTION("INC B",            std::bind(&CPU::opcode0x04, this), 1,  4,  4),
             INSTRUCTION("DEC B",            std::bind(&CPU::opcode0x05, this), 1,  4,  4),
             INSTRUCTION("LD B,u8",          std::bind(&CPU::opcode0x06, this), 2,  8,  8),
             INSTRUCTION("RLCA",             NULL, 1,  4,  4),
@@ -825,26 +839,26 @@ class CPU
             INSTRUCTION("ADD HL,BC",        NULL, 1,  8,  8),
             INSTRUCTION("LD A,(BC)",        NULL, 1,  8,  8),
             INSTRUCTION("DEC BC",           NULL, 1,  8,  8),
-            INSTRUCTION("INC C",            NULL, 1,  4,  4),
+            INSTRUCTION("INC C",            std::bind(&CPU::opcode0x0C, this), 1,  4,  4),
             INSTRUCTION("DEC C",            std::bind(&CPU::opcode0x0D, this), 1,  4,  4),
             INSTRUCTION("LD C,u8",          std::bind(&CPU::opcode0x0E, this), 2,  8,  8),
             INSTRUCTION("RRCA",             NULL, 1,  4,  4),
 
             //0x10
             INSTRUCTION("STOP",             NULL, 2,  4,  4),
-            INSTRUCTION("LD DE,u16",        NULL, 3, 12, 12),
+            INSTRUCTION("LD DE,u16",        std::bind(&CPU::opcode0x11, this), 3, 12, 12),
             INSTRUCTION("LD (DE),A",        NULL, 1,  8,  8),
             INSTRUCTION("INC DE",           NULL, 1,  8,  8),
-            INSTRUCTION("INC D",            NULL, 1,  4,  4),
-            INSTRUCTION("DEC D",            NULL, 1,  4,  4),
+            INSTRUCTION("INC D",            std::bind(&CPU::opcode0x14, this), 1,  4,  4),
+            INSTRUCTION("DEC D",            std::bind(&CPU::opcode0x15, this), 1,  4,  4),
             INSTRUCTION("LD D,u8",          NULL, 2,  8,  8),
             INSTRUCTION("RLA",              NULL, 1,  4,  4),
             INSTRUCTION("JR i8",            NULL, 2, 12, 12),
             INSTRUCTION("ADD HL,DE",        NULL, 1,  8,  8),
-            INSTRUCTION("LD A,(DE)",        NULL, 1,  8,  8),
+            INSTRUCTION("LD A,(DE)",        std::bind(&CPU::opcode0x1A, this), 1,  8,  8),
             INSTRUCTION("DEC DE",           NULL, 1,  8,  8),
-            INSTRUCTION("INC E",            NULL, 1,  4,  4),
-            INSTRUCTION("DEC E",            NULL, 1,  4,  4),
+            INSTRUCTION("INC E",            std::bind(&CPU::opcode0x1C, this), 1,  4,  4),
+            INSTRUCTION("DEC E",            std::bind(&CPU::opcode0x1D, this), 1,  4,  4),
             INSTRUCTION("LD E,u8",          NULL, 2,  8,  8),
             INSTRUCTION("RRA",              NULL, 1,  4,  4),
 
@@ -853,16 +867,16 @@ class CPU
             INSTRUCTION("LD HL,u16",        std::bind(&CPU::opcode0x21, this), 3, 12, 12),
             INSTRUCTION("LD (HL+),A",       NULL, 1,  8,  8),
             INSTRUCTION("INC HL",           NULL, 1,  8,  8),
-            INSTRUCTION("INC H",            NULL, 1,  4,  4),
-            INSTRUCTION("DEC H",            NULL, 1,  4,  4),
+            INSTRUCTION("INC H",            std::bind(&CPU::opcode0x24, this), 1,  4,  4),
+            INSTRUCTION("DEC H",            std::bind(&CPU::opcode0x25, this), 1,  4,  4),
             INSTRUCTION("LD H,u8",          NULL, 2,  8,  8),
             INSTRUCTION("DAA",              NULL, 1,  4,  4),
             INSTRUCTION("JR Z,i8",          NULL, 2, 12,  8),
             INSTRUCTION("ADD HL,HL",        NULL, 1,  8,  8),
             INSTRUCTION("LD A,(HL+)",       NULL, 1,  8,  8),
             INSTRUCTION("DEC HL",           NULL, 1,  8,  8),
-            INSTRUCTION("INC L",            NULL, 1,  4,  4),
-            INSTRUCTION("DEC L",            NULL, 1,  4,  4),
+            INSTRUCTION("INC L",            std::bind(&CPU::opcode0x2C, this), 1,  4,  4),
+            INSTRUCTION("DEC L",            std::bind(&CPU::opcode0x2D, this), 1,  4,  4),
             INSTRUCTION("LD L,u8",          NULL, 2,  8,  8),
             INSTRUCTION("CPL",              NULL, 1,  4,  4),
 
@@ -879,8 +893,8 @@ class CPU
             INSTRUCTION("ADD HL,SP",        NULL, 1,  8,  8),
             INSTRUCTION("LD A,(HL-)",       NULL, 1,  8,  8),
             INSTRUCTION("DEC SP",           NULL, 1,  8,  8),
-            INSTRUCTION("INC A",            NULL, 1,  4,  4),
-            INSTRUCTION("DEC A",            NULL, 1,  4,  4),
+            INSTRUCTION("INC A",            std::bind(&CPU::opcode0x3C, this), 1,  4,  4),
+            INSTRUCTION("DEC A",            std::bind(&CPU::opcode0x3D, this), 1,  4,  4),
             INSTRUCTION("LD A,u8",          std::bind(&CPU::opcode0x3E, this), 2,  8,  8),
             INSTRUCTION("CCF",              NULL, 1,  4,  4),
 
@@ -900,7 +914,7 @@ class CPU
             INSTRUCTION("LD C,H",           NULL, 1,  4,  4),
             INSTRUCTION("LD C,L",           NULL, 1,  4,  4),
             INSTRUCTION("LD C,(HL)",        NULL, 1,  8,  8),
-            INSTRUCTION("LD C,A",           NULL, 1,  4,  4),
+            INSTRUCTION("LD C,A",           std::bind(&CPU::opcode0x4F, this), 1,  4,  4),
 
             //0x50
             INSTRUCTION("LD D,B",           NULL, 1,  4,  4),
@@ -946,7 +960,7 @@ class CPU
             INSTRUCTION("LD (HL),H",        NULL, 1,  8,  8),
             INSTRUCTION("LD (HL),L",        NULL, 1,  8,  8),
             INSTRUCTION("HALT",             NULL, 1,  4,  4),
-            INSTRUCTION("LD (HL),A",        NULL, 1,  8,  8),
+            INSTRUCTION("LD (HL),A",        std::bind(&CPU::opcode0x77, this), 1,  8,  8),
             INSTRUCTION("LD A,B",           NULL, 1,  4,  4),
             INSTRUCTION("LD A,C",           NULL, 1,  4,  4),
             INSTRUCTION("LD A,D",           NULL, 1,  4,  4),
@@ -1034,7 +1048,7 @@ class CPU
             INSTRUCTION("JP NZ,u16",        NULL, 3, 16, 12),
             INSTRUCTION("JP u16",           std::bind(&CPU::opcode0xC3, this), 3, 16, 16),
             INSTRUCTION("CALL NZ,u16",      NULL, 3, 24, 12),
-            INSTRUCTION("PUSH BC",          NULL, 1, 16, 16),
+            INSTRUCTION("PUSH BC",          std::bind(&CPU::opcode0xC5, this), 1, 16, 16),
             INSTRUCTION("ADD A,u8",         NULL, 2,  8,  8),
             INSTRUCTION("RST 00h",          NULL, 1, 16, 16),
             INSTRUCTION("RET Z",            NULL, 1, 20,  8),
@@ -1042,7 +1056,7 @@ class CPU
             INSTRUCTION("JP Z,u16",         NULL, 3, 16, 12),
             INSTRUCTION("PREFIX CB",        NULL, 1,  4,  4),
             INSTRUCTION("CALL Z,u16",       NULL, 3, 24, 12),
-            INSTRUCTION("CALL u16",         NULL, 3, 24, 24),
+            INSTRUCTION("CALL u16",         std::bind(&CPU::opcode0xCD, this), 3, 24, 24),
             INSTRUCTION("ADC A,u8",         NULL, 2,  8,  8),
             INSTRUCTION("RST 08h",          NULL, 1, 16, 16),
 
@@ -1067,7 +1081,7 @@ class CPU
             //0xE0
             INSTRUCTION("LD (FF00+u8),A",   std::bind(&CPU::opcode0xE0, this), 2, 12, 12),
             INSTRUCTION("POP HL",           NULL, 1, 12, 12),
-            INSTRUCTION("LD (FF00+C),A",    NULL, 1,  8,  8),
+            INSTRUCTION("LD (FF00+C),A",    std::bind(&CPU::opcode0xE2, this), 1,  8,  8),
             INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
             INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
             INSTRUCTION("PUSH HL",          NULL, 1, 16, 16),
@@ -1122,14 +1136,14 @@ class CPU
             INSTRUCTION("RRC A",            NULL, 2,  8,  8),
 
             //0x10
-            INSTRUCTION("RL B",             NULL, 2,  8,  8),
-            INSTRUCTION("RL C",             NULL, 2,  8,  8),
-            INSTRUCTION("RL D",             NULL, 2,  8,  8),
-            INSTRUCTION("RL E",             NULL, 2,  8,  8),
-            INSTRUCTION("RL H",             NULL, 2,  8,  8),
-            INSTRUCTION("RL L",             NULL, 2,  8,  8),
+            INSTRUCTION("RL B",             std::bind(&CPU::opcode0x10, this), 2,  8,  8),
+            INSTRUCTION("RL C",             std::bind(&CPU::opcode0x11, this), 2,  8,  8),
+            INSTRUCTION("RL D",             std::bind(&CPU::opcode0x12, this), 2,  8,  8),
+            INSTRUCTION("RL E",             std::bind(&CPU::opcode0x13, this), 2,  8,  8),
+            INSTRUCTION("RL H",             std::bind(&CPU::opcode0x14, this), 2,  8,  8),
+            INSTRUCTION("RL L",             std::bind(&CPU::opcode0x15, this), 2,  8,  8),
             INSTRUCTION("RL (HL)",          NULL, 2, 16, 16),
-            INSTRUCTION("RL A",             NULL, 2,  8,  8),
+            INSTRUCTION("RL A",             std::bind(&CPU::opcode0x16, this), 2,  8,  8),
             INSTRUCTION("RR B",             NULL, 2,  8,  8),
             INSTRUCTION("RR C",             NULL, 2,  8,  8),
             INSTRUCTION("RR D",             NULL, 2,  8,  8),
@@ -1176,76 +1190,76 @@ class CPU
             INSTRUCTION("SRL A",            NULL, 2,  8,  8),
 
             //0x40
-            INSTRUCTION("BIT 0,B",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 0,C",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 0,D",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 0,E",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 0,H",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 0,L",          NULL, 2,  8,  8),
+            INSTRUCTION("BIT 0,B",          std::bind(&CPU::opcodeCB0x40, this), 2,  8,  8),
+            INSTRUCTION("BIT 0,C",          std::bind(&CPU::opcodeCB0x41, this), 2,  8,  8),
+            INSTRUCTION("BIT 0,D",          std::bind(&CPU::opcodeCB0x42, this), 2,  8,  8),
+            INSTRUCTION("BIT 0,E",          std::bind(&CPU::opcodeCB0x43, this), 2,  8,  8),
+            INSTRUCTION("BIT 0,H",          std::bind(&CPU::opcodeCB0x44, this), 2,  8,  8),
+            INSTRUCTION("BIT 0,L",          std::bind(&CPU::opcodeCB0x45, this), 2,  8,  8),
             INSTRUCTION("BIT 0,(HL)",       NULL, 2, 12, 12),
-            INSTRUCTION("BIT 0,A",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 1,B",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 1,C",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 1,D",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 1,E",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 1,H",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 1,L",          NULL, 2,  8,  8),
+            INSTRUCTION("BIT 0,A",          std::bind(&CPU::opcodeCB0x47, this), 2,  8,  8),
+            INSTRUCTION("BIT 1,B",          std::bind(&CPU::opcodeCB0x48, this), 2,  8,  8),
+            INSTRUCTION("BIT 1,C",          std::bind(&CPU::opcodeCB0x49, this), 2,  8,  8),
+            INSTRUCTION("BIT 1,D",          std::bind(&CPU::opcodeCB0x4A, this), 2,  8,  8),
+            INSTRUCTION("BIT 1,E",          std::bind(&CPU::opcodeCB0x4B, this), 2,  8,  8),
+            INSTRUCTION("BIT 1,H",          std::bind(&CPU::opcodeCB0x4C, this), 2,  8,  8),
+            INSTRUCTION("BIT 1,L",          std::bind(&CPU::opcodeCB0x4D, this), 2,  8,  8),
             INSTRUCTION("BIT 1,(HL)",       NULL, 2, 12, 12),
-            INSTRUCTION("BIT 1,A",          NULL, 2,  8,  8),
+            INSTRUCTION("BIT 1,A",          std::bind(&CPU::opcodeCB0x4F, this), 2,  8,  8),
 
             //0x50
-            INSTRUCTION("BIT 2,B",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 2,C",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 2,D",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 2,E",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 2,H",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 2,L",          NULL, 2,  8,  8),
+            INSTRUCTION("BIT 2,B",          std::bind(&CPU::opcodeCB0x50, this), 2,  8,  8),
+            INSTRUCTION("BIT 2,C",          std::bind(&CPU::opcodeCB0x51, this), 2,  8,  8),
+            INSTRUCTION("BIT 2,D",          std::bind(&CPU::opcodeCB0x52, this), 2,  8,  8),
+            INSTRUCTION("BIT 2,E",          std::bind(&CPU::opcodeCB0x53, this), 2,  8,  8),
+            INSTRUCTION("BIT 2,H",          std::bind(&CPU::opcodeCB0x54, this), 2,  8,  8),
+            INSTRUCTION("BIT 2,L",          std::bind(&CPU::opcodeCB0x55, this), 2,  8,  8),
             INSTRUCTION("BIT 2,(HL)",       NULL, 2, 12, 12),
-            INSTRUCTION("BIT 2,A",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 3,B",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 3,C",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 3,D",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 3,E",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 3,H",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 3,L",          NULL, 2,  8,  8),
+            INSTRUCTION("BIT 2,A",          std::bind(&CPU::opcodeCB0x57, this), 2,  8,  8),
+            INSTRUCTION("BIT 3,B",          std::bind(&CPU::opcodeCB0x58, this), 2,  8,  8),
+            INSTRUCTION("BIT 3,C",          std::bind(&CPU::opcodeCB0x59, this), 2,  8,  8),
+            INSTRUCTION("BIT 3,D",          std::bind(&CPU::opcodeCB0x5A, this), 2,  8,  8),
+            INSTRUCTION("BIT 3,E",          std::bind(&CPU::opcodeCB0x5B, this), 2,  8,  8),
+            INSTRUCTION("BIT 3,H",          std::bind(&CPU::opcodeCB0x5C, this), 2,  8,  8),
+            INSTRUCTION("BIT 3,L",          std::bind(&CPU::opcodeCB0x5D, this), 2,  8,  8),
             INSTRUCTION("BIT 3,(HL)",       NULL, 2, 12, 12),
-            INSTRUCTION("BIT 3,A",          NULL, 2,  8,  8),
+            INSTRUCTION("BIT 3,A",          std::bind(&CPU::opcodeCB0x5F, this), 2,  8,  8),
 
             //0x60
-            INSTRUCTION("BIT 4,B",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 4,C",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 4,D",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 4,E",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 4,H",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 4,L",          NULL, 2,  8,  8),
+            INSTRUCTION("BIT 4,B",          std::bind(&CPU::opcodeCB0x60, this), 2,  8,  8),
+            INSTRUCTION("BIT 4,C",          std::bind(&CPU::opcodeCB0x61, this), 2,  8,  8),
+            INSTRUCTION("BIT 4,D",          std::bind(&CPU::opcodeCB0x62, this), 2,  8,  8),
+            INSTRUCTION("BIT 4,E",          std::bind(&CPU::opcodeCB0x63, this), 2,  8,  8),
+            INSTRUCTION("BIT 4,H",          std::bind(&CPU::opcodeCB0x64, this), 2,  8,  8),
+            INSTRUCTION("BIT 4,L",          std::bind(&CPU::opcodeCB0x65, this), 2,  8,  8),
             INSTRUCTION("BIT 4,(HL)",       NULL, 2, 12, 12),
-            INSTRUCTION("BIT 4,A",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 5,B",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 5,C",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 5,D",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 5,E",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 5,H",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 5,L",          NULL, 2,  8,  8),
+            INSTRUCTION("BIT 4,A",          std::bind(&CPU::opcodeCB0x67, this), 2,  8,  8),
+            INSTRUCTION("BIT 5,B",          std::bind(&CPU::opcodeCB0x68, this), 2,  8,  8),
+            INSTRUCTION("BIT 5,C",          std::bind(&CPU::opcodeCB0x69, this), 2,  8,  8),
+            INSTRUCTION("BIT 5,D",          std::bind(&CPU::opcodeCB0x6A, this), 2,  8,  8),
+            INSTRUCTION("BIT 5,E",          std::bind(&CPU::opcodeCB0x6B, this), 2,  8,  8),
+            INSTRUCTION("BIT 5,H",          std::bind(&CPU::opcodeCB0x6C, this), 2,  8,  8),
+            INSTRUCTION("BIT 5,L",          std::bind(&CPU::opcodeCB0x6D, this), 2,  8,  8),
             INSTRUCTION("BIT 5,(HL)",       NULL, 2, 12, 12),
-            INSTRUCTION("BIT 5,A",          NULL, 2,  8,  8),
+            INSTRUCTION("BIT 5,A",          std::bind(&CPU::opcodeCB0x6E, this), 2,  8,  8),
 
             //0x70
-            INSTRUCTION("BIT 6,B",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 6,C",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 6,D",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 6,E",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 6,H",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 6,L",          NULL, 2,  8,  8),
+            INSTRUCTION("BIT 6,B",          std::bind(&CPU::opcodeCB0x70, this), 2,  8,  8),
+            INSTRUCTION("BIT 6,C",          std::bind(&CPU::opcodeCB0x71, this), 2,  8,  8),
+            INSTRUCTION("BIT 6,D",          std::bind(&CPU::opcodeCB0x72, this), 2,  8,  8),
+            INSTRUCTION("BIT 6,E",          std::bind(&CPU::opcodeCB0x73, this), 2,  8,  8),
+            INSTRUCTION("BIT 6,H",          std::bind(&CPU::opcodeCB0x74, this), 2,  8,  8),
+            INSTRUCTION("BIT 6,L",          std::bind(&CPU::opcodeCB0x75, this), 2,  8,  8),
             INSTRUCTION("BIT 6,(HL)",       NULL, 2, 12, 12),
-            INSTRUCTION("BIT 6,A",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 7,B",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 7,C",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 7,D",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 7,E",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 7,H",          NULL, 2,  8,  8),
-            INSTRUCTION("BIT 7,L",          NULL, 2,  8,  8),
+            INSTRUCTION("BIT 6,A",          std::bind(&CPU::opcodeCB0x77, this), 2,  8,  8),
+            INSTRUCTION("BIT 7,B",          std::bind(&CPU::opcodeCB0x78, this), 2,  8,  8),
+            INSTRUCTION("BIT 7,C",          std::bind(&CPU::opcodeCB0x79, this), 2,  8,  8),
+            INSTRUCTION("BIT 7,D",          std::bind(&CPU::opcodeCB0x7A, this), 2,  8,  8),
+            INSTRUCTION("BIT 7,E",          std::bind(&CPU::opcodeCB0x7B, this), 2,  8,  8),
+            INSTRUCTION("BIT 7,H",          std::bind(&CPU::opcodeCB0x7C, this), 2,  8,  8),
+            INSTRUCTION("BIT 7,L",          std::bind(&CPU::opcodeCB0x7D, this), 2,  8,  8),
             INSTRUCTION("BIT 7,(HL)",       NULL, 2, 12, 12),
-            INSTRUCTION("BIT 7,A",          NULL, 2,  8,  8),
+            INSTRUCTION("BIT 7,A",          std::bind(&CPU::opcodeCB0x7F, this), 2,  8,  8),
 
             //0x80
             INSTRUCTION("RES 0,B",          NULL, 2,  8,  8),

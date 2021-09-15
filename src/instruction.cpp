@@ -2,11 +2,22 @@
 #include "cpu.h"
 #include "mmu.h"
 
+void CPU::pushStack(const u16& val)
+{
+    m_Registers.SP--;
+    m_MMU->write(m_Registers.SP, static_cast<u8>((val & 0x00FF)     ));
+    m_Registers.SP--;
+    m_MMU->write(m_Registers.SP, static_cast<u8>((val & 0xFF00) >> 8));
+}
+
 //--------------------------------------Opcode Helpers--------------------------------------//
 
 void CPU::opcodeINC(u8& reg)
 {
-
+    reg++;
+    clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry);
+    setZeroFromVal(reg);
+    if((reg * 0x0f) == 0x00) setFlag(Flags::Register::HalfCarry);
 }
 
 void CPU::opcodeDEC(u8& reg)
@@ -101,6 +112,7 @@ void CPU::opcodeJR(bool condition)
         m_Registers.PC = addr;
         m_Branched = true;
 
+        LOG_PUSH();
         LOG_JP(addr);
     }
     else
@@ -111,7 +123,22 @@ void CPU::opcodeJR(bool condition)
 
 void CPU::opcodeCALL(bool condition)
 {
+    u8 low  = m_MMU->read(m_Registers.PC++);
+    u8 high = m_MMU->read(m_Registers.PC++);
 
+    if(condition)
+    {
+        pushStack(m_Registers.PC);
+        u16 addr = static_cast<u16>(high) << 8 | static_cast<u16>(low);
+        m_Registers.PC = addr;
+
+        LOG_PUSH();
+        LOG_JP(addr);
+    }
+    else
+    {
+        LOG_NJP();
+    }
 }
 
 void CPU::opcodeRET(bool condiiton)
@@ -126,7 +153,7 @@ void CPU::opcodePUSH(const u8& reg)
 
 void CPU::opcodePOP(u8& reg)
 {
-    
+
 }
 
 //--------------------------------------Opcodes--------------------------------------//
@@ -135,7 +162,7 @@ void CPU::opcodePOP(u8& reg)
 
 void CPU::opcode0x00() // NOP
 {
-    
+
 }
 
 void CPU::opcode0x01() // LD BC,u16
@@ -155,7 +182,10 @@ void CPU::opcode0x03() // INC BC
 
 void CPU::opcode0x04() // INC B
 {
+    opcodeINC(m_Registers.B);
 
+    LOG_B_REG();
+    LOG_FLAGS();
 }
 
 void CPU::opcode0x05() // DEC B
@@ -200,7 +230,10 @@ void CPU::opcode0x0B() // DEC BC
 
 void CPU::opcode0x0C() // INC C
 {
+    opcodeINC(m_Registers.C);
 
+    LOG_C_REG();
+    LOG_FLAGS();
 }
 
 void CPU::opcode0x0D() // DEC C
@@ -232,7 +265,10 @@ void CPU::opcode0x10() // STOP
 
 void CPU::opcode0x11() // LD DE,u16
 {
+    m_Registers.E = m_MMU->read(m_Registers.PC++);
+    m_Registers.D = m_MMU->read(m_Registers.PC++);
 
+    LOG_DE_REG();
 }
 
 void CPU::opcode0x12() // LD (DE),A
@@ -247,12 +283,18 @@ void CPU::opcode0x13() // INC DE
 
 void CPU::opcode0x14() // INC D
 {
+    opcodeINC(m_Registers.D);
 
+    LOG_D_REG();
+    LOG_FLAGS();
 }
 
 void CPU::opcode0x15() // DEC D
 {
+    opcodeDEC(m_Registers.D);
 
+    LOG_D_REG();
+    LOG_FLAGS();
 }
 
 void CPU::opcode0x16() // LD D,u8
@@ -277,7 +319,9 @@ void CPU::opcode0x19() // ADD HL,DE
 
 void CPU::opcode0x1A() // LD A,(DE)
 {
+    m_Registers.A = m_MMU->read(m_Registers.DE);
 
+    LOG_A_REG();
 }
 
 void CPU::opcode0x1B() // DEC DE
@@ -287,12 +331,18 @@ void CPU::opcode0x1B() // DEC DE
 
 void CPU::opcode0x1C() // INC E
 {
+    opcodeINC(m_Registers.E);
 
+    LOG_E_REG();
+    LOG_FLAGS();
 }
 
 void CPU::opcode0x1D() // DEC E
 {
+    opcodeDEC(m_Registers.E);
 
+    LOG_E_REG();
+    LOG_FLAGS();
 }
 
 void CPU::opcode0x1E() // LD E,u8
@@ -333,12 +383,18 @@ void CPU::opcode0x23() // INC HL
 
 void CPU::opcode0x24() // INC H
 {
+    opcodeINC(m_Registers.H);
 
+    LOG_H_REG();
+    LOG_FLAGS();
 }
 
 void CPU::opcode0x25() // DEC H
 {
+    opcodeDEC(m_Registers.H);
 
+    LOG_H_REG();
+    LOG_FLAGS();
 }
 
 void CPU::opcode0x26() // LD H,u8
@@ -373,12 +429,18 @@ void CPU::opcode0x2B() // DEC HL
 
 void CPU::opcode0x2C() // INC L
 {
+    opcodeINC(m_Registers.L);
 
+    LOG_L_REG();
+    LOG_FLAGS();
 }
 
 void CPU::opcode0x2D() // DEC L
 {
+    opcodeDEC(m_Registers.L);
 
+    LOG_L_REG();
+    LOG_FLAGS();
 }
 
 void CPU::opcode0x2E() // LD L,u8
@@ -461,12 +523,18 @@ void CPU::opcode0x3B() // DEC SP
 
 void CPU::opcode0x3C() // INC A
 {
+    opcodeINC(m_Registers.A);
 
+    LOG_A_REG();
+    LOG_FLAGS();
 }
 
 void CPU::opcode0x3D() // DEC A
 {
+    opcodeDEC(m_Registers.A);
 
+    LOG_A_REG();
+    LOG_FLAGS();
 }
 
 void CPU::opcode0x3E() // LD A,u8
@@ -560,7 +628,9 @@ void CPU::opcode0x4E() // LD C,(HL)
 
 void CPU::opcode0x4F() // LD C,A
 {
+    m_Registers.C = m_Registers.A;
 
+    LOG_C_REG();
 }
 
 //0x50
@@ -766,7 +836,9 @@ void CPU::opcode0x76() // HALT
 
 void CPU::opcode0x77() // LD (HL),A
 {
+    m_MMU->write(m_Registers.HL, m_Registers.A);
 
+    LOG_WRITE(m_Registers.HL, m_Registers.A);
 }
 
 void CPU::opcode0x78() // LD A,B
@@ -1170,7 +1242,9 @@ void CPU::opcode0xC4() // CALL NZ,u16
 
 void CPU::opcode0xC5() // PUSH BC
 {
+    pushStack(m_Registers.BC);
 
+    LOG_PUSH();
 }
 
 void CPU::opcode0xC6() // ADD A,u8
@@ -1198,10 +1272,14 @@ void CPU::opcode0xCA() // JP Z,u16
 
 }
 
+/**
+
 void CPU::opcode0xCB() // PREFIX CB
 {
 
 }
+
+**/
 
 void CPU::opcode0xCC() // CALL Z,u16
 {
@@ -1210,7 +1288,7 @@ void CPU::opcode0xCC() // CALL Z,u16
 
 void CPU::opcode0xCD() // CALL u16
 {
-
+    opcodeCALL(true);
 }
 
 void CPU::opcode0xCE() // ADC A,u8
@@ -1323,7 +1401,11 @@ void CPU::opcode0xE1() // POP HL
 
 void CPU::opcode0xE2() // LD (FF00+C),A
 {
+    u8 offset = m_Registers.C;
+    u16 addr = 0xFF00 | offset;
+    m_MMU->write(addr, m_Registers.A);
 
+    LOG_WRITE(addr, m_Registers.A);
 }
 
 void CPU::opcode0xE3() // UNUSED

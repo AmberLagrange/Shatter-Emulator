@@ -15,18 +15,36 @@ void CPU::setMMU(MMU* mmu)
 u8 CPU::tick()
 {
     handleInterrupts();
-    Instruction instruction = instructions[m_MMU->read(m_Registers.PC++)];
-    ASSERT(instruction.op, "Opcode 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_MMU->read(m_Registers.PC - 1)) << ": " << instruction.mnemonic);
+
+    Instruction instruction;
+    u8 cycles = 0;
+    u8 opcode = m_MMU->read(m_Registers.PC++);
+
+    if(opcode == 0xCB)
+    {
+        opcode = m_MMU->read(m_Registers.PC++);
+        instruction = instructionsCB[opcode];
+        cycles += 4; // Add 4 cycles due to the CB prefix
+
+        ASSERT(instruction.op, "Opcode 0xCB" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(opcode) << ": " << instruction.mnemonic);
+    }
+    else
+    {
+        instruction = instructions[opcode];
+        ASSERT(instruction.op, "Opcode 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(opcode) << ": " << instruction.mnemonic);
+    }
+
+    
     LOG(instruction.mnemonic);
     std::invoke(instruction.op);
 
     if(m_Branched)
     {
         m_Branched = false;
-        return instruction.cyclesBranch;
+        cycles + instruction.cyclesBranch;
     }
 
-    return instruction.cyclesNoBranch;
+    cycles + instruction.cyclesNoBranch;
 }
 void CPU::reset()
 {

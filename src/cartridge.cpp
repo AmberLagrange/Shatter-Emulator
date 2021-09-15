@@ -50,7 +50,7 @@ void Cartridge::dump()
 
 void Cartridge::dump()
 {
-    
+
 }
 
 #endif

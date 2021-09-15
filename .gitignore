@@ -35,6 +35,7 @@
 *.gba
 *.gb
 *.rom
+*.bin
 
 #vscode
 .vscode/

@@ -22,7 +22,7 @@ void Gameboy::start()
         u8 cycles = m_CPU.tick();
         m_PPU.tick(cycles);
 
-        m_Screen.update();
+        //m_Screen.update();
     }
 }
 
