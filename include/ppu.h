@@ -7,6 +7,6 @@ class PPU
     public:
         PPU();
 
-        void tick();
+        void tick(u8 cycles);
     private:
 };

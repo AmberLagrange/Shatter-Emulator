@@ -5,6 +5,41 @@
 #include "instruction.h"
 #include "flags.h"
 
+//--------------------------------------Log Helper Macros--------------------------------------//
+
+#define LOG_A_REG() LOG("A Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.A) << ".")
+#define LOG_F_REG() LOG("F Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.F) << ".")
+#define LOG_B_REG() LOG("B Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.B) << ".")
+#define LOG_C_REG() LOG("C Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.C) << ".")
+#define LOG_D_REG() LOG("D Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.D) << ".")
+#define LOG_E_REG() LOG("E Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.E) << ".")
+#define LOG_H_REG() LOG("H Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.H) << ".")
+#define LOG_L_REG() LOG("F Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.L) << ".")
+
+#define LOG_FLAGS() LOG("Flags updated to: "                                          \
+                        << ((m_Registers.F & Flags::Register::Zero)      ? "Z" : "_") \
+                        << ((m_Registers.F & Flags::Register::Negative)  ? "N" : "_") \
+                        << ((m_Registers.F & Flags::Register::HalfCarry) ? "H" : "_") \
+                        << ((m_Registers.F & Flags::Register::Carry)     ? "C" : "_") \
+                        << ".")
+
+#define LOG_AF_REG() LOG("AF Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.AF) << ".")
+#define LOG_BC_REG() LOG("BC Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.BC) << ".")
+#define LOG_DE_REG() LOG("DE Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.DE) << ".")
+#define LOG_HL_REG() LOG("HL Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.HL) << ".")
+#define LOG_SP_REG() LOG("SP Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.SP) << ".")
+
+#define LOG_WRITE(addr, val) LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(val) << " to address 0x" << std::setw(4) << addr << ".")
+
+#define LOG_JP(addr) LOG("Jumped to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(addr) << ".");
+#define LOG_NJP() LOG("Did not jump.");
+
+#define LOG_RET(addr) LOG("Returned to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(addr) << ".");
+#define LOG_NRET() LOG("Did not return.");
+
+#define LOG_DI() LOG("Disabled Interrupts.")
+#define LOG_EI() LOG("Enabled Interrupts.")
+
 class MMU;
 
 class CPU
@@ -14,7 +49,7 @@ class CPU
 
         void setMMU(MMU* mmu);
 
-        void tick();
+        u8 tick();
 
         inline void setFlag(const Flags::Register& flag)    { m_Registers.F |= flag; }
         inline void clearFlag(const Flags::Register& flag)  { m_Registers.F &= ~flag; }
@@ -99,6 +134,7 @@ class CPU
 
         Registers m_Registers;
         bool m_IME;
+        bool m_Branched;
 
     public:
         //--------------------------------------Opcode Helpers--------------------------------------//
@@ -128,328 +164,634 @@ class CPU
 
         //0x00
 
-        void op00(); // NOP
-        void op01(); // LD BC,u16
-        void op02(); // LD (BC),A
-        void op03(); // INC BC
-        void op04(); // INC B
-        void op05(); // DEC B
-        void op06(); // LD B,u8
-        void op07(); // RLCA
-        void op08(); // LD (u16),SP
-        void op09(); // ADD HL,BC
-        void op0A(); // LD A,(BC)
-        void op0B(); // DEC BC
-        void op0C(); // INC C
-        void op0D(); // DEC C
-        void op0E(); // LD C,u8
-        void op0F(); // RRCA
+        void opcode0x00(); // NOP
+        void opcode0x01(); // LD BC,u16
+        void opcode0x02(); // LD (BC),A
+        void opcode0x03(); // INC BC
+        void opcode0x04(); // INC B
+        void opcode0x05(); // DEC B
+        void opcode0x06(); // LD B,u8
+        void opcode0x07(); // RLCA
+        void opcode0x08(); // LD (u16),SP
+        void opcode0x09(); // ADD HL,BC
+        void opcode0x0A(); // LD A,(BC)
+        void opcode0x0B(); // DEC BC
+        void opcode0x0C(); // INC C
+        void opcode0x0D(); // DEC C
+        void opcode0x0E(); // LD C,u8
+        void opcode0x0F(); // RRCA
 
         //0x10
 
-        void op10(); // STOP
-        void op11(); // LD DE,u16
-        void op12(); // LD (DE),A
-        void op13(); // INC DE
-        void op14(); // INC D
-        void op15(); // DEC D
-        void op16(); // LD D,u8
-        void op17(); // RLA
-        void op18(); // JR i8
-        void op19(); // ADD HL,DE
-        void op1A(); // LD A,(DE)
-        void op1B(); // DEC DE
-        void op1C(); // INC E
-        void op1D(); // DEC E
-        void op1E(); // LD E,u8
-        void op1F(); // RRA
+        void opcode0x10(); // STOP
+        void opcode0x11(); // LD DE,u16
+        void opcode0x12(); // LD (DE),A
+        void opcode0x13(); // INC DE
+        void opcode0x14(); // INC D
+        void opcode0x15(); // DEC D
+        void opcode0x16(); // LD D,u8
+        void opcode0x17(); // RLA
+        void opcode0x18(); // JR i8
+        void opcode0x19(); // ADD HL,DE
+        void opcode0x1A(); // LD A,(DE)
+        void opcode0x1B(); // DEC DE
+        void opcode0x1C(); // INC E
+        void opcode0x1D(); // DEC E
+        void opcode0x1E(); // LD E,u8
+        void opcode0x1F(); // RRA
 
         //0x20
 
-        void op20(); // JR NZ,i8
-        void op21(); // LD HL,u16
-        void op22(); // LD (HL+),A
-        void op23(); // INC HL
-        void op24(); // INC H
-        void op25(); // DEC H
-        void op26(); // LD H,u8
-        void op27(); // DAA
-        void op28(); // JR Z,i8
-        void op29(); // ADD HL,HL
-        void op2A(); // LD A,(HL+)
-        void op2B(); // DEC HL
-        void op2C(); // INC L
-        void op2D(); // DEC L
-        void op2E(); // LD L,u8
-        void op2F(); // CPL
+        void opcode0x20(); // JR NZ,i8
+        void opcode0x21(); // LD HL,u16
+        void opcode0x22(); // LD (HL+),A
+        void opcode0x23(); // INC HL
+        void opcode0x24(); // INC H
+        void opcode0x25(); // DEC H
+        void opcode0x26(); // LD H,u8
+        void opcode0x27(); // DAA
+        void opcode0x28(); // JR Z,i8
+        void opcode0x29(); // ADD HL,HL
+        void opcode0x2A(); // LD A,(HL+)
+        void opcode0x2B(); // DEC HL
+        void opcode0x2C(); // INC L
+        void opcode0x2D(); // DEC L
+        void opcode0x2E(); // LD L,u8
+        void opcode0x2F(); // CPL
 
         //0x30
 
-        void op30(); // JR NC,i8
-        void op31(); // LD SP,u16
-        void op32(); // LD (HL-),A
-        void op33(); // INC SP
-        void op34(); // INC (HL)
-        void op35(); // DEC (HL)
-        void op36(); // LD (HL),u8
-        void op37(); // SCF
-        void op38(); // JR C,i8
-        void op39(); // ADD HL,SP
-        void op3A(); // LD A,(HL-)
-        void op3B(); // DEC SP
-        void op3C(); // INC A
-        void op3D(); // DEC A
-        void op3E(); // LD A,u8
-        void op3F(); // CCF
+        void opcode0x30(); // JR NC,i8
+        void opcode0x31(); // LD SP,u16
+        void opcode0x32(); // LD (HL-),A
+        void opcode0x33(); // INC SP
+        void opcode0x34(); // INC (HL)
+        void opcode0x35(); // DEC (HL)
+        void opcode0x36(); // LD (HL),u8
+        void opcode0x37(); // SCF
+        void opcode0x38(); // JR C,i8
+        void opcode0x39(); // ADD HL,SP
+        void opcode0x3A(); // LD A,(HL-)
+        void opcode0x3B(); // DEC SP
+        void opcode0x3C(); // INC A
+        void opcode0x3D(); // DEC A
+        void opcode0x3E(); // LD A,u8
+        void opcode0x3F(); // CCF
 
         //0x40
 
-        void op40(); // LD B,B
-        void op41(); // LD B,C
-        void op42(); // LD B,D
-        void op43(); // LD B,E
-        void op44(); // LD B,H
-        void op45(); // LD B,L
-        void op46(); // LD B,(HL)
-        void op47(); // LD B,A
-        void op48(); // LD C,B
-        void op49(); // LD C,C
-        void op4A(); // LD C,D
-        void op4B(); // LD C,E
-        void op4C(); // LD C,H
-        void op4D(); // LD C,L
-        void op4E(); // LD C,(HL)
-        void op4F(); // LD C,A
+        void opcode0x40(); // LD B,B
+        void opcode0x41(); // LD B,C
+        void opcode0x42(); // LD B,D
+        void opcode0x43(); // LD B,E
+        void opcode0x44(); // LD B,H
+        void opcode0x45(); // LD B,L
+        void opcode0x46(); // LD B,(HL)
+        void opcode0x47(); // LD B,A
+        void opcode0x48(); // LD C,B
+        void opcode0x49(); // LD C,C
+        void opcode0x4A(); // LD C,D
+        void opcode0x4B(); // LD C,E
+        void opcode0x4C(); // LD C,H
+        void opcode0x4D(); // LD C,L
+        void opcode0x4E(); // LD C,(HL)
+        void opcode0x4F(); // LD C,A
 
         //0x50
 
-        void op50(); // LD D,B
-        void op51(); // LD D,C
-        void op52(); // LD D,D
-        void op53(); // LD D,E
-        void op54(); // LD D,H
-        void op55(); // LD D,L
-        void op56(); // LD D,(HL)
-        void op57(); // LD D,A
-        void op58(); // LD E,B
-        void op59(); // LD E,C
-        void op5A(); // LD E,D
-        void op5B(); // LD E,E
-        void op5C(); // LD E,H
-        void op5D(); // LD E,L
-        void op5E(); // LD E,(HL)
-        void op5F(); // LD E,A
+        void opcode0x50(); // LD D,B
+        void opcode0x51(); // LD D,C
+        void opcode0x52(); // LD D,D
+        void opcode0x53(); // LD D,E
+        void opcode0x54(); // LD D,H
+        void opcode0x55(); // LD D,L
+        void opcode0x56(); // LD D,(HL)
+        void opcode0x57(); // LD D,A
+        void opcode0x58(); // LD E,B
+        void opcode0x59(); // LD E,C
+        void opcode0x5A(); // LD E,D
+        void opcode0x5B(); // LD E,E
+        void opcode0x5C(); // LD E,H
+        void opcode0x5D(); // LD E,L
+        void opcode0x5E(); // LD E,(HL)
+        void opcode0x5F(); // LD E,A
 
         //0x60
 
-        void op60(); // LD H,B
-        void op61(); // LD H,C
-        void op62(); // LD H,D
-        void op63(); // LD H,E
-        void op64(); // LD H,H
-        void op65(); // LD H,L
-        void op66(); // LD H,(HL)
-        void op67(); // LD H,A
-        void op68(); // LD L,B
-        void op69(); // LD L,C
-        void op6A(); // LD L,D
-        void op6B(); // LD L,E
-        void op6C(); // LD L,H
-        void op6D(); // LD L,L
-        void op6E(); // LD L,(HL)
-        void op6F(); // LD L,A
+        void opcode0x60(); // LD H,B
+        void opcode0x61(); // LD H,C
+        void opcode0x62(); // LD H,D
+        void opcode0x63(); // LD H,E
+        void opcode0x64(); // LD H,H
+        void opcode0x65(); // LD H,L
+        void opcode0x66(); // LD H,(HL)
+        void opcode0x67(); // LD H,A
+        void opcode0x68(); // LD L,B
+        void opcode0x69(); // LD L,C
+        void opcode0x6A(); // LD L,D
+        void opcode0x6B(); // LD L,E
+        void opcode0x6C(); // LD L,H
+        void opcode0x6D(); // LD L,L
+        void opcode0x6E(); // LD L,(HL)
+        void opcode0x6F(); // LD L,A
 
         //0x70
 
-        void op70(); // LD (HL),B
-        void op71(); // LD (HL),C
-        void op72(); // LD (HL),D
-        void op73(); // LD (HL),E
-        void op74(); // LD (HL),H
-        void op75(); // LD (HL),L
-        void op76(); // HALT
-        void op77(); // LD (HL),A
-        void op78(); // LD A,B
-        void op79(); // LD A,C
-        void op7A(); // LD A,D
-        void op7B(); // LD A,E
-        void op7C(); // LD A,H
-        void op7D(); // LD A,L
-        void op7E(); // LD A,(HL)
-        void op7F(); // LD A,A
+        void opcode0x70(); // LD (HL),B
+        void opcode0x71(); // LD (HL),C
+        void opcode0x72(); // LD (HL),D
+        void opcode0x73(); // LD (HL),E
+        void opcode0x74(); // LD (HL),H
+        void opcode0x75(); // LD (HL),L
+        void opcode0x76(); // HALT
+        void opcode0x77(); // LD (HL),A
+        void opcode0x78(); // LD A,B
+        void opcode0x79(); // LD A,C
+        void opcode0x7A(); // LD A,D
+        void opcode0x7B(); // LD A,E
+        void opcode0x7C(); // LD A,H
+        void opcode0x7D(); // LD A,L
+        void opcode0x7E(); // LD A,(HL)
+        void opcode0x7F(); // LD A,A
 
         //0x80
 
-        void op80(); // ADD A,B
-        void op81(); // ADD A,C
-        void op82(); // ADD A,D
-        void op83(); // ADD A,E
-        void op84(); // ADD A,H
-        void op85(); // ADD A,L
-        void op86(); // ADD A,(HL)
-        void op87(); // ADD A,A
-        void op88(); // ADC A,B
-        void op89(); // ADC A,C
-        void op8A(); // ADC A,D
-        void op8B(); // ADC A,E
-        void op8C(); // ADC A,H
-        void op8D(); // ADC A,L
-        void op8E(); // ADC A,(HL)
-        void op8F(); // ADC A,A
+        void opcode0x80(); // ADD A,B
+        void opcode0x81(); // ADD A,C
+        void opcode0x82(); // ADD A,D
+        void opcode0x83(); // ADD A,E
+        void opcode0x84(); // ADD A,H
+        void opcode0x85(); // ADD A,L
+        void opcode0x86(); // ADD A,(HL)
+        void opcode0x87(); // ADD A,A
+        void opcode0x88(); // ADC A,B
+        void opcode0x89(); // ADC A,C
+        void opcode0x8A(); // ADC A,D
+        void opcode0x8B(); // ADC A,E
+        void opcode0x8C(); // ADC A,H
+        void opcode0x8D(); // ADC A,L
+        void opcode0x8E(); // ADC A,(HL)
+        void opcode0x8F(); // ADC A,A
 
         //0x90
 
-        void op90(); // SUB A,B
-        void op91(); // SUB A,C
-        void op92(); // SUB A,D
-        void op93(); // SUB A,E
-        void op94(); // SUB A,H
-        void op95(); // SUB A,L
-        void op96(); // SUB A,(HL)
-        void op97(); // SUB A,A
-        void op98(); // SBC A,B
-        void op99(); // SBC A,C
-        void op9A(); // SBC A,D
-        void op9B(); // SBC A,E
-        void op9C(); // SBC A,H
-        void op9D(); // SBC A,L
-        void op9E(); // SBC A,(HL)
-        void op9F(); // SBC A,A
+        void opcode0x90(); // SUB A,B
+        void opcode0x91(); // SUB A,C
+        void opcode0x92(); // SUB A,D
+        void opcode0x93(); // SUB A,E
+        void opcode0x94(); // SUB A,H
+        void opcode0x95(); // SUB A,L
+        void opcode0x96(); // SUB A,(HL)
+        void opcode0x97(); // SUB A,A
+        void opcode0x98(); // SBC A,B
+        void opcode0x99(); // SBC A,C
+        void opcode0x9A(); // SBC A,D
+        void opcode0x9B(); // SBC A,E
+        void opcode0x9C(); // SBC A,H
+        void opcode0x9D(); // SBC A,L
+        void opcode0x9E(); // SBC A,(HL)
+        void opcode0x9F(); // SBC A,A
 
         //0xA0
 
-        void opA0(); // AND A,B
-        void opA1(); // AND A,C
-        void opA2(); // AND A,D
-        void opA3(); // AND A,E
-        void opA4(); // AND A,H
-        void opA5(); // AND A,L
-        void opA6(); // AND A,(HL)
-        void opA7(); // AND A,A
-        void opA8(); // XOR A,B
-        void opA9(); // XOR A,C
-        void opAA(); // XOR A,D
-        void opAB(); // XOR A,E
-        void opAC(); // XOR A,H
-        void opAD(); // XOR A,L
-        void opAE(); // XOR A,(HL)
-        void opAF(); // XOR A,A
+        void opcode0xA0(); // AND A,B
+        void opcode0xA1(); // AND A,C
+        void opcode0xA2(); // AND A,D
+        void opcode0xA3(); // AND A,E
+        void opcode0xA4(); // AND A,H
+        void opcode0xA5(); // AND A,L
+        void opcode0xA6(); // AND A,(HL)
+        void opcode0xA7(); // AND A,A
+        void opcode0xA8(); // XOR A,B
+        void opcode0xA9(); // XOR A,C
+        void opcode0xAA(); // XOR A,D
+        void opcode0xAB(); // XOR A,E
+        void opcode0xAC(); // XOR A,H
+        void opcode0xAD(); // XOR A,L
+        void opcode0xAE(); // XOR A,(HL)
+        void opcode0xAF(); // XOR A,A
 
         //0xB0
 
-        void opB0(); // OR A,B
-        void opB1(); // OR A,C
-        void opB2(); // OR A,D
-        void opB3(); // OR A,E
-        void opB4(); // OR A,H
-        void opB5(); // OR A,L
-        void opB6(); // OR A,(HL)
-        void opB7(); // OR A,A
-        void opB8(); // CP A,B
-        void opB9(); // CP A,C
-        void opBA(); // CP A,D
-        void opBB(); // CP A,E
-        void opBC(); // CP A,H
-        void opBD(); // CP A,L
-        void opBE(); // CP A,(HL)
-        void opBF(); // CP A,A
+        void opcode0xB0(); // OR A,B
+        void opcode0xB1(); // OR A,C
+        void opcode0xB2(); // OR A,D
+        void opcode0xB3(); // OR A,E
+        void opcode0xB4(); // OR A,H
+        void opcode0xB5(); // OR A,L
+        void opcode0xB6(); // OR A,(HL)
+        void opcode0xB7(); // OR A,A
+        void opcode0xB8(); // CP A,B
+        void opcode0xB9(); // CP A,C
+        void opcode0xBA(); // CP A,D
+        void opcode0xBB(); // CP A,E
+        void opcode0xBC(); // CP A,H
+        void opcode0xBD(); // CP A,L
+        void opcode0xBE(); // CP A,(HL)
+        void opcode0xBF(); // CP A,A
 
         //0xC0
 
-        void opC0(); // RET NZ
-        void opC1(); // POP BC
-        void opC2(); // JP NZ,u16
-        void opC3(); // JP u16
-        void opC4(); // CALL NZ,u16
-        void opC5(); // PUSH BC
-        void opC6(); // ADD A,u8
-        void opC7(); // RST 00h
-        void opC8(); // RET Z
-        void opC9(); // RET
-        void opCA(); // JP Z,u16
-        void opCB(); // PREFIX CB
-        void opCC(); // CALL Z,u16
-        void opCD(); // CALL u16
-        void opCE(); // ADC A,u8
-        void opCF(); // RST 08h
+        void opcode0xC0(); // RET NZ
+        void opcode0xC1(); // POP BC
+        void opcode0xC2(); // JP NZ,u16
+        void opcode0xC3(); // JP u16
+        void opcode0xC4(); // CALL NZ,u16
+        void opcode0xC5(); // PUSH BC
+        void opcode0xC6(); // ADD A,u8
+        void opcode0xC7(); // RST 00h
+        void opcode0xC8(); // RET Z
+        void opcode0xC9(); // RET
+        void opcode0xCA(); // JP Z,u16
+        void opcode0xCB(); // PREFIX CB
+        void opcode0xCC(); // CALL Z,u16
+        void opcode0xCD(); // CALL u16
+        void opcode0xCE(); // ADC A,u8
+        void opcode0xCF(); // RST 08h
 
         //0xD0
 
-        void opD0(); // RET NC
-        void opD1(); // POP DE
-        void opD2(); // JP NC,u16
-        void opD3(); // UNUSED
-        void opD4(); // CALL NC,u16
-        void opD5(); // PUSH DE
-        void opD6(); // SUB A,u8
-        void opD7(); // RST 10h
-        void opD8(); // RET C
-        void opD9(); // RETI
-        void opDA(); // JP C,u16
-        void opDB(); // UNUSED
-        void opDC(); // CALL C,u16
-        void opDD(); // UNUSED
-        void opDE(); // SBC A,u8
-        void opDF(); // RST 18h
+        void opcode0xD0(); // RET NC
+        void opcode0xD1(); // POP DE
+        void opcode0xD2(); // JP NC,u16
+        void opcode0xD3(); // UNUSED
+        void opcode0xD4(); // CALL NC,u16
+        void opcode0xD5(); // PUSH DE
+        void opcode0xD6(); // SUB A,u8
+        void opcode0xD7(); // RST 10h
+        void opcode0xD8(); // RET C
+        void opcode0xD9(); // RETI
+        void opcode0xDA(); // JP C,u16
+        void opcode0xDB(); // UNUSED
+        void opcode0xDC(); // CALL C,u16
+        void opcode0xDD(); // UNUSED
+        void opcode0xDE(); // SBC A,u8
+        void opcode0xDF(); // RST 18h
 
         //0xE0
 
-        void opE0(); // LD (FF00+u8),A
-        void opE1(); // POP HL
-        void opE2(); // LD (FF00+C),A
-        void opE3(); // UNUSED
-        void opE4(); // UNUSED
-        void opE5(); // PUSH HL
-        void opE6(); // AND A,u8
-        void opE7(); // RST 20h
-        void opE8(); // ADD SP,i8
-        void opE9(); // JP HL
-        void opEA(); // LD (u16),A
-        void opEB(); // UNUSED
-        void opEC(); // UNUSED
-        void opED(); // UNUSED
-        void opEE(); // XOR A,u8
-        void opEF(); // RST 28h
+        void opcode0xE0(); // LD (FF00+u8),A
+        void opcode0xE1(); // POP HL
+        void opcode0xE2(); // LD (FF00+C),A
+        void opcode0xE3(); // UNUSED
+        void opcode0xE4(); // UNUSED
+        void opcode0xE5(); // PUSH HL
+        void opcode0xE6(); // AND A,u8
+        void opcode0xE7(); // RST 20h
+        void opcode0xE8(); // ADD SP,i8
+        void opcode0xE9(); // JP HL
+        void opcode0xEA(); // LD (u16),A
+        void opcode0xEB(); // UNUSED
+        void opcode0xEC(); // UNUSED
+        void opcode0xED(); // UNUSED
+        void opcode0xEE(); // XOR A,u8
+        void opcode0xEF(); // RST 28h
 
         //0xF0
 
-        void opF0(); // LD A,(FF00+u8)
-        void opF1(); // POP AF
-        void opF2(); // LD A,(FF00+C)
-        void opF3(); // DI
-        void opF4(); // UNUSED
-        void opF5(); // PUSH AF
-        void opF6(); // OR A,u8
-        void opF7(); // RST 30h
-        void opF8(); // LD HL,SP+i8
-        void opF9(); // LD SP,HL
-        void opFA(); // LD A,(u16)
-        void opFB(); // EI
-        void opFC(); // UNUSED
-        void opFD(); // UNUSED
-        void opFE(); // CP A,u8
-        void opFF(); // RST 38h
+        void opcode0xF0(); // LD A,(FF00+u8)
+        void opcode0xF1(); // POP AF
+        void opcode0xF2(); // LD A,(FF00+C)
+        void opcode0xF3(); // DI
+        void opcode0xF4(); // UNUSED
+        void opcode0xF5(); // PUSH AF
+        void opcode0xF6(); // OR A,u8
+        void opcode0xF7(); // RST 30h
+        void opcode0xF8(); // LD HL,SP+i8
+        void opcode0xF9(); // LD SP,HL
+        void opcode0xFA(); // LD A,(u16)
+        void opcode0xFB(); // EI
+        void opcode0xFC(); // UNUSED
+        void opcode0xFD(); // UNUSED
+        void opcode0xFE(); // CP A,u8
+        void opcode0xFF(); // RST 38h
+
+        //--------------------------------------CB Opcodes--------------------------------------//
+
+        //0x00
+
+        void opcodeCB0x00(); // RLC B
+        void opcodeCB0x01(); // RLC C
+        void opcodeCB0x02(); // RLC D
+        void opcodeCB0x03(); // RLC E
+        void opcodeCB0x04(); // RLC H
+        void opcodeCB0x05(); // RLC L
+        void opcodeCB0x06(); // RLC (HL)
+        void opcodeCB0x07(); // RLC A
+        void opcodeCB0x08(); // RRC B
+        void opcodeCB0x09(); // RRC C
+        void opcodeCB0x0A(); // RRC D
+        void opcodeCB0x0B(); // RRC E
+        void opcodeCB0x0C(); // RRC H
+        void opcodeCB0x0D(); // RRC L
+        void opcodeCB0x0E(); // RRC (HL)
+        void opcodeCB0x0F(); // RRC A
+
+        //0x10
+
+        void opcodeCB0x10(); // RL B
+        void opcodeCB0x11(); // RL C
+        void opcodeCB0x12(); // RL D
+        void opcodeCB0x13(); // RL E
+        void opcodeCB0x14(); // RL H
+        void opcodeCB0x15(); // RL L
+        void opcodeCB0x16(); // RL (HL)
+        void opcodeCB0x17(); // RL A
+        void opcodeCB0x18(); // RR B
+        void opcodeCB0x19(); // RR C
+        void opcodeCB0x1A(); // RR D
+        void opcodeCB0x1B(); // RR E
+        void opcodeCB0x1C(); // RR H
+        void opcodeCB0x1D(); // RR L
+        void opcodeCB0x1E(); // RR (HL)
+        void opcodeCB0x1F(); // RR A
+
+        //0x20
+
+        void opcodeCB0x20(); // SLA B
+        void opcodeCB0x21(); // SLA C
+        void opcodeCB0x22(); // SLA D
+        void opcodeCB0x23(); // SLA E
+        void opcodeCB0x24(); // SLA H
+        void opcodeCB0x25(); // SLA L
+        void opcodeCB0x26(); // SLA (HL)
+        void opcodeCB0x27(); // SLA A
+        void opcodeCB0x28(); // SRA B
+        void opcodeCB0x29(); // SRA C
+        void opcodeCB0x2A(); // SRA D
+        void opcodeCB0x2B(); // SRA E
+        void opcodeCB0x2C(); // SRA H
+        void opcodeCB0x2D(); // SRA L
+        void opcodeCB0x2E(); // SRA (HL)
+        void opcodeCB0x2F(); // SRA A
+
+        //0x30
+
+        void opcodeCB0x30(); // SWAP B
+        void opcodeCB0x31(); // SWAP C
+        void opcodeCB0x32(); // SWAP D
+        void opcodeCB0x33(); // SWAP E
+        void opcodeCB0x34(); // SWAP H
+        void opcodeCB0x35(); // SWAP L
+        void opcodeCB0x36(); // SWAP (HL)
+        void opcodeCB0x37(); // SWAP A
+        void opcodeCB0x38(); // SRL B
+        void opcodeCB0x39(); // SRL C
+        void opcodeCB0x3A(); // SRL D
+        void opcodeCB0x3B(); // SRL E
+        void opcodeCB0x3C(); // SRL H
+        void opcodeCB0x3D(); // SRL L
+        void opcodeCB0x3E(); // SRL (HL)
+        void opcodeCB0x3F(); // SRL A
+
+        //0x40
+
+        void opcodeCB0x40(); // BIT 0,B
+        void opcodeCB0x41(); // BIT 0,C
+        void opcodeCB0x42(); // BIT 0,D
+        void opcodeCB0x43(); // BIT 0,E
+        void opcodeCB0x44(); // BIT 0,H
+        void opcodeCB0x45(); // BIT 0,L
+        void opcodeCB0x46(); // BIT 0,(HL)
+        void opcodeCB0x47(); // BIT 0,A
+        void opcodeCB0x48(); // BIT 1,B
+        void opcodeCB0x49(); // BIT 1,C
+        void opcodeCB0x4A(); // BIT 1,D
+        void opcodeCB0x4B(); // BIT 1,E
+        void opcodeCB0x4C(); // BIT 1,H
+        void opcodeCB0x4D(); // BIT 1,L
+        void opcodeCB0x4E(); // BIT 1,(HL)
+        void opcodeCB0x4F(); // BIT 1,A
+
+        //0x50
+
+        void opcodeCB0x50(); // BIT 2,B
+        void opcodeCB0x51(); // BIT 2,C
+        void opcodeCB0x52(); // BIT 2,D
+        void opcodeCB0x53(); // BIT 2,E
+        void opcodeCB0x54(); // BIT 2,H
+        void opcodeCB0x55(); // BIT 2,L
+        void opcodeCB0x56(); // BIT 2,(HL)
+        void opcodeCB0x57(); // BIT 2,A
+        void opcodeCB0x58(); // BIT 3,B
+        void opcodeCB0x59(); // BIT 3,C
+        void opcodeCB0x5A(); // BIT 3,D
+        void opcodeCB0x5B(); // BIT 3,E
+        void opcodeCB0x5C(); // BIT 3,H
+        void opcodeCB0x5D(); // BIT 3,L
+        void opcodeCB0x5E(); // BIT 3,(HL)
+        void opcodeCB0x5F(); // BIT 3,A
+
+        //0x60
+
+        void opcodeCB0x60(); // BIT 4,B
+        void opcodeCB0x61(); // BIT 4,C
+        void opcodeCB0x62(); // BIT 4,D
+        void opcodeCB0x63(); // BIT 4,E
+        void opcodeCB0x64(); // BIT 4,H
+        void opcodeCB0x65(); // BIT 4,L
+        void opcodeCB0x66(); // BIT 4,(HL)
+        void opcodeCB0x67(); // BIT 4,A
+        void opcodeCB0x68(); // BIT 5,B
+        void opcodeCB0x69(); // BIT 5,C
+        void opcodeCB0x6A(); // BIT 5,D
+        void opcodeCB0x6B(); // BIT 5,E
+        void opcodeCB0x6C(); // BIT 5,H
+        void opcodeCB0x6D(); // BIT 5,L
+        void opcodeCB0x6E(); // BIT 5,(HL)
+        void opcodeCB0x6F(); // BIT 5,A
+
+        //0x70
+
+        void opcodeCB0x70(); // BIT 6,B
+        void opcodeCB0x71(); // BIT 6,C
+        void opcodeCB0x72(); // BIT 6,D
+        void opcodeCB0x73(); // BIT 6,E
+        void opcodeCB0x74(); // BIT 6,H
+        void opcodeCB0x75(); // BIT 6,L
+        void opcodeCB0x76(); // BIT 6,(HL)
+        void opcodeCB0x77(); // BIT 6,A
+        void opcodeCB0x78(); // BIT 7,B
+        void opcodeCB0x79(); // BIT 7,C
+        void opcodeCB0x7A(); // BIT 7,D
+        void opcodeCB0x7B(); // BIT 7,E
+        void opcodeCB0x7C(); // BIT 7,H
+        void opcodeCB0x7D(); // BIT 7,L
+        void opcodeCB0x7E(); // BIT 7,(HL)
+        void opcodeCB0x7F(); // BIT 7,A
+
+        //0x80
+
+        void opcodeCB0x80(); // RES 0,B
+        void opcodeCB0x81(); // RES 0,C
+        void opcodeCB0x82(); // RES 0,D
+        void opcodeCB0x83(); // RES 0,E
+        void opcodeCB0x84(); // RES 0,H
+        void opcodeCB0x85(); // RES 0,L
+        void opcodeCB0x86(); // RES 0,(HL)
+        void opcodeCB0x87(); // RES 0,A
+        void opcodeCB0x88(); // RES 1,B
+        void opcodeCB0x89(); // RES 1,C
+        void opcodeCB0x8A(); // RES 1,D
+        void opcodeCB0x8B(); // RES 1,E
+        void opcodeCB0x8C(); // RES 1,H
+        void opcodeCB0x8D(); // RES 1,L
+        void opcodeCB0x8E(); // RES 1,(HL)
+        void opcodeCB0x8F(); // RES 1,A
+
+        //0x90
+
+        void opcodeCB0x90(); // RES 2,B
+        void opcodeCB0x91(); // RES 2,C
+        void opcodeCB0x92(); // RES 2,D
+        void opcodeCB0x93(); // RES 2,E
+        void opcodeCB0x94(); // RES 2,H
+        void opcodeCB0x95(); // RES 2,L
+        void opcodeCB0x96(); // RES 2,(HL)
+        void opcodeCB0x97(); // RES 2,A
+        void opcodeCB0x98(); // RES 3,B
+        void opcodeCB0x99(); // RES 3,C
+        void opcodeCB0x9A(); // RES 3,D
+        void opcodeCB0x9B(); // RES 3,E
+        void opcodeCB0x9C(); // RES 3,H
+        void opcodeCB0x9D(); // RES 3,L
+        void opcodeCB0x9E(); // RES 3,(HL)
+        void opcodeCB0x9F(); // RES 3,A
+
+        //0xA0
+
+        void opcodeCB0xA0(); // RES 4,B
+        void opcodeCB0xA1(); // RES 4,C
+        void opcodeCB0xA2(); // RES 4,D
+        void opcodeCB0xA3(); // RES 4,E
+        void opcodeCB0xA4(); // RES 4,H
+        void opcodeCB0xA5(); // RES 4,L
+        void opcodeCB0xA6(); // RES 4,(HL)
+        void opcodeCB0xA7(); // RES 4,A
+        void opcodeCB0xA8(); // RES 5,B
+        void opcodeCB0xA9(); // RES 5,C
+        void opcodeCB0xAA(); // RES 5,D
+        void opcodeCB0xAB(); // RES 5,E
+        void opcodeCB0xAC(); // RES 5,H
+        void opcodeCB0xAD(); // RES 5,L
+        void opcodeCB0xAE(); // RES 5,(HL)
+        void opcodeCB0xAF(); // RES 5,A
+
+        //0xB0
+
+        void opcodeCB0xB0(); // RES 6,B
+        void opcodeCB0xB1(); // RES 6,C
+        void opcodeCB0xB2(); // RES 6,D
+        void opcodeCB0xB3(); // RES 6,E
+        void opcodeCB0xB4(); // RES 6,H
+        void opcodeCB0xB5(); // RES 6,L
+        void opcodeCB0xB6(); // RES 6,(HL)
+        void opcodeCB0xB7(); // RES 6,A
+        void opcodeCB0xB8(); // RES 7,B
+        void opcodeCB0xB9(); // RES 7,C
+        void opcodeCB0xBA(); // RES 7,D
+        void opcodeCB0xBB(); // RES 7,E
+        void opcodeCB0xBC(); // RES 7,H
+        void opcodeCB0xBD(); // RES 7,L
+        void opcodeCB0xBE(); // RES 7,(HL)
+        void opcodeCB0xBF(); // RES 7,A
+
+        //0xC0
+
+        void opcodeCB0xC0(); // SET 0,B
+        void opcodeCB0xC1(); // SET 0,C
+        void opcodeCB0xC2(); // SET 0,D
+        void opcodeCB0xC3(); // SET 0,E
+        void opcodeCB0xC4(); // SET 0,H
+        void opcodeCB0xC5(); // SET 0,L
+        void opcodeCB0xC6(); // SET 0,(HL)
+        void opcodeCB0xC7(); // SET 0,A
+        void opcodeCB0xC8(); // SET 1,B
+        void opcodeCB0xC9(); // SET 1,C
+        void opcodeCB0xCA(); // SET 1,D
+        void opcodeCB0xCB(); // SET 1,E
+        void opcodeCB0xCC(); // SET 1,H
+        void opcodeCB0xCD(); // SET 1,L
+        void opcodeCB0xCE(); // SET 1,(HL)
+        void opcodeCB0xCF(); // SET 1,A
+
+        //0xD0
+
+        void opcodeCB0xD0(); // SET 2,B
+        void opcodeCB0xD1(); // SET 2,C
+        void opcodeCB0xD2(); // SET 2,D
+        void opcodeCB0xD3(); // SET 2,E
+        void opcodeCB0xD4(); // SET 2,H
+        void opcodeCB0xD5(); // SET 2,L
+        void opcodeCB0xD6(); // SET 2,(HL)
+        void opcodeCB0xD7(); // SET 2,A
+        void opcodeCB0xD8(); // SET 3,B
+        void opcodeCB0xD9(); // SET 3,C
+        void opcodeCB0xDA(); // SET 3,D
+        void opcodeCB0xDB(); // SET 3,E
+        void opcodeCB0xDC(); // SET 3,H
+        void opcodeCB0xDD(); // SET 3,L
+        void opcodeCB0xDE(); // SET 3,(HL)
+        void opcodeCB0xDF(); // SET 3,A
+
+        //0xE0
+
+        void opcodeCB0xE0(); // SET 4,B
+        void opcodeCB0xE1(); // SET 4,C
+        void opcodeCB0xE2(); // SET 4,D
+        void opcodeCB0xE3(); // SET 4,E
+        void opcodeCB0xE4(); // SET 4,H
+        void opcodeCB0xE5(); // SET 4,L
+        void opcodeCB0xE6(); // SET 4,(HL)
+        void opcodeCB0xE7(); // SET 4,A
+        void opcodeCB0xE8(); // SET 5,B
+        void opcodeCB0xE9(); // SET 5,C
+        void opcodeCB0xEA(); // SET 5,D
+        void opcodeCB0xEB(); // SET 5,E
+        void opcodeCB0xEC(); // SET 5,H
+        void opcodeCB0xED(); // SET 5,L
+        void opcodeCB0xEE(); // SET 5,(HL)
+        void opcodeCB0xEF(); // SET 5,A
+
+        //0xF0
+
+        void opcodeCB0xF0(); // SET 6,B
+        void opcodeCB0xF1(); // SET 6,C
+        void opcodeCB0xF2(); // SET 6,D
+        void opcodeCB0xF3(); // SET 6,E
+        void opcodeCB0xF4(); // SET 6,H
+        void opcodeCB0xF5(); // SET 6,L
+        void opcodeCB0xF6(); // SET 6,(HL)
+        void opcodeCB0xF7(); // SET 6,A
+        void opcodeCB0xF8(); // SET 7,B
+        void opcodeCB0xF9(); // SET 7,C
+        void opcodeCB0xFA(); // SET 7,D
+        void opcodeCB0xFB(); // SET 7,E
+        void opcodeCB0xFC(); // SET 7,H
+        void opcodeCB0xFD(); // SET 7,L
+        void opcodeCB0xFE(); // SET 7,(HL)
+        void opcodeCB0xFF(); // SET 7,A
 
         //--------------------------------------Opcode Tables--------------------------------------//
 
         const Instruction instructions[0x100] = 
         {
             //0x00
-            INSTRUCTION("NOP",              std::bind(&CPU::op00, this), 1,  4,  4),
+            INSTRUCTION("NOP",              std::bind(&CPU::opcode0x00, this), 1,  4,  4),
             INSTRUCTION("LD BC,u16",        NULL, 3, 12, 12),
             INSTRUCTION("LD (BC),A",        NULL, 1,  8,  8),
             INSTRUCTION("INC BC",           NULL, 1,  8,  8),
             INSTRUCTION("INC B",            NULL, 1,  4,  4),
-            INSTRUCTION("DEC B",            std::bind(&CPU::op05, this), 1,  4,  4),
-            INSTRUCTION("LD B,u8",          std::bind(&CPU::op06, this), 2,  8,  8),
+            INSTRUCTION("DEC B",            std::bind(&CPU::opcode0x05, this), 1,  4,  4),
+            INSTRUCTION("LD B,u8",          std::bind(&CPU::opcode0x06, this), 2,  8,  8),
             INSTRUCTION("RLCA",             NULL, 1,  4,  4),
             INSTRUCTION("LD (u16),SP",      NULL, 3, 20, 20),
             INSTRUCTION("ADD HL,BC",        NULL, 1,  8,  8),
             INSTRUCTION("LD A,(BC)",        NULL, 1,  8,  8),
             INSTRUCTION("DEC BC",           NULL, 1,  8,  8),
             INSTRUCTION("INC C",            NULL, 1,  4,  4),
-            INSTRUCTION("DEC C",            std::bind(&CPU::op0D, this), 1,  4,  4),
-            INSTRUCTION("LD C,u8",          std::bind(&CPU::op0E, this), 2,  8,  8),
+            INSTRUCTION("DEC C",            std::bind(&CPU::opcode0x0D, this), 1,  4,  4),
+            INSTRUCTION("LD C,u8",          std::bind(&CPU::opcode0x0E, this), 2,  8,  8),
             INSTRUCTION("RRCA",             NULL, 1,  4,  4),
 
             //0x10
@@ -471,8 +813,8 @@ class CPU
             INSTRUCTION("RRA",              NULL, 1,  4,  4),
 
             //0x20
-            INSTRUCTION("JR NZ,i8",         std::bind(&CPU::op20, this), 2, 12,  8),
-            INSTRUCTION("LD HL,u16",        std::bind(&CPU::op21, this), 3, 12, 12),
+            INSTRUCTION("JR NZ,i8",         std::bind(&CPU::opcode0x20, this), 2, 12,  8),
+            INSTRUCTION("LD HL,u16",        std::bind(&CPU::opcode0x21, this), 3, 12, 12),
             INSTRUCTION("LD (HL+),A",       NULL, 1,  8,  8),
             INSTRUCTION("INC HL",           NULL, 1,  8,  8),
             INSTRUCTION("INC H",            NULL, 1,  4,  4),
@@ -490,8 +832,8 @@ class CPU
 
             //0x30
             INSTRUCTION("JR NC,i8",         NULL, 2, 12,  8),
-            INSTRUCTION("LD SP,u16",        NULL, 3, 12, 12),
-            INSTRUCTION("LD (HL-),A",       std::bind(&CPU::op32, this), 1,  8,  8),
+            INSTRUCTION("LD SP,u16",        std::bind(&CPU::opcode0x31, this), 3, 12, 12),
+            INSTRUCTION("LD (HL-),A",       std::bind(&CPU::opcode0x32, this), 1,  8,  8),
             INSTRUCTION("INC SP",           NULL, 1,  8,  8),
             INSTRUCTION("INC (HL)",         NULL, 1, 12, 12),
             INSTRUCTION("DEC (HL)",         NULL, 1, 12, 12),
@@ -503,7 +845,7 @@ class CPU
             INSTRUCTION("DEC SP",           NULL, 1,  8,  8),
             INSTRUCTION("INC A",            NULL, 1,  4,  4),
             INSTRUCTION("DEC A",            NULL, 1,  4,  4),
-            INSTRUCTION("LD A,u8",          std::bind(&CPU::op3E, this), 2,  8,  8),
+            INSTRUCTION("LD A,u8",          std::bind(&CPU::opcode0x3E, this), 2,  8,  8),
             INSTRUCTION("CCF",              NULL, 1,  4,  4),
 
             //0x40
@@ -630,7 +972,7 @@ class CPU
             INSTRUCTION("XOR A,H",          NULL, 1,  4,  4),
             INSTRUCTION("XOR A,L",          NULL, 1,  4,  4),
             INSTRUCTION("XOR A,(HL)",       NULL, 1,  8,  8),
-            INSTRUCTION("XOR A,A",          std::bind(&CPU::opAF, this), 1,  4,  4),
+            INSTRUCTION("XOR A,A",          std::bind(&CPU::opcode0xAF, this), 1,  4,  4),
 
             //0xB0
             INSTRUCTION("OR A,B",           NULL, 1,  4,  4),
@@ -654,7 +996,7 @@ class CPU
             INSTRUCTION("RET NZ",           NULL, 1, 20,  8),
             INSTRUCTION("POP BC",           NULL, 1, 12, 12),
             INSTRUCTION("JP NZ,u16",        NULL, 3, 16, 12),
-            INSTRUCTION("JP u16",           std::bind(&CPU::opC3, this), 3, 16, 16),
+            INSTRUCTION("JP u16",           std::bind(&CPU::opcode0xC3, this), 3, 16, 16),
             INSTRUCTION("CALL NZ,u16",      NULL, 3, 24, 12),
             INSTRUCTION("PUSH BC",          NULL, 1, 16, 16),
             INSTRUCTION("ADD A,u8",         NULL, 2,  8,  8),
@@ -687,7 +1029,7 @@ class CPU
             INSTRUCTION("RST 18h",          NULL, 1, 16, 16),
 
             //0xE0
-            INSTRUCTION("LD (FF00+u8),A",   std::bind(&CPU::opE0, this), 2, 12, 12),
+            INSTRUCTION("LD (FF00+u8),A",   std::bind(&CPU::opcode0xE0, this), 2, 12, 12),
             INSTRUCTION("POP HL",           NULL, 1, 12, 12),
             INSTRUCTION("LD (FF00+C),A",    NULL, 1,  8,  8),
             INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
@@ -705,10 +1047,10 @@ class CPU
             INSTRUCTION("RST 28h",          NULL, 1, 16, 16),
 
             //0xF0
-            INSTRUCTION("LD A,(FF00+u8)",   std::bind(&CPU::opF0, this), 2, 12, 12),
+            INSTRUCTION("LD A,(FF00+u8)",   std::bind(&CPU::opcode0xF0, this), 2, 12, 12),
             INSTRUCTION("POP AF",           NULL, 1, 12, 12),
             INSTRUCTION("LD A,(FF00+C)",    NULL, 1,  8,  8),
-            INSTRUCTION("DI",               std::bind(&CPU::opF3, this), 1,  4,  4),
+            INSTRUCTION("DI",               std::bind(&CPU::opcode0xF3, this), 1,  4,  4),
             INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
             INSTRUCTION("PUSH AF",          NULL, 1, 16, 16),
             INSTRUCTION("OR A,u8",          NULL, 2,  8,  8),
@@ -716,10 +1058,10 @@ class CPU
             INSTRUCTION("LD HL,SP+i8",      NULL, 2, 12, 12),
             INSTRUCTION("LD SP,HL",         NULL, 1,  8,  8),
             INSTRUCTION("LD A,(u16)",       NULL, 3, 16, 16),
-            INSTRUCTION("EI",               std::bind(&CPU::opFB, this), 1,  4,  4),
+            INSTRUCTION("EI",               std::bind(&CPU::opcode0xFB, this), 1,  4,  4),
             INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
             INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
-            INSTRUCTION("CP A,u8",          std::bind(&CPU::opFE, this), 2,  8,  8),
+            INSTRUCTION("CP A,u8",          std::bind(&CPU::opcode0xFE, this), 2,  8,  8),
             INSTRUCTION("RST 38h",          NULL, 1, 16, 16)
         };
         

@@ -19,8 +19,8 @@ void Gameboy::start()
 
     while(m_Running)
     {
-        m_CPU.tick();
-        m_PPU.tick();
+        u8 cycles = m_CPU.tick();
+        m_PPU.tick(cycles);
 
         m_Screen.update();
     }

@@ -12,7 +12,7 @@ void MMU::load(const char* path)
 
 u8 MMU::read(const u16& address)
 {
-    if(address < 0x8000) return m_Rom.read8(address);
+    if(address < 0x8000) return m_Rom.read(address);
     if(address < 0xA000) return m_VRAM[address - 0x8000];
     if(address < 0xC000) return m_RAMBANK[address - 0xA000];
     if(address < 0xE000) return m_RAM[address - 0xC000];

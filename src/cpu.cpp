@@ -12,14 +12,21 @@ void CPU::setMMU(MMU* mmu)
     m_MMU = mmu;
 }
 
-void CPU::tick()
+u8 CPU::tick()
 {
     handleInterrupts();
     Instruction instruction = instructions[m_MMU->read(m_Registers.PC++)];
-    LOG(std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_MMU->read(m_Registers.PC)));
     ASSERT(instruction.op, "Opcode 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_MMU->read(m_Registers.PC - 1)) << ": " << instruction.mnemonic);
     LOG(instruction.mnemonic);
     std::invoke(instruction.op);
+
+    if(m_Branched)
+    {
+        m_Branched = false;
+        return instruction.cyclesBranch;
+    }
+
+    return instruction.cyclesNoBranch;
 }
 void CPU::reset()
 {
@@ -40,10 +47,11 @@ void CPU::reset()
     m_Registers.SP = 0xFFFE;
     LOG("\tSP Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.SP);
 
-    m_Registers.PC = 0x0100;
+    m_Registers.PC = 0x0000;
     LOG("\tPC Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.PC);
 
     m_IME = false;
+    m_Branched = false;
 }
 
 void CPU::handleInterrupts()

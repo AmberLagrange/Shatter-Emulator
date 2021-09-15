@@ -5,7 +5,7 @@ PPU::PPU()
     LOG("Initializing GPU!");
 }
 
-void PPU::tick()
+void PPU::tick(u8 cycles)
 {
-
+    
 }
