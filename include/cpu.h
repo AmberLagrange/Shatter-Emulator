@@ -175,6 +175,26 @@ class CPU
         void opcodeSRL(u8& reg);
 
         void opcodeBIT(const u8& bit, u8& reg);
+        void opcodeRES(const u8& bit, u8& reg);
+        void opcodeSET(const u8& bit, u8& reg);
+
+        //HL variants
+
+        void opcodeRLC_HL();
+        void opcodeRRC_HL();
+
+        void opcodeRL_HL();
+        void opcodeRR_HL();
+
+        void opcodeSLA_HL();
+        void opcodeSRA_HL();
+
+        void opcodeSWAP_HL();
+        void opcodeSRL_HL();
+
+        void opcodeBIT_HL(const u8& bit);
+        void opcodeRES_HL(const u8& bit);
+        void opcodeSET_HL(const u8& bit);
 
         //--------------------------------------Opcodes--------------------------------------//
 
