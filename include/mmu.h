@@ -16,13 +16,14 @@ class MMU
 
         u8 read(const u16& address);
         u8 write(const u16& address, const u8& val);
+
+        inline void setCPU(CPU* cpu) { m_CPU = cpu; }
     private:
         void reset();
 
     private:
         Cartridge m_Rom;
+        CPU* m_CPU;
 
-        u8 m_VRAM[0x2000];
-        u8 m_RAMBANK[0x2000];
-        u8 m_RAM[0x2000];
+        u8 m_Memory[0x8000];
 };

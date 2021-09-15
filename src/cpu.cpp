@@ -7,11 +7,6 @@ CPU::CPU()
     reset();
 }
 
-void CPU::setMMU(MMU* mmu)
-{
-    m_MMU = mmu;
-}
-
 u8 CPU::tick()
 {
     handleInterrupts();
@@ -26,14 +21,13 @@ u8 CPU::tick()
         instruction = instructionsCB[opcode];
         cycles += 4; // Add 4 cycles due to the CB prefix
 
-        ASSERT(instruction.op, "Opcode 0xCB" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(opcode) << ": " << instruction.mnemonic);
+        ASSERT(instruction.op, "Opcode CB 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(opcode) << ": " << instruction.mnemonic);
     }
     else
     {
         instruction = instructions[opcode];
         ASSERT(instruction.op, "Opcode 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(opcode) << ": " << instruction.mnemonic);
     }
-
     
     LOG(instruction.mnemonic);
     std::invoke(instruction.op);
@@ -45,6 +39,8 @@ u8 CPU::tick()
     }
 
     cycles + instruction.cyclesNoBranch;
+
+    return cycles;
 }
 void CPU::reset()
 {

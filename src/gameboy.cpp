@@ -4,6 +4,7 @@ Gameboy::Gameboy()
     : m_Screen(*this), m_Running(false), m_Halted(false)
 {
     m_CPU.setMMU(&m_MMU);
+    m_MMU.setCPU(&m_CPU);
 }
 
 void Gameboy::load(const char* path)

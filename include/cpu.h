@@ -37,9 +37,9 @@
                                    << static_cast<u16>(m_MMU->read(m_Registers.SP + 1)) << " to the stack.")
 
 #define LOG_POP() LOG("Popped 0x" << std::setw(2) << std::setfill('0') << std::hex     \
-                                  << static_cast<u16>(m_MMU->read(m_Registers.SP - 1)) \
+                                  << static_cast<u16>(m_MMU->read(m_Registers.SP - 2)) \
                                   << std::setw(2) << std::setfill('0') << std::hex     \
-                                  << static_cast<u16>(m_MMU->read(m_Registers.SP - 2)) << " from the stack.")
+                                  << static_cast<u16>(m_MMU->read(m_Registers.SP - 1)) << " from the stack.")
 
 #define LOG_JP(addr) LOG("Jumped to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(addr) << ".");
 #define LOG_NJP() LOG("Did not jump.");
@@ -57,8 +57,6 @@ class CPU
     public:
         CPU();
 
-        void setMMU(MMU* mmu);
-
         u8 tick();
 
         inline void setFlag(const Flags::Register& flag)    { m_Registers.F |= flag; }
@@ -71,6 +69,10 @@ class CPU
 
         inline static bool getBit(const u8& reg, const u8& bit) { return ((reg >> bit) & 0b00000001); }
 
+        inline void setMMU(MMU* mmu) { m_MMU = mmu; }
+
+        inline bool getIME()         { return m_IME; }
+        inline bool setIME(bool ime) { return m_IME = ime; }
     private:
         void reset();
         void handleInterrupts();
@@ -149,9 +151,10 @@ class CPU
         bool m_Branched;
 
     public:
-        void pushStack(const u16& val);
-
         //--------------------------------------Opcode Helpers--------------------------------------//
+
+        void pushStack(const u16& val);
+        void popStack(u16& reg);
 
         void opcodeINC(u8& reg);
         void opcodeDEC(u8& reg);
@@ -828,7 +831,7 @@ class CPU
         {
             //0x00
             INSTRUCTION("NOP",              std::bind(&CPU::opcode0x00, this), 1,  4,  4),
-            INSTRUCTION("LD BC,u16",        NULL, 3, 12, 12),
+            INSTRUCTION("LD BC,u16",        std::bind(&CPU::opcode0x01, this), 3, 12, 12),
             INSTRUCTION("LD (BC),A",        NULL, 1,  8,  8),
             INSTRUCTION("INC BC",           NULL, 1,  8,  8),
             INSTRUCTION("INC B",            std::bind(&CPU::opcode0x04, this), 1,  4,  4),
@@ -852,7 +855,7 @@ class CPU
             INSTRUCTION("INC D",            std::bind(&CPU::opcode0x14, this), 1,  4,  4),
             INSTRUCTION("DEC D",            std::bind(&CPU::opcode0x15, this), 1,  4,  4),
             INSTRUCTION("LD D,u8",          NULL, 2,  8,  8),
-            INSTRUCTION("RLA",              NULL, 1,  4,  4),
+            INSTRUCTION("RLA",              std::bind(&CPU::opcode0x17, this), 1,  4,  4),
             INSTRUCTION("JR i8",            NULL, 2, 12, 12),
             INSTRUCTION("ADD HL,DE",        NULL, 1,  8,  8),
             INSTRUCTION("LD A,(DE)",        std::bind(&CPU::opcode0x1A, this), 1,  8,  8),
@@ -1044,7 +1047,7 @@ class CPU
 
             //0xC0
             INSTRUCTION("RET NZ",           NULL, 1, 20,  8),
-            INSTRUCTION("POP BC",           NULL, 1, 12, 12),
+            INSTRUCTION("POP BC",           std::bind(&CPU::opcode0xC1, this), 1, 12, 12),
             INSTRUCTION("JP NZ,u16",        NULL, 3, 16, 12),
             INSTRUCTION("JP u16",           std::bind(&CPU::opcode0xC3, this), 3, 16, 16),
             INSTRUCTION("CALL NZ,u16",      NULL, 3, 24, 12),
@@ -1136,14 +1139,14 @@ class CPU
             INSTRUCTION("RRC A",            NULL, 2,  8,  8),
 
             //0x10
-            INSTRUCTION("RL B",             std::bind(&CPU::opcode0x10, this), 2,  8,  8),
-            INSTRUCTION("RL C",             std::bind(&CPU::opcode0x11, this), 2,  8,  8),
-            INSTRUCTION("RL D",             std::bind(&CPU::opcode0x12, this), 2,  8,  8),
-            INSTRUCTION("RL E",             std::bind(&CPU::opcode0x13, this), 2,  8,  8),
-            INSTRUCTION("RL H",             std::bind(&CPU::opcode0x14, this), 2,  8,  8),
-            INSTRUCTION("RL L",             std::bind(&CPU::opcode0x15, this), 2,  8,  8),
+            INSTRUCTION("RL B",             std::bind(&CPU::opcodeCB0x10, this), 2,  8,  8),
+            INSTRUCTION("RL C",             std::bind(&CPU::opcodeCB0x11, this), 2,  8,  8),
+            INSTRUCTION("RL D",             std::bind(&CPU::opcodeCB0x12, this), 2,  8,  8),
+            INSTRUCTION("RL E",             std::bind(&CPU::opcodeCB0x13, this), 2,  8,  8),
+            INSTRUCTION("RL H",             std::bind(&CPU::opcodeCB0x14, this), 2,  8,  8),
+            INSTRUCTION("RL L",             std::bind(&CPU::opcodeCB0x15, this), 2,  8,  8),
             INSTRUCTION("RL (HL)",          NULL, 2, 16, 16),
-            INSTRUCTION("RL A",             std::bind(&CPU::opcode0x16, this), 2,  8,  8),
+            INSTRUCTION("RL A",             std::bind(&CPU::opcodeCB0x16, this), 2,  8,  8),
             INSTRUCTION("RR B",             NULL, 2,  8,  8),
             INSTRUCTION("RR C",             NULL, 2,  8,  8),
             INSTRUCTION("RR D",             NULL, 2,  8,  8),

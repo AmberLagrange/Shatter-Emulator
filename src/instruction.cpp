@@ -10,6 +10,16 @@ void CPU::pushStack(const u16& val)
     m_MMU->write(m_Registers.SP, static_cast<u8>((val & 0xFF00) >> 8));
 }
 
+void CPU::popStack(u16& reg)
+{
+    u8 high = m_MMU->read(m_Registers.SP);
+    m_Registers.SP++;
+    u8 low  = m_MMU->read(m_Registers.SP);
+    m_Registers.SP++;
+
+    reg = static_cast<u16>(high) << 8 | low;
+}
+
 //--------------------------------------Opcode Helpers--------------------------------------//
 
 void CPU::opcodeINC(u8& reg)
@@ -80,7 +90,6 @@ void CPU::opcodeCP(const u8& val)
 
     if((a & 0x0F) < ((a - val) & 0x0F))
         setFlag(Flags::Register::HalfCarry);
-
 }
 
 void CPU::opcodeJP(bool condition)
@@ -112,7 +121,6 @@ void CPU::opcodeJR(bool condition)
         m_Registers.PC = addr;
         m_Branched = true;
 
-        LOG_PUSH();
         LOG_JP(addr);
     }
     else
@@ -167,7 +175,10 @@ void CPU::opcode0x00() // NOP
 
 void CPU::opcode0x01() // LD BC,u16
 {
+    m_Registers.C = m_MMU->read(m_Registers.PC++);
+    m_Registers.B = m_MMU->read(m_Registers.PC++);
 
+    LOG_BC_REG();
 }
 
 void CPU::opcode0x02() // LD (BC),A
@@ -304,7 +315,18 @@ void CPU::opcode0x16() // LD D,u8
 
 void CPU::opcode0x17() // RLA
 {
+    //RL A, except Zero Flag isn't set
 
+    u8 carry = isFlagSet(Flags::Register::Carry) ? 1 : 0;
+
+	clearAllFlags();
+
+	if(getBit(m_Registers.A, 7)) setFlag(Flags::Register::Carry);
+
+	m_Registers.A = (m_Registers.A << 1) | carry;
+
+    LOG_A_REG();
+    LOG_FLAGS();
 }
 
 void CPU::opcode0x18() // JR i8
@@ -1222,7 +1244,10 @@ void CPU::opcode0xC0() // RET NZ
 
 void CPU::opcode0xC1() // POP BC
 {
+    popStack(m_Registers.BC);
 
+    LOG_POP();
+    LOG_BC_REG();
 }
 
 void CPU::opcode0xC2() // JP NZ,u16
