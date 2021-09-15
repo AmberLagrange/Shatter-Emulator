@@ -22,6 +22,11 @@ class Gameboy
 
         u8 read(const u16& address);
         u8 write(const u16& address, const u8& val);
+
+        inline CPU& getCPU() { return m_CPU; }
+        inline MMU& getMMU() { return m_MMU; }
+        inline PPU& getPPU() { return m_PPU; }
+        inline APU& getAPU() { return m_APU; }
     private:
         CPU m_CPU;
         MMU m_MMU;
@@ -31,6 +36,4 @@ class Gameboy
 
         bool m_Running;
         bool m_Halted;
-
-        friend Instruction;
 };

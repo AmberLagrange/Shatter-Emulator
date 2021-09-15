@@ -1,7 +1,6 @@
 #include "ppu.h"
 
-PPU::PPU(Gameboy& gb)
-    : m_Gameboy(gb)
+PPU::PPU()
 {
     LOG("Initializing GPU!");
 }

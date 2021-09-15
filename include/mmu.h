@@ -10,7 +10,7 @@ class CPU;
 class MMU
 {
     public:
-        MMU(Gameboy& gb);
+        MMU();
 
         void load(const char* path);
 
@@ -18,8 +18,6 @@ class MMU
         u8 write(const u16& address, const u8& val);
     private:
         void reset();
-
-        Gameboy& m_Gameboy;
         
         Cartridge m_Rom;
 

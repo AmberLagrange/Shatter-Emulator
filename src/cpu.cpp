@@ -1,23 +1,26 @@
 #include "cpu.h"
 #include "gameboy.h"
 
-CPU::CPU(Gameboy& gb)
-    : m_Gameboy(gb)
+CPU::CPU()
 {
     LOG("Initializing CPU!");
     reset();
 }
 
+void CPU::setMMU(MMU* mmu)
+{
+    m_MMU = mmu;
+}
+
 void CPU::tick()
 {
     handleInterrupts();
-    Instruction instruction = Instruction::instructions[m_Gameboy.read(m_Registers.PC++)];
-    LOG(std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Gameboy.read(m_Registers.PC)));
-    ASSERT(instruction.op, "Opcode 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Gameboy.read(m_Registers.PC - 1)) << ": " << instruction.mnemonic);
+    Instruction instruction = instructions[m_MMU->read(m_Registers.PC++)];
+    LOG(std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_MMU->read(m_Registers.PC)));
+    ASSERT(instruction.op, "Opcode 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_MMU->read(m_Registers.PC - 1)) << ": " << instruction.mnemonic);
     LOG(instruction.mnemonic);
-    instruction.op(m_Gameboy);
+    std::invoke(instruction.op);
 }
-
 void CPU::reset()
 {
     LOG("CPU Reset sequence:");
@@ -48,36 +51,6 @@ void CPU::handleInterrupts()
     if(!m_IME)
         return;
 
-    u8 flags = m_Gameboy.read(0xFF0F);
+    u8 flags = m_MMU->read(0xFF0F);
     m_IME = false;
-}
-
-void CPU::setFlag(const Flags::Register& flag)
-{
-    m_Registers.F |= flag;
-}
-
-void CPU::clearFlag(const Flags::Register& flag)
-{
-    m_Registers.F &= ~flag;
-}
-
-void CPU::flipFlag(const Flags::Register& flag)
-{
-    m_Registers.F ^= flag;
-}
-
-bool CPU::isFlagSet(const Flags::Register& flag)
-{
-    return m_Registers.F & flag;
-}
-
-void CPU::clearAllFlags()
-{
-    clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry | Flags::Register::Carry);
-}
-
-void CPU::setZeroFromVal(const u8& val)
-{
-    if(!val) setFlag(Flags::Register::Zero);
 }
