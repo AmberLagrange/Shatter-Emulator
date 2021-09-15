@@ -4,8 +4,6 @@ Gameboy::Gameboy()
     : m_Screen(*this), m_Running(true), m_Halted(false)
 {
     m_CPU.setMMU(&m_MMU);
-
-    load("./roms/tetris.gb");
 }
 
 void Gameboy::load(const char* path)

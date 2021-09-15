@@ -67,7 +67,7 @@ clean:
 
 mkdir:
 	$(MKDIR_P) $(BUILDIR) $(BUILDIR)/$(RELDIR) $(BUILDIR)/$(DBGDIR)
-	$(MKDIR_P) $(OBJDIR)  $(OBJDIR)/$(RELDIR)  $(OBJDIR)/$(DBGDIR)
+	$(MKDIR_P) $(OBJDIR)  $(OBJDIR)/$(RELDIR)  $(OBJDIR)/$(DBGDIR) 
 
 -include $(RELDEPS)
 -include $(DBGDEPS)
