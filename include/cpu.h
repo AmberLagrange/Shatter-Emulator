@@ -160,6 +160,22 @@ class CPU
         void opcodePUSH(const u8& reg);
         void opcodePOP(u8& reg);
 
+        //--------------------------------------CB Opcode Helpers--------------------------------------//
+
+        void opcodeRLC(u8& reg);
+        void opcodeRRC(u8& reg);
+
+        void opcodeRL(u8& reg);
+        void opcodeRR(u8& reg);
+
+        void opcodeSLA(u8& reg);
+        void opcodeSRA(u8& reg);
+
+        void opcodeSWAP(u8& reg);
+        void opcodeSRL(u8& reg);
+
+        void opcodeBIT(const u8& bit, u8& reg);
+
         //--------------------------------------Opcodes--------------------------------------//
 
         //0x00
