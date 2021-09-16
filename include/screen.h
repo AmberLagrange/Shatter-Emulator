@@ -6,16 +6,12 @@
 
 class Gameboy;
 
-class Screen
+namespace Screen
 {
-    public:
-        Screen(Gameboy& gb);
-        ~Screen();
+    void initScreen();
+    void destroyScreen();
+    void setGameboy(Gameboy* gameboy);
 
-        void update();
-    private:
-        Gameboy& m_Gameboy;
-
-        SDL_Window* m_Window;
-        SDL_Renderer* m_Renderer;
+    void poll();
+    void draw();
 };

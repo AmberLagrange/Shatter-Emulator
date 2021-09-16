@@ -7,5 +7,7 @@ PPU::PPU()
 
 void PPU::tick(u8 cycles)
 {
+    //TODO: calculate when to render
 
+    std::invoke(m_DrawCallback);
 }

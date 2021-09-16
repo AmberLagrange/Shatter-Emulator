@@ -11,7 +11,7 @@ int main(int argc, char** argv)
     Gameboy gb;
 
     gb.load(argv[1]);
-    gb.start();
+    gb.run();
 
     return 0;
 }

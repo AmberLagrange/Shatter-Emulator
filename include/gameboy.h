@@ -6,7 +6,6 @@
 #include "cpu.h"
 #include "ppu.h"
 #include "apu.h"
-#include "screen.h"
 
 #include "cartridge.h"
 #include "instruction.h"
@@ -17,11 +16,8 @@ class Gameboy
         Gameboy();
 
         void load(const char* path);
-        void start();
+        void run();
         void stop();
-
-        u8 read(const u16& address);
-        u8 write(const u16& address, const u8& val);
 
         inline CPU& getCPU() { return m_CPU; }
         inline MMU& getMMU() { return m_MMU; }
@@ -32,7 +28,6 @@ class Gameboy
         MMU m_MMU;
         PPU m_PPU;
         APU m_APU;
-        Screen m_Screen;
 
         bool m_Running;
         bool m_Halted;

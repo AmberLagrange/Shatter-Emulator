@@ -1,55 +1,71 @@
 #include "screen.h"
-
 #include "gameboy.h"
 
-Screen::Screen(Gameboy& gb)
-    : m_Gameboy(gb)
+namespace Screen
 {
-    SDL_Init(SDL_INIT_VIDEO);
+    namespace
+    {
+        static Gameboy* s_Gameboy;
 
-    m_Window = SDL_CreateWindow("Shatter Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 480, 432, SDL_WINDOW_SHOWN);
-    if(!m_Window)
-    {
-        LOG("Could not create window: " << SDL_GetError());
-    }
-    else
-    {
-        LOG("\tWindow Created.");
+        static SDL_Window* s_Window;
+        static SDL_Renderer* s_Renderer;
     }
 
-    m_Renderer = SDL_CreateRenderer(m_Window, -1, SDL_RENDERER_ACCELERATED);
-    if(!m_Window)
+    void initScreen()
     {
-        LOG("Could not create renderer: " << SDL_GetError());
-    }
-    else
-    {
-        LOG("\tRenderer Created.");
-    }
-}
+        SDL_Init(SDL_INIT_VIDEO);
 
-Screen::~Screen()
-{
-    SDL_DestroyRenderer(m_Renderer);
-    SDL_DestroyWindow(m_Window);
-    SDL_Quit();
-}
-
-void Screen::update()
-{
-    SDL_SetRenderDrawColor(m_Renderer, 65, 105, 225, 255);
-    SDL_RenderClear(m_Renderer);
-
-    SDL_Event e;
-    if (SDL_PollEvent(&e))
-    {
-        switch(e.type)
+        s_Window = SDL_CreateWindow("Shatter Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 480, 432, SDL_WINDOW_SHOWN);
+        if(!s_Window)
         {
-            case SDL_QUIT:
-                m_Gameboy.stop();
-                return;
+            ERROR("Could not create window: " << SDL_GetError());
+        }
+        else
+        {
+            LOG("\tWindow Created.");
+        }
+
+        s_Renderer = SDL_CreateRenderer(s_Window, -1, SDL_RENDERER_ACCELERATED);
+        if(!s_Window)
+        {
+            ERROR("Could not create renderer: " << SDL_GetError());
+        }
+        else
+        {
+            LOG("\tRenderer Created.");
         }
     }
 
-    SDL_RenderPresent(m_Renderer);
+    void destroyScreen()
+    {
+        SDL_DestroyRenderer(s_Renderer);
+        SDL_DestroyWindow(s_Window);
+        SDL_Quit();
+    }
+
+    void setGameboy(Gameboy* gameboy)
+    {
+        s_Gameboy = gameboy;
+    }
+
+    void poll()
+    {
+        SDL_Event e;
+        if (SDL_PollEvent(&e))
+        {
+            switch(e.type)
+            {
+                case SDL_QUIT:
+                    s_Gameboy->stop();
+                    return;
+            }
+        }
+    }
+
+    void draw()
+    {
+        SDL_SetRenderDrawColor(s_Renderer, 65, 105, 225, 255);
+        SDL_RenderClear(s_Renderer);
+        SDL_RenderPresent(s_Renderer);
+    }
 }
