@@ -29,7 +29,11 @@
 #define LOG_HL_REG() LOG("HL Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.HL) << ".")
 #define LOG_SP_REG() LOG("SP Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.SP) << ".")
 
-#define LOG_WRITE(addr, val) LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(val) << " to address 0x" << std::setw(4) << addr << ".")
+#define LOG_WRITE(addr, val) LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(val) \
+                                            << " to address 0x" << std::setw(4) << addr << ".")
+
+#define LOG_READ(addr) LOG("Read 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_MMU->read(addr)) \
+                                     << " from 0x" << std::setw(4) << std::setfill('0') << std::hex << addr << ".")
 
 #define LOG_PUSH() LOG("Pushed 0x" << std::setw(2) << std::setfill('0') << std::hex     \
                                    << static_cast<u16>(m_MMU->read(m_Registers.SP    )) \

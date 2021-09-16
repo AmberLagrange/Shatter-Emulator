@@ -366,6 +366,7 @@ void CPU::opcode0x1A() // LD A,(DE)
 {
     m_Registers.A = m_MMU->read(m_Registers.DE);
 
+    LOG_READ(m_Registers.DE);
     LOG_A_REG();
 }
 
@@ -656,6 +657,7 @@ void CPU::opcode0x46() // LD B,(HL)
 {
 	m_Registers.B = m_MMU->read(m_Registers.HL);
 
+    LOG_READ(m_Registers.HL);
 	LOG_B_REG();
 }
 
@@ -712,6 +714,7 @@ void CPU::opcode0x4E() // LD C,(HL)
 {
 	m_Registers.C = m_MMU->read(m_Registers.HL);
 
+    LOG_READ(m_Registers.HL);
 	LOG_C_REG();
 }
 
@@ -770,6 +773,7 @@ void CPU::opcode0x56() // LD D,(HL)
 {
 	m_Registers.D = m_MMU->read(m_Registers.HL);
 
+    LOG_READ(m_Registers.HL);
 	LOG_D_REG();
 }
 
@@ -826,6 +830,7 @@ void CPU::opcode0x5E() // LD E,(HL)
 {
 	m_Registers.E = m_MMU->read(m_Registers.HL);
 
+    LOG_READ(m_Registers.HL);
 	LOG_E_REG();
 }
 
@@ -884,6 +889,7 @@ void CPU::opcode0x66() // LD H,(HL)
 {
 	m_Registers.H = m_MMU->read(m_Registers.HL);
 
+    LOG_READ(m_Registers.HL);
 	LOG_H_REG();
 }
 
@@ -940,6 +946,7 @@ void CPU::opcode0x6E() // LD L,(HL)
 {
 	m_Registers.L = m_MMU->read(m_Registers.HL);
 
+    LOG_READ(m_Registers.HL);
 	LOG_L_REG();
 }
 
@@ -1052,6 +1059,7 @@ void CPU::opcode0x7E() // LD A,(HL)
 {
     m_Registers.A = m_MMU->read(m_Registers.HL);
 
+    LOG_READ(m_Registers.HL);
     LOG_A_REG();
 }
 
@@ -1670,6 +1678,7 @@ void CPU::opcode0xF0() // LD A,(FF00+u8)
     u16 addr = 0xFF00 | offset;
     m_Registers.A = m_MMU->read(addr);
 
+    LOG_READ(addr);
     LOG_A_REG();
 }
 

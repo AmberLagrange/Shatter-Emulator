@@ -35,6 +35,7 @@ u8 MMU::read(const u16& address)
 
     if(address < 0xFE00) // Echo of Internal RAM
     {
+        WARN("Reading from echo of RAM at address 0x" << std::setw(4) << std::setfill('0') << std::hex << address << ".");
         return m_Memory[address - 0x8000 - 0x2000]; // Map back into RAM
     }
 
@@ -100,6 +101,8 @@ u8 MMU::write(const u16& address, const u8& val)
 
     if(address < 0xFE00) // Echo of Internal RAM
     {
+        WARN("Writing 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(val) << " to echo of RAM at address 0x"
+                          << std::setw(4) << std::setfill('0') << std::hex << address << ".");
         return m_Memory[address - 0x8000 - 0x2000] = val; // Map back into RAM
     }
 
