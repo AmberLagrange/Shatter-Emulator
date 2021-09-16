@@ -14,4 +14,6 @@ class PPU
         void tick(u8 cycles);
     private:
         std::function<void(void)> m_DrawCallback;
+
+        int temp; // Speed up emulation by not redrawing every tick
 };

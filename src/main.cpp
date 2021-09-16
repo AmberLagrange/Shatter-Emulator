@@ -1,5 +1,7 @@
 #include "gameboy.h"
 
+#include "screen.h"
+
 int main(int argc, char** argv)
 {
     if(argc != 2)
@@ -8,10 +10,17 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    Gameboy gb;
+    if(Screen::initScreen())
+    {
+        ERROR("Could not Initialize the screen! Exiting!");
+        return -1;
+    }
 
+    Gameboy gb;
     gb.load(argv[1]);
     gb.run();
+
+    Screen::destroyScreen();
 
     return 0;
 }

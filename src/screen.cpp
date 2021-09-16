@@ -11,14 +11,17 @@ namespace Screen
         static SDL_Renderer* s_Renderer;
     }
 
-    void initScreen()
+    int initScreen()
     {
+        LOG("Initializing Screen!");
+
         SDL_Init(SDL_INIT_VIDEO);
 
         s_Window = SDL_CreateWindow("Shatter Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 480, 432, SDL_WINDOW_SHOWN);
         if(!s_Window)
         {
             ERROR("Could not create window: " << SDL_GetError());
+            return -1;
         }
         else
         {
@@ -29,11 +32,14 @@ namespace Screen
         if(!s_Window)
         {
             ERROR("Could not create renderer: " << SDL_GetError());
+            return -2;
         }
         else
         {
             LOG("\tRenderer Created.");
         }
+
+        return 0;
     }
 
     void destroyScreen()

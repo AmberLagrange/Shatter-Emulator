@@ -1,6 +1,12 @@
 #include "cpu.h"
 #include "gameboy.h"
 
+#ifdef LOG_ALL
+    #define LOG_OP() LOG(instruction.mnemonic);
+#else
+    #define LOG_OP() ((void)0)
+#endif
+
 CPU::CPU()
 {
     LOG("Initializing CPU!");
@@ -29,7 +35,7 @@ u8 CPU::tick()
         ASSERT(instruction.op, "Opcode 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(opcode) << ": " << instruction.mnemonic);
     }
     
-    LOG(instruction.mnemonic);
+    LOG_OP();
     std::invoke(instruction.op);
 
     if(m_Branched)

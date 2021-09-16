@@ -8,6 +8,8 @@ Gameboy::Gameboy()
     m_CPU.setMMU(&m_MMU);
     m_MMU.setCPU(&m_CPU);
     m_PPU.setDrawCallback(std::bind(Screen::draw));
+
+    Screen::setGameboy(this);
 }
 
 void Gameboy::load(const char* path)
@@ -17,12 +19,9 @@ void Gameboy::load(const char* path)
 
 void Gameboy::run()
 {
-    LOG("Starting Gameboy\n");
+    LOG("Starting Gameboy!\n");
 
     m_Running = true;
-
-    Screen::initScreen();
-    Screen::setGameboy(this);
 
     while(m_Running)
     {
@@ -31,8 +30,6 @@ void Gameboy::run()
 
         Screen::poll();
     }
-    
-    Screen::destroyScreen();
 }
 
 void Gameboy::stop()

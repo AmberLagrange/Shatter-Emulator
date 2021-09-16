@@ -2,6 +2,8 @@
 #include "cpu.h"
 #include "mmu.h"
 
+#include "opcode_log.h"
+
 //--------------------------------------CB Opcode Helpers--------------------------------------//
 
 void CPU::opcodeRLC(u8& reg)

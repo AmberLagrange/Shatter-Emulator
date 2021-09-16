@@ -8,7 +8,7 @@ class Gameboy;
 
 namespace Screen
 {
-    void initScreen();
+    int initScreen();
     void destroyScreen();
     void setGameboy(Gameboy* gameboy);
 

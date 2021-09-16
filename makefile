@@ -59,7 +59,12 @@ $(OBJDIR)/$(DBGDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 #Other targets
+
 remake: clean all
+
+#add LOG_ALL define to log everything
+logall: CXXFLAGS += -DLOG_ALL
+logall: debug
 
 clean:
 	$(RM) -rf $(BUILDIR)

@@ -2,6 +2,8 @@
 #include "cpu.h"
 #include "mmu.h"
 
+#include "opcode_log.h"
+
 //--------------------------------------Opcode Helpers--------------------------------------//
 
 void CPU::pushStack(const u16& val)
@@ -1579,7 +1581,7 @@ void CPU::opcode0xDF() // RST 18h
 
 void CPU::opcode0xE0() // LD (FF00+u8),A
 {
-    u8 offset = m_Registers.PC++;
+    u8 offset = m_MMU->read(m_Registers.PC++);
     u16 addr = 0xFF00 | offset;
     m_MMU->write(addr, m_Registers.A);
 
