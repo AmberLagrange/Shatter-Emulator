@@ -24,7 +24,7 @@
     #define LOG_HL_REG() LOG("HL Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.HL) << ".")
     #define LOG_SP_REG() LOG("SP Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.SP) << ".")
 
-    #define LOG_WRITE(addr, val) LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(val) \
+    #define LOG_WRITE(addr) LOG("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << m_MMU->read(addr) \
                                                 << " to address 0x" << std::setw(4) << addr << ".")
 
     #define LOG_READ(addr) LOG("Read 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_MMU->read(addr)) \
@@ -40,7 +40,7 @@
                                     << std::setw(2) << std::setfill('0') << std::hex     \
                                     << static_cast<u16>(m_MMU->read(m_Registers.SP - 1)) << " from the stack.")
 
-    #define LOG_JP(addr) LOG("Jumped to: 0x" << std::setw(4) << std::setfill('0') << std::hex << addr << ".");
+    #define LOG_JP()  LOG("Jumped to: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.PC << ".");
     #define LOG_NJP() LOG("Did not jump.");
 
     #define LOG_RET() LOG("Returned to: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.PC << ".");
@@ -68,13 +68,13 @@
     #define LOG_HL_REG() ((void)0)
     #define LOG_SP_REG() ((void)0)
 
-    #define LOG_WRITE(addr, val) ((void)0)
+    #define LOG_WRITE(addr) ((void)0)
     #define LOG_READ(addr) ((void)0)
 
     #define LOG_PUSH() ((void)0)
     #define LOG_POP() ((void)0)
 
-    #define LOG_JP(addr) ((void)0)
+    #define LOG_JP()  ((void)0)
     #define LOG_NJP() ((void)0)
 
     #define LOG_RET() ((void)0)

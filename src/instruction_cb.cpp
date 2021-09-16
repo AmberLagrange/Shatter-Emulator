@@ -188,7 +188,7 @@ void CPU::opcodeCB0x06() // RLC (HL)
 {
 	opcodeRLC_HL();
 
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 	LOG_FLAGS();
 }
 
@@ -252,7 +252,7 @@ void CPU::opcodeCB0x0E() // RRC (HL)
 {
 	opcodeRRC_HL();
 
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 	LOG_FLAGS();
 }
 
@@ -318,7 +318,7 @@ void CPU::opcodeCB0x16() // RL (HL)
 {
 	opcodeRL_HL();
 
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 	LOG_FLAGS();
 }
 
@@ -382,7 +382,7 @@ void CPU::opcodeCB0x1E() // RR (HL)
 {
 	opcodeRR_HL();
 
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 	LOG_FLAGS();
 }
 
@@ -448,7 +448,7 @@ void CPU::opcodeCB0x26() // SLA (HL)
 {
 	opcodeSLA_HL();
 
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 	LOG_FLAGS();
 }
 
@@ -512,7 +512,7 @@ void CPU::opcodeCB0x2E() // SRA (HL)
 {
 	opcodeSRA_HL();
 
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 	LOG_FLAGS();
 }
 
@@ -578,7 +578,7 @@ void CPU::opcodeCB0x36() // SWAP (HL)
 {
 	opcodeSWAP_HL();
 
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 	LOG_FLAGS();
 }
 
@@ -642,7 +642,7 @@ void CPU::opcodeCB0x3E() // SRL (HL)
 {
 	opcodeSRL_HL();
 
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 	LOG_FLAGS();
 }
 
@@ -1158,7 +1158,7 @@ void CPU::opcodeCB0x86() // RES 0,(HL)
 {
 	opcodeRES_HL(0);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcodeCB0x87() // RES 0,A
@@ -1214,7 +1214,7 @@ void CPU::opcodeCB0x8E() // RES 1,(HL)
 {
 	opcodeRES_HL(1);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcodeCB0x8F() // RES 1,A
@@ -1272,7 +1272,7 @@ void CPU::opcodeCB0x96() // RES 2,(HL)
 {
 	opcodeRES_HL(2);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcodeCB0x97() // RES 2,A
@@ -1328,7 +1328,7 @@ void CPU::opcodeCB0x9E() // RES 3,(HL)
 {
 	opcodeRES_HL(3);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcodeCB0x9F() // RES 3,A
@@ -1386,7 +1386,7 @@ void CPU::opcodeCB0xA6() // RES 4,(HL)
 {
 	opcodeRES_HL(4);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcodeCB0xA7() // RES 4,A
@@ -1442,7 +1442,7 @@ void CPU::opcodeCB0xAE() // RES 5,(HL)
 {
 	opcodeRES_HL(5);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcodeCB0xAF() // RES 5,A
@@ -1500,7 +1500,7 @@ void CPU::opcodeCB0xB6() // RES 6,(HL)
 {
 	opcodeRES_HL(6);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcodeCB0xB7() // RES 6,A
@@ -1556,7 +1556,7 @@ void CPU::opcodeCB0xBE() // RES 7,(HL)
 {
 	opcodeRES_HL(7);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcodeCB0xBF() // RES 7,A
@@ -1614,7 +1614,7 @@ void CPU::opcodeCB0xC6() // SET 0,(HL)
 {
 	opcodeSET_HL(0);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcodeCB0xC7() // SET 0,A
@@ -1670,7 +1670,7 @@ void CPU::opcodeCB0xCE() // SET 1,(HL)
 {
 	opcodeSET_HL(1);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcodeCB0xCF() // SET 1,A
@@ -1728,7 +1728,7 @@ void CPU::opcodeCB0xD6() // SET 2,(HL)
 {
 	opcodeSET_HL(2);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcodeCB0xD7() // SET 2,A
@@ -1784,7 +1784,7 @@ void CPU::opcodeCB0xDE() // SET 3,(HL)
 {
 	opcodeSET_HL(3);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcodeCB0xDF() // SET 3,A
@@ -1842,7 +1842,7 @@ void CPU::opcodeCB0xE6() // SET 4,(HL)
 {
 	opcodeSET_HL(4);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcodeCB0xE7() // SET 4,A
@@ -1898,7 +1898,7 @@ void CPU::opcodeCB0xEE() // SET 5,(HL)
 {
 	opcodeSET_HL(5);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcodeCB0xEF() // SET 5,A
@@ -1956,7 +1956,7 @@ void CPU::opcodeCB0xF6() // SET 6,(HL)
 {
 	opcodeSET_HL(6);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcodeCB0xF7() // SET 6,A
@@ -2012,7 +2012,7 @@ void CPU::opcodeCB0xFE() // SET 7,(HL)
 {
 	opcodeSET_HL(7);
 	
-	LOG_WRITE(m_Registers.HL, m_MMU->read(m_Registers.HL));
+	LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcodeCB0xFF() // SET 7,A

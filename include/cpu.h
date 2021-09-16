@@ -129,9 +129,6 @@ class CPU
         void opcodeCALL(bool condition);
         void opcodeRET(bool condiiton);
 
-        void opcodePUSH(const u8& reg);
-        void opcodePOP(u8& reg);
-
         //--------------------------------------CB Opcode Helpers--------------------------------------//
 
         void opcodeRLC(u8& reg);
@@ -839,7 +836,7 @@ class CPU
             INSTRUCTION("CPL",              NULL, 1,  4,  4),
 
             //0x30
-            INSTRUCTION("JR NC,i8",         NULL, 2, 12,  8),
+            INSTRUCTION("JR NC,i8",         std::bind(&CPU::opcode0x30, this), 2, 12,  8),
             INSTRUCTION("LD SP,u16",        std::bind(&CPU::opcode0x31, this), 3, 12, 12),
             INSTRUCTION("LD (HL-),A",       std::bind(&CPU::opcode0x32, this), 1,  8,  8),
             INSTRUCTION("INC SP",           NULL, 1,  8,  8),
@@ -1001,52 +998,52 @@ class CPU
             INSTRUCTION("CP A,A",           NULL, 1,  4,  4),
 
             //0xC0
-            INSTRUCTION("RET NZ",           NULL, 1, 20,  8),
+            INSTRUCTION("RET NZ",           std::bind(&CPU::opcode0xC0, this), 1, 20,  8),
             INSTRUCTION("POP BC",           std::bind(&CPU::opcode0xC1, this), 1, 12, 12),
-            INSTRUCTION("JP NZ,u16",        NULL, 3, 16, 12),
+            INSTRUCTION("JP NZ,u16",        std::bind(&CPU::opcode0xC2, this), 3, 16, 12),
             INSTRUCTION("JP u16",           std::bind(&CPU::opcode0xC3, this), 3, 16, 16),
-            INSTRUCTION("CALL NZ,u16",      NULL, 3, 24, 12),
+            INSTRUCTION("CALL NZ,u16",      std::bind(&CPU::opcode0xC4, this), 3, 24, 12),
             INSTRUCTION("PUSH BC",          std::bind(&CPU::opcode0xC5, this), 1, 16, 16),
             INSTRUCTION("ADD A,u8",         NULL, 2,  8,  8),
             INSTRUCTION("RST 00h",          NULL, 1, 16, 16),
-            INSTRUCTION("RET Z",            NULL, 1, 20,  8),
+            INSTRUCTION("RET Z",            std::bind(&CPU::opcode0xC8, this), 1, 20,  8),
             INSTRUCTION("RET",              std::bind(&CPU::opcode0xC9, this), 1, 16, 16),
-            INSTRUCTION("JP Z,u16",         NULL, 3, 16, 12),
+            INSTRUCTION("JP Z,u16",         std::bind(&CPU::opcode0xCA, this), 3, 16, 12),
             INSTRUCTION("PREFIX CB",        NULL, 1,  4,  4),
-            INSTRUCTION("CALL Z,u16",       NULL, 3, 24, 12),
+            INSTRUCTION("CALL Z,u16",       std::bind(&CPU::opcode0xCC, this), 3, 24, 12),
             INSTRUCTION("CALL u16",         std::bind(&CPU::opcode0xCD, this), 3, 24, 24),
             INSTRUCTION("ADC A,u8",         NULL, 2,  8,  8),
             INSTRUCTION("RST 08h",          NULL, 1, 16, 16),
 
             //0xD0
-            INSTRUCTION("RET NC",           NULL, 1, 20,  8),
-            INSTRUCTION("POP DE",           NULL, 1, 12, 12),
-            INSTRUCTION("JP NC,u16",        NULL, 3, 16, 12),
+            INSTRUCTION("RET NC",           std::bind(&CPU::opcode0xD0, this), 1, 20,  8),
+            INSTRUCTION("POP DE",           std::bind(&CPU::opcode0xD1, this), 1, 12, 12),
+            INSTRUCTION("JP NC,u16",        std::bind(&CPU::opcode0xD2, this), 3, 16, 12),
             INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
-            INSTRUCTION("CALL NC,u16",      NULL, 3, 24, 12),
-            INSTRUCTION("PUSH DE",          NULL, 1, 16, 16),
+            INSTRUCTION("CALL NC,u16",      std::bind(&CPU::opcode0xD4, this), 3, 24, 12),
+            INSTRUCTION("PUSH DE",          std::bind(&CPU::opcode0xD5, this), 1, 16, 16),
             INSTRUCTION("SUB A,u8",         NULL, 2,  8,  8),
             INSTRUCTION("RST 10h",          NULL, 1, 16, 16),
-            INSTRUCTION("RET C",            NULL, 1, 20,  8),
-            INSTRUCTION("RETI",             NULL, 1, 16, 16),
-            INSTRUCTION("JP C,u16",         NULL, 3, 16, 12),
+            INSTRUCTION("RET C",            std::bind(&CPU::opcode0xD8, this), 1, 20,  8),
+            INSTRUCTION("RETI",             std::bind(&CPU::opcode0xD9, this), 1, 16, 16),
+            INSTRUCTION("JP C,u16",         std::bind(&CPU::opcode0xDA, this), 3, 16, 12),
             INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
-            INSTRUCTION("CALL C,u16",       NULL, 3, 24, 12),
+            INSTRUCTION("CALL C,u16",       std::bind(&CPU::opcode0xDC, this), 3, 24, 12),
             INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
             INSTRUCTION("SBC A,u8",         NULL, 2,  8,  8),
             INSTRUCTION("RST 18h",          NULL, 1, 16, 16),
 
             //0xE0
             INSTRUCTION("LD (FF00+u8),A",   std::bind(&CPU::opcode0xE0, this), 2, 12, 12),
-            INSTRUCTION("POP HL",           NULL, 1, 12, 12),
+            INSTRUCTION("POP HL",           std::bind(&CPU::opcode0xE1, this), 1, 12, 12),
             INSTRUCTION("LD (FF00+C),A",    std::bind(&CPU::opcode0xE2, this), 1,  8,  8),
             INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
             INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
-            INSTRUCTION("PUSH HL",          NULL, 1, 16, 16),
+            INSTRUCTION("PUSH HL",          std::bind(&CPU::opcode0xE5, this), 1, 16, 16),
             INSTRUCTION("AND A,u8",         NULL, 2,  8,  8),
             INSTRUCTION("RST 20h",          NULL, 1, 16, 16),
             INSTRUCTION("ADD SP,i8",        NULL, 2, 16, 16),
-            INSTRUCTION("JP HL",            NULL, 1,  4,  4),
+            INSTRUCTION("JP HL",            std::bind(&CPU::opcode0xE9, this), 1,  4,  4),
             INSTRUCTION("LD (u16),A",       std::bind(&CPU::opcode0xEA, this), 3, 16, 16),
             INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
             INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
@@ -1056,11 +1053,11 @@ class CPU
 
             //0xF0
             INSTRUCTION("LD A,(FF00+u8)",   std::bind(&CPU::opcode0xF0, this), 2, 12, 12),
-            INSTRUCTION("POP AF",           NULL, 1, 12, 12),
+            INSTRUCTION("POP AF",           std::bind(&CPU::opcode0xF1, this), 1, 12, 12),
             INSTRUCTION("LD A,(FF00+C)",    NULL, 1,  8,  8),
             INSTRUCTION("DI",               std::bind(&CPU::opcode0xF3, this), 1,  4,  4),
             INSTRUCTION("UNUSED",           NULL, 1,  0,  0),
-            INSTRUCTION("PUSH AF",          NULL, 1, 16, 16),
+            INSTRUCTION("PUSH AF",          std::bind(&CPU::opcode0xF5, this), 1, 16, 16),
             INSTRUCTION("OR A,u8",          NULL, 2,  8,  8),
             INSTRUCTION("RST 30h",          NULL, 1, 16, 16),
             INSTRUCTION("LD HL,SP+i8",      NULL, 2, 12, 12),
