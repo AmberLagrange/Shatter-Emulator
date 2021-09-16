@@ -35,10 +35,12 @@ u8 CPU::tick()
     if(m_Branched)
     {
         m_Branched = false;
-        cycles + instruction.cyclesBranch;
+        cycles += instruction.cyclesBranch;
     }
-
-    cycles + instruction.cyclesNoBranch;
+    else
+    {
+        cycles += instruction.cyclesNoBranch;
+    }
 
     return cycles;
 }
