@@ -56,9 +56,9 @@ class Logger : std::ostream
 {
     public:
         Logger(LogLevel level = LogLevel::Error, std::ostream& stream = std::cout)
-            : m_LogLevel(level), m_Stream(stream)
+            : m_LogLevel(level), m_Stream(stream), m_Open((m_LogLevel >= s_LogLevel) || ((m_LogLevel == LogLevel::Opcode) && s_OpcodeLogging))
         {
-            if(m_LogLevel >= s_LogLevel)
+            if(m_Open)
             {
                 switch(m_LogLevel)
                 {
@@ -66,7 +66,7 @@ class Logger : std::ostream
                         stream << "[OPCODE] ";
                         break;
                     case LogLevel::Trace:
-                        stream << "[" << GREEN << "Trace" << RESET << "] ";
+                        stream << "[" << GREEN << "TRACE" << RESET << "] ";
                         break;
                     case LogLevel::Debug:
                         stream << "[" << CYAN << "DEBUG" << RESET << "] ";
@@ -87,7 +87,7 @@ class Logger : std::ostream
 
         ~Logger()
         {
-            if(m_LogLevel >= s_LogLevel)
+            if(m_Open)
             {
                 m_Stream << RESET << "\n";
             }
@@ -96,9 +96,9 @@ class Logger : std::ostream
         template <class T>
         Logger& operator<<(const T& msg)
         {
-            if(m_LogLevel >= s_LogLevel)
+            if(m_Open)
             {
-                std::cout << msg;
+                m_Stream << msg;
             }
 
             return *this;
@@ -106,7 +106,7 @@ class Logger : std::ostream
 
         Logger& operator<<(std::ostream& (*manip)(std::ostream&))
         {
-            if(m_LogLevel >= s_LogLevel)
+            if(m_Open)
             {
                 static_cast<std::ostream&>(*this) << manip;
             }
@@ -114,16 +114,25 @@ class Logger : std::ostream
             return *this;
         }
         
-        static void setLogLevel(LogLevel level);
+        inline static void setLogLevel(LogLevel level) { s_LogLevel = level; }
+        inline static void enableOpcodeLogging()  { s_OpcodeLogging = true; }
+        inline static void disableOpcodeLogging() { s_OpcodeLogging = false; }
     private:
         LogLevel m_LogLevel;
         std::ostream& m_Stream;
+        bool m_Open;
 
         static LogLevel s_LogLevel;
+        static bool s_OpcodeLogging;
 };
 
-#define TRACE(x)    Logger(LogLevel::Trace) << x;
-#define DEBUG(x)    Logger(LogLevel::Debug) << x;
-#define WARN(x)     Logger(LogLevel::Warn) << x;
-#define ERROR(x)    Logger(LogLevel::Error, std::cerr) << x;
-#define CRITICAL(x) Logger(LogLevel::Critical, std::cerr) << x;
+#define SET_LOG_LEVEL(x)        Logger::setLogLevel(x)
+#define ENABLE_OP_LOGGING()     Logger::enableOpcodeLogging()
+#define DISABLE_OP_LOGGING()    Logger::enableOpcodeLogging()
+
+#define OPCODE(x)               Logger(LogLevel::Opcode) << x
+#define TRACE(x)                Logger(LogLevel::Trace) << x
+#define DEBUG(x)                Logger(LogLevel::Debug) << x
+#define WARN(x)                 Logger(LogLevel::Warn) << x
+#define ERROR(x)                Logger(LogLevel::Error, std::cerr) << x
+#define CRITICAL(x)             Logger(LogLevel::Critical, std::cerr) << x

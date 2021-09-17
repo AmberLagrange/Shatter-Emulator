@@ -1,5 +1,9 @@
 #include "logger.h"
 
-LogLevel Logger::s_LogLevel = LogLevel::Debug;
+#ifdef NDEBUG
+    LogLevel Logger::s_LogLevel = LogLevel::Warn;
+#else
+    LogLevel Logger::s_LogLevel = LogLevel::Debug;
+#endif
 
-void Logger::setLogLevel(LogLevel level) { s_LogLevel = level; }
+bool Logger::s_OpcodeLogging = false;

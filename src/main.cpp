@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 
     if(optionExists(argv, argv + argc, "-v") | optionExists(argv, argv + argc, "--verbose"))
     {
-        Logger::setLogLevel(LogLevel::Opcode);
+        ENABLE_OP_LOGGING();
     }
 
     Gameboy gameboy;
