@@ -2,7 +2,7 @@
 
 PPU::PPU()
 {
-    LOG("Initializing GPU!");
+    DEBUG("Initializing GPU!");
 
     temp = 0;
 }

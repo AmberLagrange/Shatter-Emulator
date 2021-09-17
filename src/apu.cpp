@@ -2,5 +2,5 @@
 
 APU::APU()
 {
-    LOG("Initializing APU!");
+    DEBUG("Initializing APU!");
 }

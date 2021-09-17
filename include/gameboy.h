@@ -16,6 +16,7 @@ class Gameboy
         Gameboy();
 
         void load(const char* path);
+
         void run();
         void stop();
 
@@ -23,6 +24,7 @@ class Gameboy
         inline MMU& getMMU() { return m_MMU; }
         inline PPU& getPPU() { return m_PPU; }
         inline APU& getAPU() { return m_APU; }
+
     private:
         CPU m_CPU;
         MMU m_MMU;

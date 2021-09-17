@@ -19,7 +19,7 @@ void Gameboy::load(const char* path)
 
 void Gameboy::run()
 {
-    LOG("Starting Gameboy!\n");
+    DEBUG("Starting Gameboy!");
 
     m_Running = true;
 

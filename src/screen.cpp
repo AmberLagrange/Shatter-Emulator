@@ -13,7 +13,7 @@ namespace Screen
 
     int initScreen()
     {
-        LOG("Initializing Screen!");
+        DEBUG("Initializing Screen!");
 
         SDL_Init(SDL_INIT_VIDEO);
 
@@ -25,7 +25,7 @@ namespace Screen
         }
         else
         {
-            LOG("\tWindow Created.");
+            DEBUG("\tWindow Created.");
         }
 
         s_Renderer = SDL_CreateRenderer(s_Window, -1, SDL_RENDERER_ACCELERATED);
@@ -36,7 +36,7 @@ namespace Screen
         }
         else
         {
-            LOG("\tRenderer Created.");
+            DEBUG("\tRenderer Created.");
         }
 
         return 0;

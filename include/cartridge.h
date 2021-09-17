@@ -14,7 +14,6 @@ class Cartridge
 
         u8 read(u16 address);
 
-        void dump();
     private:
         std::vector<u8> contents;
 

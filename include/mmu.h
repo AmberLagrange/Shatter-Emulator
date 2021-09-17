@@ -18,6 +18,7 @@ class MMU
         u8 write(const u16& address, const u8& val);
 
         inline void setCPU(CPU* cpu) { m_CPU = cpu; }
+        
     private:
         void reset();
 

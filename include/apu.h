@@ -8,5 +8,6 @@ class APU
 {
     public:
         APU();
+        
     private:
 };

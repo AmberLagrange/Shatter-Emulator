@@ -520,9 +520,9 @@ void CPU::opcode0x31() // LD SP,u16
 {
     u8 low  = m_MMU->read(m_Registers.PC++);
     u8 high = m_MMU->read(m_Registers.PC++);
-    u16 val = static_cast<u16>(high) << 8 | static_cast<u16>(low);
+    m_Registers.SP = static_cast<u16>(high) << 8 | static_cast<u16>(low);
 
-    m_Registers.SP = val;
+    LOG_SP_REG();
 }
 
 void CPU::opcode0x32() // LD (HL-),A

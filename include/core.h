@@ -2,7 +2,7 @@
 
 #define CLOCK_SPEED 4194304
 
-#include "log.h"
+#include "logger.h"
 
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
     #define IS_BIG_ENDIAN
@@ -17,9 +17,9 @@
 
     #define ASSERT(x, msg)  if(!x)                                                                  \
                             {                                                                       \
-                                ERROR(EXE_NAME << ": " << __FILE__ << ":" << __LINE__ << ": "       \
+                                CRITICAL(EXE_NAME << ": " << __FILE__ << ":" << __LINE__ << ": "       \
                                 << __PRETTY_FUNCTION__ << ": Assertion `" << #x << "' failed.");    \
-                                ERROR(msg);                                                         \
+                                CRITICAL(msg);                                                         \
                                 std::abort();                                                       \
                             }
 #else

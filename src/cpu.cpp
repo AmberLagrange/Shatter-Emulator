@@ -2,14 +2,14 @@
 #include "gameboy.h"
 
 #ifdef LOG_ALL
-    #define LOG_OP() LOG(instruction.mnemonic);
+    #define LOG_OP() DEBUG(instruction.mnemonic);
 #else
     #define LOG_OP() ((void)0)
 #endif
 
 CPU::CPU()
 {
-    LOG("Initializing CPU!");
+    DEBUG("Initializing CPU!");
     reset();
 }
 
@@ -52,25 +52,25 @@ u8 CPU::tick()
 }
 void CPU::reset()
 {
-    LOG("CPU Reset sequence:");
+    DEBUG("CPU Reset sequence:");
 
     m_Registers.AF = 0x01B0;
-    LOG("\tAF Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.AF);
+    DEBUG("\tAF Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.AF);
 
     m_Registers.BC = 0x0013;
-    LOG("\tBC Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.BC);
+    DEBUG("\tBC Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.BC);
 
     m_Registers.DE = 0x00D8;
-    LOG("\tDE Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.DE);
+    DEBUG("\tDE Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.DE);
 
     m_Registers.HL = 0x014D;
-    LOG("\tHL Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.HL);
+    DEBUG("\tHL Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.HL);
 
     m_Registers.SP = 0xFFFE;
-    LOG("\tSP Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.SP);
+    DEBUG("\tSP Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.SP);
 
     m_Registers.PC = 0x0000;
-    LOG("\tPC Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.PC);
+    DEBUG("\tPC Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.PC);
 
     m_IME = false;
     m_Branched = false;

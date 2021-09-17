@@ -3,7 +3,7 @@
 
 MMU::MMU()
 {
-    LOG("Initializing MMU!");
+    DEBUG("Initializing MMU!");
 }
 
 void MMU::load(const char* path)

@@ -28,6 +28,7 @@ class CPU
 
         inline bool getIME()         { return m_IME; }
         inline bool setIME(bool ime) { return m_IME = ime; }
+
     private:
         void reset();
         void handleInterrupts();
