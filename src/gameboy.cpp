@@ -11,7 +11,6 @@ Gameboy::Gameboy()
 
     Screen::setGameboy(this);
 }
-
 void Gameboy::load(const char* path)
 {
     m_MMU.load(path);
@@ -30,6 +29,8 @@ void Gameboy::run()
 
         Screen::poll();
     }
+
+    DEBUG("Stopping Gameboy!");
 }
 
 void Gameboy::stop()
