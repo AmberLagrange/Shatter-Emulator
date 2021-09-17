@@ -39,62 +39,62 @@ namespace Flags
 
 inline Flags::Register operator|(const Flags::Register& flag1, const Flags::Register& flag2)
 {
-    return static_cast<Flags::Register>(static_cast<int>(flag1) | static_cast<int>(flag2));
+    return static_cast<Flags::Register>(static_cast<u8>(flag1) | static_cast<u8>(flag2));
 }
 
 inline Flags::Register& operator|=(Flags::Register& flag1, const Flags::Register& flag2)
 {
-    return flag1 = static_cast<Flags::Register>(static_cast<int>(flag1) | static_cast<int>(flag2));
+    return flag1 = static_cast<Flags::Register>(static_cast<u8>(flag1) | static_cast<u8>(flag2));
 }
 
 inline Flags::Register operator&(const Flags::Register& flag1, const Flags::Register& flag2)
 {
-    return static_cast<Flags::Register>(static_cast<int>(flag1) & static_cast<int>(flag2));
+    return static_cast<Flags::Register>(static_cast<u8>(flag1) & static_cast<u8>(flag2));
 }
 
 inline Flags::Register& operator&=(Flags::Register& flag1, const Flags::Register& flag2)
 {
-    return flag1 = static_cast<Flags::Register>(static_cast<int>(flag1) & static_cast<int>(flag2));
+    return flag1 = static_cast<Flags::Register>(static_cast<u8>(flag1) & static_cast<u8>(flag2));
 }
 
 inline Flags::Register operator^(const Flags::Register& flag1, const Flags::Register& flag2)
 {
-    return static_cast<Flags::Register>(static_cast<int>(flag1) ^ static_cast<int>(flag2));
+    return static_cast<Flags::Register>(static_cast<u8>(flag1) ^ static_cast<u8>(flag2));
 }
 
 inline Flags::Register& operator^=(Flags::Register& flag1, const Flags::Register& flag2)
 {
-    return flag1 = static_cast<Flags::Register>(static_cast<int>(flag1) ^ static_cast<int>(flag2));
+    return flag1 = static_cast<Flags::Register>(static_cast<u8>(flag1) ^ static_cast<u8>(flag2));
 }
 
 //--------------------------------------Interrupt Flags--------------------------------------//
 
 inline Flags::Interrupt operator|(const Flags::Interrupt& flag1, const Flags::Interrupt& flag2)
 {
-    return static_cast<Flags::Interrupt>(static_cast<int>(flag1) | static_cast<int>(flag2));
+    return static_cast<Flags::Interrupt>(static_cast<u8>(flag1) | static_cast<u8>(flag2));
 }
 
 inline Flags::Interrupt& operator|=(Flags::Interrupt& flag1, const Flags::Interrupt& flag2)
 {
-    return flag1 = static_cast<Flags::Interrupt>(static_cast<int>(flag1) | static_cast<int>(flag2));
+    return flag1 = static_cast<Flags::Interrupt>(static_cast<u8>(flag1) | static_cast<u8>(flag2));
 }
 
 inline Flags::Interrupt operator&(const Flags::Interrupt& flag1, const Flags::Interrupt& flag2)
 {
-    return static_cast<Flags::Interrupt>(static_cast<int>(flag1) & static_cast<int>(flag2));
+    return static_cast<Flags::Interrupt>(static_cast<u8>(flag1) & static_cast<u8>(flag2));
 }
 
 inline Flags::Interrupt& operator&=(Flags::Interrupt& flag1, const Flags::Interrupt& flag2)
 {
-    return flag1 = static_cast<Flags::Interrupt>(static_cast<int>(flag1) & static_cast<int>(flag2));
+    return flag1 = static_cast<Flags::Interrupt>(static_cast<u8>(flag1) & static_cast<u8>(flag2));
 }
 
 inline Flags::Interrupt operator^(const Flags::Interrupt& flag1, const Flags::Interrupt& flag2)
 {
-    return static_cast<Flags::Interrupt>(static_cast<int>(flag1) ^ static_cast<int>(flag2));
+    return static_cast<Flags::Interrupt>(static_cast<u8>(flag1) ^ static_cast<u8>(flag2));
 }
 
 inline Flags::Interrupt& operator^=(Flags::Interrupt& flag1, const Flags::Interrupt& flag2)
 {
-    return flag1 = static_cast<Flags::Interrupt>(static_cast<int>(flag1) ^ static_cast<int>(flag2));
+    return flag1 = static_cast<Flags::Interrupt>(static_cast<u8>(flag1) ^ static_cast<u8>(flag2));
 }
