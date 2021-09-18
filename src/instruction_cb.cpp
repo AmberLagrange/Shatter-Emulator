@@ -22,7 +22,7 @@ void CPU::opcodeRL(u8& reg)
 
 	clearAllFlags();
 
-	if(getBit(reg, 7)) setFlag(Flags::Register::Carry);
+	if(GET_BIT(reg, 7)) setFlag(Flags::Register::Carry);
 
 	reg = (reg << 1) | carry;
 

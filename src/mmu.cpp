@@ -52,7 +52,7 @@ u8 MMU::read(const u16& address)
 
     if(address < 0xFF4C) // Input
     {
-        return 0xAB;
+        return m_Memory[address - 0x8000];
     }
 
     if(address < 0xFF80) // Unusable
@@ -120,7 +120,7 @@ u8 MMU::write(const u16& address, const u8& val)
 
     if(address < 0xFF4C) // Input
     {
-        return 0xAB;
+        return m_Memory[address - 0x8000] = val;
     }
 
     if(address < 0xFF80) // Unusable

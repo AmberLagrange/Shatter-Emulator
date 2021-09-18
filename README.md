@@ -52,4 +52,4 @@ Additional arguments can be passed as well.
 |                        Rudimentary CPU Logging and Screen                        |
 |:--------------------------------------------------------------------------------:|
 |![Initial Logging](./screenshots/Initial%20Logging.png?raw=true "Initial Logging")|
-|   ![Render Window](./screenshots/Render%20Window.png?raw=true "Render Window")   |
+|         ![Nintendont](./screenshots/Nintendont.png?raw=true "Nintendont")        |

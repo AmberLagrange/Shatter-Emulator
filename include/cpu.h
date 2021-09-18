@@ -22,8 +22,6 @@ class CPU
         inline void clearAllFlags()                         { clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry | Flags::Register::Carry); }
         inline void setZeroFromVal(const u8& val)           { if(!val) setFlag(Flags::Register::Zero); }
 
-        inline static bool getBit(const u8& reg, const u8& bit) { return ((reg >> bit) & 0b00000001); }
-
         inline void setMMU(MMU* mmu) { m_MMU = mmu; }
 
         inline bool getIME()         { return m_IME; }

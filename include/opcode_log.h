@@ -21,7 +21,7 @@
 #define LOG_HL_REG() OPCODE("HL Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.HL) << ".")
 #define LOG_SP_REG() OPCODE("SP Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.SP) << ".")
 
-#define LOG_WRITE(addr) OPCODE("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << m_MMU->read(addr) \
+#define LOG_WRITE(addr) OPCODE("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_MMU->read(addr)) \
                                           << " to address 0x" << std::setw(4) << addr << ".")
 
 #define LOG_READ(addr) OPCODE("Read 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_MMU->read(addr)) \

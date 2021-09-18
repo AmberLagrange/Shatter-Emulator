@@ -4,6 +4,8 @@
 
 #include "logger.h"
 
+#include "utils.h"
+
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
     #define IS_BIG_ENDIAN
 #else
@@ -17,9 +19,9 @@
 
     #define ASSERT(x, msg)  if(!x)                                                                  \
                             {                                                                       \
-                                CRITICAL(EXE_NAME << ": " << __FILE__ << ":" << __LINE__ << ": "       \
+                                CRITICAL(EXE_NAME << ": " << __FILE__ << ":" << __LINE__ << ": "    \
                                 << __PRETTY_FUNCTION__ << ": Assertion `" << #x << "' failed.");    \
-                                CRITICAL(msg);                                                         \
+                                CRITICAL(msg);                                                      \
                                 std::abort();                                                       \
                             }
 #else
@@ -29,8 +31,8 @@
 #define GAMEBOY_WIDTH   160
 #define GAMEBOY_HEIGHT  144
 
-#define VRAM_WIDTH      256
-#define VRAM_HEIGHT     256
+#define VRAM_WIDTH      0xFF
+#define VRAM_HEIGHT     0xFF
 
 #define CLOCK_HZ        4194304
 

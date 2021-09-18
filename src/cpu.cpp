@@ -1,8 +1,8 @@
 #include "cpu.h"
 #include "gameboy.h"
 
-#ifdef LOG_ALL
-    #define LOG_OP() DEBUG(instruction.mnemonic);
+#ifndef NDEBUG
+    #define LOG_OP() OPCODE(instruction.mnemonic);
 #else
     #define LOG_OP() ((void)0)
 #endif

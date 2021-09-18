@@ -161,7 +161,6 @@ void CPU::opcodeCALL(bool condition)
         u16 addr = static_cast<u16>(high) << 8 | static_cast<u16>(low);
         m_Registers.PC = addr;
 
-        LOG_PUSH();
         LOG_JP();
     }
     else
@@ -177,7 +176,6 @@ void CPU::opcodeRET(bool condiiton)
         popStack(m_Registers.PC);
         m_Branched = true;
 
-        LOG_POP();
         LOG_RET();
     }
     else
@@ -349,7 +347,7 @@ void CPU::opcode0x17() // RLA
 
     clearAllFlags();
 
-    if(getBit(m_Registers.A, 7)) setFlag(Flags::Register::Carry);
+    if(GET_BIT(m_Registers.A, 7)) setFlag(Flags::Register::Carry);
 
     m_Registers.A = (m_Registers.A << 1) | carry;
 
