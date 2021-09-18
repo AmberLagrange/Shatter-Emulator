@@ -13,9 +13,9 @@ void PPU::tick(u8 cycles)
 {
     //TODO: calculate when to render
 
-    temp++;
+    temp += cycles;
 
-    if(temp == 1000)
+    if(temp >= 1000)
     {
         temp = 0;
 

@@ -82,5 +82,11 @@ void CPU::handleInterrupts()
         return;
 
     u8 flags = m_MMU->read(0xFF0F);
+
+    if(flags)
+    {
+        DEBUG("Interrupt Flag");
+    }
+
     m_IME = false;
 }

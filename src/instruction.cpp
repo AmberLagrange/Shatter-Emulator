@@ -49,31 +49,31 @@ void CPU::opcodeDEC(u8& reg)
     LOG_FLAGS();
 }
 
-void CPU::opcodeADD(const u8& val)
+void CPU::opcodeADD([[maybe_unused]] const u8& val)
 {
     LOG_FLAGS();
     LOG_A_REG();
 }
 
-void CPU::opcodeADC(const u8& val)
+void CPU::opcodeADC([[maybe_unused]] const u8& val)
 {
     LOG_FLAGS();
     LOG_A_REG();
 }
 
-void CPU::opcodeSUB(const u8& val)
+void CPU::opcodeSUB([[maybe_unused]] const u8& val)
 {
     LOG_FLAGS();
     LOG_A_REG();
 }
 
-void CPU::opcodeSBC(const u8& val)
+void CPU::opcodeSBC([[maybe_unused]] const u8& val)
 {
     LOG_FLAGS();
     LOG_A_REG();
 }
 
-void CPU::opcodeAND(const u8& val)
+void CPU::opcodeAND([[maybe_unused]] const u8& val)
 {   
     LOG_FLAGS();
     LOG_A_REG();
@@ -89,7 +89,7 @@ void CPU::opcodeXOR(const u8& val)
     LOG_A_REG();
 }
 
-void CPU::opcodeOR(const u8& val)
+void CPU::opcodeOR([[maybe_unused]] const u8& val)
 {
     LOG_FLAGS();
     LOG_A_REG();

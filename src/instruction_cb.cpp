@@ -6,12 +6,12 @@
 
 //--------------------------------------CB Opcode Helpers--------------------------------------//
 
-void CPU::opcodeRLC(u8& reg)
+void CPU::opcodeRLC([[maybe_unused]] u8& reg)
 {
 	
 }
 
-void CPU::opcodeRRC(u8& reg)
+void CPU::opcodeRRC([[maybe_unused]] u8& reg)
 {
 	
 }
@@ -29,27 +29,27 @@ void CPU::opcodeRL(u8& reg)
 	setZeroFromVal(reg);
 }
 
-void CPU::opcodeRR(u8& reg)
+void CPU::opcodeRR([[maybe_unused]] u8& reg)
 {
 	
 }
 
-void CPU::opcodeSLA(u8& reg)
+void CPU::opcodeSLA([[maybe_unused]] u8& reg)
 {
 	
 }
 
-void CPU::opcodeSRA(u8& reg)
+void CPU::opcodeSRA([[maybe_unused]] u8& reg)
 {
 	
 }
 
-void CPU::opcodeSWAP(u8& reg)
+void CPU::opcodeSWAP([[maybe_unused]] u8& reg)
 {
 	
 }
 
-void CPU::opcodeSRL(u8& reg)
+void CPU::opcodeSRL([[maybe_unused]] u8& reg)
 {
 	
 }
@@ -65,12 +65,12 @@ void CPU::opcodeBIT(const u8& bit, u8& reg)
     setFlag(Flags::Register::HalfCarry);
 }
 
-void CPU::opcodeRES(const u8& bit, u8& reg)
+void CPU::opcodeRES([[maybe_unused]] const u8& bit, [[maybe_unused]] u8& reg)
 {
 	
 }
 
-void CPU::opcodeSET(const u8& bit, u8& reg)
+void CPU::opcodeSET([[maybe_unused]] const u8& bit, [[maybe_unused]] u8& reg)
 {
 	
 }
@@ -117,17 +117,17 @@ void CPU::opcodeSRL_HL()
 	
 }
 
-void CPU::opcodeBIT_HL(const u8& bit)
+void CPU::opcodeBIT_HL([[maybe_unused]] const u8& bit)
 {
 	
 }
 
-void CPU::opcodeRES_HL(const u8& bit)
+void CPU::opcodeRES_HL([[maybe_unused]] const u8& bit)
 {
 	
 }
 
-void CPU::opcodeSET_HL(const u8& bit)
+void CPU::opcodeSET_HL([[maybe_unused]] const u8& bit)
 {
 	
 }
