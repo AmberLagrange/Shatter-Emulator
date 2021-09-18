@@ -7,7 +7,8 @@ Gameboy::Gameboy()
 {
     m_CPU.setMMU(&m_MMU);
     m_MMU.setCPU(&m_CPU);
-    m_PPU.setDrawCallback(std::bind(Screen::draw));
+    u8* test;
+    m_PPU.setDrawCallback(std::bind(Screen::draw, std::placeholders::_1));
 
     Screen::setGameboy(this);
 }

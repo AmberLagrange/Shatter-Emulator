@@ -1,8 +1,8 @@
 #pragma once
 
-#include <SDL2/SDL.h>
-
 #include "core.h"
+
+#include <SDL2/SDL.h>
 
 class Gameboy;
 
@@ -13,5 +13,5 @@ namespace Screen
     void setGameboy(Gameboy* gameboy);
 
     void poll();
-    void draw();
+    void draw(u8* buffer);
 };

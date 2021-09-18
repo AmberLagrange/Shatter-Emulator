@@ -8,7 +8,6 @@
 #include "apu.h"
 
 #include "cartridge.h"
-#include "instruction.h"
 
 class Gameboy
 {

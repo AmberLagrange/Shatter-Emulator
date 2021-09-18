@@ -1,9 +1,9 @@
+#include "core.h"
+
 #include <algorithm>
 #include <string>
 
 #include <filesystem>
-
-#include "core.h"
 
 #include "gameboy.h"
 #include "screen.h"

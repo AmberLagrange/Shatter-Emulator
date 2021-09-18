@@ -26,6 +26,11 @@
     #define ASSERT(x, msg) ((void)0)
 #endif
 
+#define GAMEBOY_WIDTH   160
+#define GAMEBOY_HEIGHT  144
+
+#define CLOCK_HZ        4194304
+
 #include <stdint.h>
 
 typedef uint8_t u8;
