@@ -29,6 +29,9 @@
 #define GAMEBOY_WIDTH   160
 #define GAMEBOY_HEIGHT  144
 
+#define VRAM_WIDTH      256
+#define VRAM_HEIGHT     256
+
 #define CLOCK_HZ        4194304
 
 #include <stdint.h>

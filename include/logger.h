@@ -128,7 +128,7 @@ class Logger : std::ostream
 
 #define SET_LOG_LEVEL(x)        Logger::setLogLevel(x)
 #define ENABLE_OP_LOGGING()     Logger::enableOpcodeLogging()
-#define DISABLE_OP_LOGGING()    Logger::enableOpcodeLogging()
+#define DISABLE_OP_LOGGING()    Logger::disableOpcodeLogging()
 
 #define OPCODE(x)               Logger(LogLevel::Opcode) << x
 #define TRACE(x)                Logger(LogLevel::Trace) << x
