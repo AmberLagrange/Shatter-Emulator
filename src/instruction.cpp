@@ -10,6 +10,7 @@ void CPU::pushStack(const u16& val)
 {
     m_Registers.SP--;
     m_MMU->write(m_Registers.SP, static_cast<u8>((val & 0x00FF)     ));
+
     m_Registers.SP--;
     m_MMU->write(m_Registers.SP, static_cast<u8>((val & 0xFF00) >> 8));
 
@@ -20,6 +21,7 @@ void CPU::popStack(u16& reg)
 {
     u8 high = m_MMU->read(m_Registers.SP);
     m_Registers.SP++;
+
     u8 low  = m_MMU->read(m_Registers.SP);
     m_Registers.SP++;
 
@@ -31,9 +33,10 @@ void CPU::popStack(u16& reg)
 void CPU::opcodeINC(u8& reg)
 {
     reg++;
+
     clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry);
-    setZeroFromVal(reg);
     if((reg & 0x0F) == 0x00) setFlag(Flags::Register::HalfCarry);
+    setZeroFromVal(reg);
 
     LOG_FLAGS();
 }
@@ -41,10 +44,12 @@ void CPU::opcodeINC(u8& reg)
 void CPU::opcodeDEC(u8& reg)
 {
     reg--;
+
     clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry);
-    setZeroFromVal(reg);
+
     setFlag(Flags::Register::Negative);
     if((reg & 0x0F) == 0x0F) setFlag(Flags::Register::HalfCarry);
+    setZeroFromVal(reg);
 
     LOG_FLAGS();
 }
@@ -53,9 +58,11 @@ void CPU::opcodeADD(const u8& val)
 {
     clearAllFlags();
 
-    if(0xFF - val > m_Registers.A) setFlag(Flags::Register::Carry);
+    if(m_Registers.A > 0xFF - val) setFlag(Flags::Register::Carry);
     if((m_Registers.A & 0x0F) + (val & 0x0F) > 0x0F) setFlag(Flags::Register::HalfCarry);
+
     m_Registers.A += val;
+
     setZeroFromVal(m_Registers.A);
 
     LOG_FLAGS();
@@ -65,12 +72,15 @@ void CPU::opcodeADD(const u8& val)
 void CPU::opcodeADC(const u8& val)
 {
     u8 carry = isFlagSet(Flags::Register::Carry);
+    u16 a = static_cast<u16>(m_Registers.A);
 
     clearAllFlags();
 
-    if(0xFF - val - carry > m_Registers.A) setFlag(Flags::Register::Carry);
-    if((m_Registers.A & 0x0F) + (val & 0x0F) + carry > 0x0F) setFlag(Flags::Register::HalfCarry);
-    m_Registers.A += (val + carry);
+    if(a + val + carry > 0x00FF) setFlag(Flags::Register::Carry);
+    if((a & 0x000F) + (val & 0x0F) + carry > 0x0F) setFlag(Flags::Register::HalfCarry);
+
+    m_Registers.A = static_cast<u8>(a + val + carry);
+    
     setZeroFromVal(m_Registers.A);
 
     LOG_FLAGS();
@@ -80,10 +90,13 @@ void CPU::opcodeADC(const u8& val)
 void CPU::opcodeSUB(const u8& val)
 {
     clearAllFlags();
+
     setFlag(Flags::Register::Negative);
     if(m_Registers.A < val) setFlag(Flags::Register::Carry);
     if(((m_Registers.A & 0x0F) < (val & 0x0F))) setFlag(Flags::Register::HalfCarry);
+
     m_Registers.A -= val;
+    
     setZeroFromVal(m_Registers.A);
 
     LOG_FLAGS();
@@ -93,30 +106,23 @@ void CPU::opcodeSUB(const u8& val)
 void CPU::opcodeSBC(const u8& val)
 {
     u8 carry = isFlagSet(Flags::Register::Carry);
+    u16 a = static_cast<u16>(m_Registers.A);
 
     clearAllFlags();
     setFlag(Flags::Register::Negative);
 
-    if(val == 0xFF && carry) // Subtract "0" (0x100), but set H and C flags
-    {
-        setFlag(Flags::Register::HalfCarry | Flags::Register::Carry);
-    }
-    else
-    {
-        if(m_Registers.A < val + carry) setFlag(Flags::Register::Carry);
-        if((m_Registers.A & 0x0F) < ((val + carry) & 0x0F)) setFlag(Flags::Register::HalfCarry);
-        m_Registers.A -= (val + carry);
-    }
+    if(a - val - carry > 0x00FF) setFlag(Flags::Register::Carry);
+    if((a & 0x000F) < (val & 0x0F) + carry) setFlag(Flags::Register::HalfCarry);
 
+    m_Registers.A = static_cast<u8>((a - val - carry) & 0x00FF);
+    
     setZeroFromVal(m_Registers.A);
-
-    LOG_FLAGS();
-    LOG_A_REG();
 }
 
 void CPU::opcodeAND(const u8& val)
 {   
     m_Registers.A &= val;
+
     clearAllFlags();
     setFlag(Flags::Register::HalfCarry);
     setZeroFromVal(m_Registers.A);
@@ -128,6 +134,7 @@ void CPU::opcodeAND(const u8& val)
 void CPU::opcodeXOR(const u8& val)
 {
     m_Registers.A ^= val;
+
     clearAllFlags();
     setZeroFromVal(m_Registers.A);
 
@@ -138,6 +145,7 @@ void CPU::opcodeXOR(const u8& val)
 void CPU::opcodeOR(const u8& val)
 {
     m_Registers.A |= val;
+
     clearAllFlags();
     setZeroFromVal(m_Registers.A);
 
@@ -147,31 +155,15 @@ void CPU::opcodeOR(const u8& val)
 
 void CPU::opcodeCP(const u8& val)
 {
-    const u8& a = m_Registers.A;
     clearAllFlags();
     setFlag(Flags::Register::Negative);
 
-    if(a < val)
-        setFlag(Flags::Register::Carry);
-
-    if(a == val)
-        setFlag(Flags::Register::Zero);
-
-    if((a & 0x0F) < (val & 0x0F))
-        setFlag(Flags::Register::HalfCarry);
+    if(m_Registers.A < val) setFlag(Flags::Register::Carry);
+    if((m_Registers.A & 0x0F) < (val & 0x0F)) setFlag(Flags::Register::HalfCarry);
+    if(m_Registers.A == val) setFlag(Flags::Register::Zero);
 
     LOG_FLAGS();
     LOG_A_REG();
-}
-
-void CPU::opcodeADD_HL(const u16& val)
-{
-    clearFlag(Flags::Register::Negative | Flags::Register::HalfCarry | Flags::Register::Carry);
-    if(0xFFFF - val > m_Registers.HL) setFlag(Flags::Register::Carry);
-    if(((m_Registers.HL) & 0x0F) + ((val >> 8) & 0x0F) > 0x0F) setFlag(Flags::Register::HalfCarry);
-
-    LOG_FLAGS();
-    LOG_HL_REG();
 }
 
 void CPU::opcodeJP(bool condition)
@@ -248,6 +240,34 @@ void CPU::opcodeRST(const u8& val)
     m_Registers.PC = static_cast<u16>(val);
 
     LOG_JP();
+}
+
+// 16 bit variants
+
+void CPU::opcodeADD_HL(const u16& val)
+{
+    clearFlag(Flags::Register::Negative | Flags::Register::HalfCarry | Flags::Register::Carry);
+    if(m_Registers.HL > 0xFFFF - val) setFlag(Flags::Register::Carry);
+    if((m_Registers.HL & 0x0FFF) + (val & 0x0FFF) > 0x0FFF) setFlag(Flags::Register::HalfCarry);
+
+    m_Registers.HL += val;
+
+    LOG_FLAGS();
+    LOG_HL_REG();
+}
+
+u16 CPU::opcodeADD_SP()
+{
+    clearAllFlags();
+
+    i8 offset = static_cast<i8>(m_MMU->read(m_Registers.PC++));
+
+    if((offset & 0xFF) + (m_Registers.SP & 0x00FF) > 0x00FF) setFlag(Flags::Register::Carry);
+    if((offset & 0x0F) + (m_Registers.SP & 0x000F) > 0x000F) setFlag(Flags::Register::HalfCarry);
+
+    LOG_FLAGS();
+
+    return m_Registers.SP + offset;
 }
 
 //--------------------------------------Opcodes--------------------------------------//
@@ -697,6 +717,7 @@ void CPU::opcode0x34() // INC (HL)
     m_MMU->write(m_Registers.HL, val);
 
     LOG_WRITE(m_Registers.HL);
+    LOG_FLAGS();
 }
 
 void CPU::opcode0x35() // DEC (HL)
@@ -709,6 +730,7 @@ void CPU::opcode0x35() // DEC (HL)
     m_MMU->write(m_Registers.HL, val);
 
     LOG_WRITE(m_Registers.HL);
+    LOG_FLAGS();
 }
 
 void CPU::opcode0x36() // LD (HL),u8
@@ -1797,8 +1819,7 @@ void CPU::opcode0xE7() // RST 20h
 
 void CPU::opcode0xE8() // ADD SP,i8
 {
-    i8 offset = static_cast<i8>(m_MMU->read(m_Registers.PC++));
-    m_Registers.SP += offset;
+    m_Registers.SP = opcodeADD_SP();
 
     LOG_SP_REG();
 }
@@ -1904,8 +1925,7 @@ void CPU::opcode0xF7() // RST 30h
 
 void CPU::opcode0xF8() // LD HL,SP+i8
 {
-    i8 offset = static_cast<i8>(m_MMU->read(m_Registers.PC++));
-    m_Registers.HL = m_Registers.SP + offset;
+    m_Registers.HL = opcodeADD_SP();
 
     LOG_HL_REG();
 }

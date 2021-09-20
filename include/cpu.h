@@ -104,7 +104,7 @@ class CPU
         bool m_IME;
         bool m_Branched;
 
-    public:
+    private:
         //--------------------------------------Opcode Helpers--------------------------------------//
 
         void pushStack(const u16& val);
@@ -123,8 +123,6 @@ class CPU
         void opcodeOR(const u8& val);
         void opcodeCP(const u8& val);
 
-        void opcodeADD_HL(const u16& val);
-
         void opcodeJP(bool condition);
         void opcodeJR(bool condition);
 
@@ -132,6 +130,11 @@ class CPU
         void opcodeRET(bool condiiton);
 
         void opcodeRST(const u8& val);
+
+        // 16 bit variants
+
+        void opcodeADD_HL(const u16& val);
+        u16  opcodeADD_SP();
 
         //--------------------------------------CB Opcode Helpers--------------------------------------//
 
@@ -151,7 +154,7 @@ class CPU
         void opcodeRES(const u8& bit, u8& reg);
         void opcodeSET(const u8& bit, u8& reg);
 
-        //HL variants
+        // 16 bit variants
 
         void opcodeBIT_HL(const u8& bit);
         void opcodeRES_HL(const u8& bit);
@@ -1188,7 +1191,7 @@ class CPU
             INSTRUCTION("BIT 5,H",          std::bind(&CPU::opcodeCB0x6C, this), 2,  8,  8),
             INSTRUCTION("BIT 5,L",          std::bind(&CPU::opcodeCB0x6D, this), 2,  8,  8),
             INSTRUCTION("BIT 5,(HL)",       std::bind(&CPU::opcodeCB0x6E, this), 2, 12, 12),
-            INSTRUCTION("BIT 5,A",          std::bind(&CPU::opcodeCB0x6E, this), 2,  8,  8),
+            INSTRUCTION("BIT 5,A",          std::bind(&CPU::opcodeCB0x6F, this), 2,  8,  8),
 
             //0x70
             INSTRUCTION("BIT 6,B",          std::bind(&CPU::opcodeCB0x70, this), 2,  8,  8),

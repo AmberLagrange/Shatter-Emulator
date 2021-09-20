@@ -69,7 +69,7 @@ void CPU::reset()
     m_Registers.SP = 0xFFFE;
     DEBUG("\tSP Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.SP);
 
-    m_Registers.PC = 0x0000;
+    m_Registers.PC = 0x0100;
     DEBUG("\tPC Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.PC);
 
     m_IME = false;
