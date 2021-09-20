@@ -26,5 +26,7 @@ class MMU
         Cartridge m_Rom;
         CPU* m_CPU;
 
+        std::string blarggString = "";
+
         u8 m_Memory[0x8000];
 };

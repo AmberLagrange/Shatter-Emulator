@@ -6,19 +6,33 @@
 
 //--------------------------------------CB Opcode Helpers--------------------------------------//
 
-void CPU::opcodeRLC([[maybe_unused]] u8& reg)
+void CPU::opcodeRLC(u8& reg)
 {
-	
+	clearAllFlags();
+
+	u8 carry = GET_BIT(reg, 7);
+
+	reg = (reg << 1) | carry;
+
+	if(carry) setFlag(Flags::Register::Carry);
+	setZeroFromVal(reg);
 }
 
-void CPU::opcodeRRC([[maybe_unused]] u8& reg)
+void CPU::opcodeRRC(u8& reg)
 {
-	
+	clearAllFlags();
+
+	u8 carry = GET_BIT(reg, 0);
+
+	reg = (carry << 7) | (reg >> 1);
+
+	if(carry) setFlag(Flags::Register::Carry);
+	setZeroFromVal(reg);
 }
 
 void CPU::opcodeRL(u8& reg)
 {
-	u8 carry = isFlagSet(Flags::Register::Carry) ? 1 : 0;
+	u8 carry = isFlagSet(Flags::Register::Carry);
 
 	clearAllFlags();
 
@@ -29,34 +43,65 @@ void CPU::opcodeRL(u8& reg)
 	setZeroFromVal(reg);
 }
 
-void CPU::opcodeRR([[maybe_unused]] u8& reg)
+void CPU::opcodeRR(u8& reg)
 {
-	
+	u8 carry = isFlagSet(Flags::Register::Carry);
+
+	clearAllFlags();
+
+	if(GET_BIT(reg, 0)) setFlag(Flags::Register::Carry);
+
+	reg = (carry << 7) | (reg >> 1);
+
+	setZeroFromVal(reg);
 }
 
-void CPU::opcodeSLA([[maybe_unused]] u8& reg)
+void CPU::opcodeSLA(u8& reg)
 {
-	
+	clearAllFlags();
+
+	if(GET_BIT(reg, 7)) setFlag(Flags::Register::Carry);
+
+	reg <<= 1;
+
+	setZeroFromVal(reg);
 }
 
-void CPU::opcodeSRA([[maybe_unused]] u8& reg)
+void CPU::opcodeSRA(u8& reg)
 {
-	
+	clearAllFlags();
+
+	if(GET_BIT(reg, 7)) setFlag(Flags::Register::Carry);
+	reg >>= 1;
+
+	if(GET_BIT(reg, 6)) reg |= 0x80;
+
+	setZeroFromVal(reg);
 }
 
-void CPU::opcodeSWAP([[maybe_unused]] u8& reg)
+void CPU::opcodeSWAP(u8& reg)
 {
-	
+	u8 low  = reg & 0x0F;
+	u8 high = reg * 0xF0;
+
+	reg = (low << 4) | (high >> 4);
 }
 
-void CPU::opcodeSRL([[maybe_unused]] u8& reg)
+void CPU::opcodeSRL(u8& reg)
 {
-	
+	u8 carry = GET_BIT(reg, 0);
+
+	clearAllFlags();
+
+	reg >>= 1;
+
+	if(carry) setFlag(Flags::Register::Carry);
+	setZeroFromVal(reg);
 }
 
 void CPU::opcodeBIT(const u8& bit, u8& reg)
 {
-	if((reg >> bit) & 0b00000001)
+	if(GET_BIT(reg, bit))
         clearFlag(Flags::Register::Zero);
     else
         setFlag(Flags::Register::Zero);
@@ -65,71 +110,47 @@ void CPU::opcodeBIT(const u8& bit, u8& reg)
     setFlag(Flags::Register::HalfCarry);
 }
 
-void CPU::opcodeRES([[maybe_unused]] const u8& bit, [[maybe_unused]] u8& reg)
+void CPU::opcodeRES(const u8& bit, u8& reg)
 {
-	
+	reg &= ~(0x01 << bit);
 }
 
-void CPU::opcodeSET([[maybe_unused]] const u8& bit, [[maybe_unused]] u8& reg)
+void CPU::opcodeSET(const u8& bit, u8& reg)
 {
-	
+	reg |= (0x01 << bit);
 }
 
 //HL variants
 
-void CPU::opcodeRLC_HL()
+void CPU::opcodeBIT_HL(const u8& bit)
 {
-	
+	u8 val = m_MMU->read(m_Registers.HL);
+
+	if(GET_BIT(val, bit))
+        clearFlag(Flags::Register::Zero);
+    else
+        setFlag(Flags::Register::Zero);
+
+    clearFlag(Flags::Register::Negative);
+    setFlag(Flags::Register::HalfCarry);
 }
 
-void CPU::opcodeRRC_HL()
+void CPU::opcodeRES_HL(const u8& bit)
 {
-	
-}
+	u8 val = m_MMU->read(m_Registers.HL);
 
-void CPU::opcodeRL_HL()
-{
-	
-}
+	val &= ~(0x01 << bit);
 
-void CPU::opcodeRR_HL()
-{
-	
-}
-
-void CPU::opcodeSLA_HL()
-{
-	
-}
-
-void CPU::opcodeSRA_HL()
-{
-	
-}
-
-void CPU::opcodeSWAP_HL()
-{
-	
-}
-
-void CPU::opcodeSRL_HL()
-{
-	
-}
-
-void CPU::opcodeBIT_HL([[maybe_unused]] const u8& bit)
-{
-	
-}
-
-void CPU::opcodeRES_HL([[maybe_unused]] const u8& bit)
-{
-	
+	m_MMU->write(m_Registers.HL, val);
 }
 
 void CPU::opcodeSET_HL([[maybe_unused]] const u8& bit)
 {
-	
+	u8 val = m_MMU->read(m_Registers.HL);
+
+	val |= (0x01 << bit);
+
+	m_MMU->write(m_Registers.HL, val);
 }
 
 //--------------------------------------CB Opcodes--------------------------------------//
@@ -186,7 +207,18 @@ void CPU::opcodeCB0x05() // RLC L
 
 void CPU::opcodeCB0x06() // RLC (HL)
 {
-	opcodeRLC_HL();
+	u8 val = m_MMU->read(m_Registers.HL);
+	
+	clearAllFlags();
+
+	u8 carry = GET_BIT(val, 7);
+
+	val = (val << 1) | carry;
+
+	if(carry) setFlag(Flags::Register::Carry);
+	setZeroFromVal(val);
+
+	m_MMU->write(m_Registers.HL, val);
 
 	LOG_WRITE(m_Registers.HL);
 	LOG_FLAGS();
@@ -250,7 +282,18 @@ void CPU::opcodeCB0x0D() // RRC L
 
 void CPU::opcodeCB0x0E() // RRC (HL)
 {
-	opcodeRRC_HL();
+	u8 val = m_MMU->read(m_Registers.HL);
+
+	clearAllFlags();
+
+	u8 carry = GET_BIT(val, 0);
+
+	val = (carry << 7) | (val >> 1);
+
+	if(carry) setFlag(Flags::Register::Carry);
+	setZeroFromVal(val);
+
+	m_MMU->write(m_Registers.HL, val);
 
 	LOG_WRITE(m_Registers.HL);
 	LOG_FLAGS();
@@ -316,7 +359,19 @@ void CPU::opcodeCB0x15() // RL L
 
 void CPU::opcodeCB0x16() // RL (HL)
 {
-	opcodeRL_HL();
+	u8 val = m_MMU->read(m_Registers.HL);
+
+	u8 carry = isFlagSet(Flags::Register::Carry);
+
+	clearAllFlags();
+
+	if(GET_BIT(val, 7)) setFlag(Flags::Register::Carry);
+
+	val = (val << 1) | carry;
+
+	setZeroFromVal(val);
+
+	m_MMU->write(m_Registers.HL, val);
 
 	LOG_WRITE(m_Registers.HL);
 	LOG_FLAGS();
@@ -380,7 +435,19 @@ void CPU::opcodeCB0x1D() // RR L
 
 void CPU::opcodeCB0x1E() // RR (HL)
 {
-	opcodeRR_HL();
+	u8 val = m_MMU->read(m_Registers.HL);
+
+	u8 carry = isFlagSet(Flags::Register::Carry);
+
+	clearAllFlags();
+
+	if(GET_BIT(val, 0)) setFlag(Flags::Register::Carry);
+
+	val = (carry << 7) | (val >> 1);
+
+	setZeroFromVal(val);
+
+	m_MMU->write(m_Registers.HL, val);
 
 	LOG_WRITE(m_Registers.HL);
 	LOG_FLAGS();
@@ -446,7 +513,17 @@ void CPU::opcodeCB0x25() // SLA L
 
 void CPU::opcodeCB0x26() // SLA (HL)
 {
-	opcodeSLA_HL();
+	u8 val = m_MMU->read(m_Registers.HL);
+
+	clearAllFlags();
+
+	if(GET_BIT(val, 7)) setFlag(Flags::Register::Carry);
+
+	val <<= 1;
+
+	setZeroFromVal(val);
+
+	m_MMU->write(m_Registers.HL, val);
 
 	LOG_WRITE(m_Registers.HL);
 	LOG_FLAGS();
@@ -510,7 +587,18 @@ void CPU::opcodeCB0x2D() // SRA L
 
 void CPU::opcodeCB0x2E() // SRA (HL)
 {
-	opcodeSRA_HL();
+	u8 val = m_MMU->read(m_Registers.HL);
+
+	clearAllFlags();
+
+	if(GET_BIT(val, 7)) setFlag(Flags::Register::Carry);
+	val >>= 1;
+
+	if(GET_BIT(val, 6)) val |= 0x80;
+
+	setZeroFromVal(val);
+
+	m_MMU->write(m_Registers.HL, val);
 
 	LOG_WRITE(m_Registers.HL);
 	LOG_FLAGS();
@@ -576,7 +664,12 @@ void CPU::opcodeCB0x35() // SWAP L
 
 void CPU::opcodeCB0x36() // SWAP (HL)
 {
-	opcodeSWAP_HL();
+	u8 val = m_MMU->read(m_Registers.HL);
+
+	u8 low  = val & 0x0F;
+	u8 high = val & 0xF0;
+
+	m_MMU->write(m_Registers.HL, (low << 4) | (high >> 4));
 
 	LOG_WRITE(m_Registers.HL);
 	LOG_FLAGS();
@@ -640,7 +733,18 @@ void CPU::opcodeCB0x3D() // SRL L
 
 void CPU::opcodeCB0x3E() // SRL (HL)
 {
-	opcodeSRL_HL();
+	u8 val = m_MMU->read(m_Registers.HL);
+
+	u8 carry = GET_BIT(val, 0);
+
+	clearAllFlags();
+
+	val >>= 1;
+
+	if(carry) setFlag(Flags::Register::Carry);
+	setZeroFromVal(val);
+
+	m_MMU->write(m_Registers.HL, val);
 
 	LOG_WRITE(m_Registers.HL);
 	LOG_FLAGS();

@@ -55,7 +55,7 @@ enum LogLevel
 class Logger : std::ostream
 {
     public:
-        Logger(LogLevel level = LogLevel::Error, std::ostream& stream = std::cout)
+        Logger(LogLevel level = LogLevel::Error, std::ostream& stream = *s_DefaultStream)
             : m_LogLevel(level), m_Stream(stream), m_Open((m_LogLevel >= s_LogLevel) || ((m_LogLevel == LogLevel::Opcode) && s_OpcodeLogging))
         {
             if(m_Open)
@@ -117,6 +117,7 @@ class Logger : std::ostream
         inline static void setLogLevel(LogLevel level) { s_LogLevel = level; }
         inline static void enableOpcodeLogging()  { s_OpcodeLogging = true; }
         inline static void disableOpcodeLogging() { s_OpcodeLogging = false; }
+        inline static void setDefaultStream(std::ostream& stream) { s_DefaultStream = &stream; }
     private:
         LogLevel m_LogLevel;
         std::ostream& m_Stream;
@@ -124,6 +125,7 @@ class Logger : std::ostream
 
         static LogLevel s_LogLevel;
         static bool s_OpcodeLogging;
+        static std::ostream* s_DefaultStream;
 };
 
 #define SET_LOG_LEVEL(x)        Logger::setLogLevel(x)

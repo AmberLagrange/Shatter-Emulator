@@ -7,7 +7,7 @@
 #define LOG_D_REG() OPCODE("D Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.D) << ".")
 #define LOG_E_REG() OPCODE("E Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.E) << ".")
 #define LOG_H_REG() OPCODE("H Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.H) << ".")
-#define LOG_L_REG() OPCODE("F Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.L) << ".")
+#define LOG_L_REG() OPCODE("L Register updated to: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.L) << ".")
 
 #define LOG_FLAGS() OPCODE("Flags updated to: " << ((m_Registers.F & Flags::Register::Zero)      ? "Z" : "_") \
                                                 << ((m_Registers.F & Flags::Register::Negative)  ? "N" : "_") \

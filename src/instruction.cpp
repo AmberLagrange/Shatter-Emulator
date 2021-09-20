@@ -23,7 +23,7 @@ void CPU::popStack(u16& reg)
     u8 low  = m_MMU->read(m_Registers.SP);
     m_Registers.SP++;
 
-    reg = static_cast<u16>(high) << 8 | low;
+    reg = (static_cast<u16>(high) << 8) | low;
 
     LOG_POP();
 }
@@ -33,7 +33,7 @@ void CPU::opcodeINC(u8& reg)
     reg++;
     clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry);
     setZeroFromVal(reg);
-    if((reg * 0x0f) == 0x00) setFlag(Flags::Register::HalfCarry);
+    if((reg & 0x0F) == 0x00) setFlag(Flags::Register::HalfCarry);
 
     LOG_FLAGS();
 }
@@ -44,37 +44,83 @@ void CPU::opcodeDEC(u8& reg)
     clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry);
     setZeroFromVal(reg);
     setFlag(Flags::Register::Negative);
-    if((reg & 0x0f) == 0x0f) setFlag(Flags::Register::HalfCarry);
+    if((reg & 0x0F) == 0x0F) setFlag(Flags::Register::HalfCarry);
 
     LOG_FLAGS();
 }
 
-void CPU::opcodeADD([[maybe_unused]] const u8& val)
+void CPU::opcodeADD(const u8& val)
 {
+    clearAllFlags();
+
+    if(0xFF - val > m_Registers.A) setFlag(Flags::Register::Carry);
+    if((m_Registers.A & 0x0F) + (val & 0x0F) > 0x0F) setFlag(Flags::Register::HalfCarry);
+    m_Registers.A += val;
+    setZeroFromVal(m_Registers.A);
+
     LOG_FLAGS();
     LOG_A_REG();
 }
 
-void CPU::opcodeADC([[maybe_unused]] const u8& val)
+void CPU::opcodeADC(const u8& val)
 {
+    u8 carry = isFlagSet(Flags::Register::Carry);
+
+    clearAllFlags();
+
+    if(0xFF - val - carry > m_Registers.A) setFlag(Flags::Register::Carry);
+    if((m_Registers.A & 0x0F) + (val & 0x0F) + carry > 0x0F) setFlag(Flags::Register::HalfCarry);
+    m_Registers.A += (val + carry);
+    setZeroFromVal(m_Registers.A);
+
     LOG_FLAGS();
     LOG_A_REG();
 }
 
-void CPU::opcodeSUB([[maybe_unused]] const u8& val)
+void CPU::opcodeSUB(const u8& val)
 {
+    clearAllFlags();
+    setFlag(Flags::Register::Negative);
+    if(m_Registers.A < val) setFlag(Flags::Register::Carry);
+    if(((m_Registers.A & 0x0F) < (val & 0x0F))) setFlag(Flags::Register::HalfCarry);
+    m_Registers.A -= val;
+    setZeroFromVal(m_Registers.A);
+
     LOG_FLAGS();
     LOG_A_REG();
 }
 
-void CPU::opcodeSBC([[maybe_unused]] const u8& val)
+void CPU::opcodeSBC(const u8& val)
 {
+    u8 carry = isFlagSet(Flags::Register::Carry);
+
+    clearAllFlags();
+    setFlag(Flags::Register::Negative);
+
+    if(val == 0xFF && carry) // Subtract "0" (0x100), but set H and C flags
+    {
+        setFlag(Flags::Register::HalfCarry | Flags::Register::Carry);
+    }
+    else
+    {
+        if(m_Registers.A < val + carry) setFlag(Flags::Register::Carry);
+        if((m_Registers.A & 0x0F) < ((val + carry) & 0x0F)) setFlag(Flags::Register::HalfCarry);
+        m_Registers.A -= (val + carry);
+    }
+
+    setZeroFromVal(m_Registers.A);
+
     LOG_FLAGS();
     LOG_A_REG();
 }
 
-void CPU::opcodeAND([[maybe_unused]] const u8& val)
+void CPU::opcodeAND(const u8& val)
 {   
+    m_Registers.A &= val;
+    clearAllFlags();
+    setFlag(Flags::Register::HalfCarry);
+    setZeroFromVal(m_Registers.A);
+
     LOG_FLAGS();
     LOG_A_REG();
 }
@@ -89,8 +135,12 @@ void CPU::opcodeXOR(const u8& val)
     LOG_A_REG();
 }
 
-void CPU::opcodeOR([[maybe_unused]] const u8& val)
+void CPU::opcodeOR(const u8& val)
 {
+    m_Registers.A |= val;
+    clearAllFlags();
+    setZeroFromVal(m_Registers.A);
+
     LOG_FLAGS();
     LOG_A_REG();
 }
@@ -107,11 +157,21 @@ void CPU::opcodeCP(const u8& val)
     if(a == val)
         setFlag(Flags::Register::Zero);
 
-    if((a & 0x0F) < ((a - val) & 0x0F))
+    if((a & 0x0F) < (val & 0x0F))
         setFlag(Flags::Register::HalfCarry);
 
     LOG_FLAGS();
     LOG_A_REG();
+}
+
+void CPU::opcodeADD_HL(const u16& val)
+{
+    clearFlag(Flags::Register::Negative | Flags::Register::HalfCarry | Flags::Register::Carry);
+    if(0xFFFF - val > m_Registers.HL) setFlag(Flags::Register::Carry);
+    if(((m_Registers.HL) & 0x0F) + ((val >> 8) & 0x0F) > 0x0F) setFlag(Flags::Register::HalfCarry);
+
+    LOG_FLAGS();
+    LOG_HL_REG();
 }
 
 void CPU::opcodeJP(bool condition)
@@ -121,7 +181,7 @@ void CPU::opcodeJP(bool condition)
 
     if(condition)
     {
-        m_Registers.PC = static_cast<u16>(high) << 8 | static_cast<u16>(low);
+        m_Registers.PC = (static_cast<u16>(high) << 8) | low;
         m_Branched = true;
 
         LOG_JP();
@@ -134,12 +194,11 @@ void CPU::opcodeJP(bool condition)
 
 void CPU::opcodeJR(bool condition)
 {
-    i8 offset = m_MMU->read(m_Registers.PC++);
-    u16 addr = m_Registers.PC + offset;
+    i8 offset = static_cast<i8>(m_MMU->read(m_Registers.PC++));
 
     if(condition)
     {
-        m_Registers.PC = addr;
+        m_Registers.PC += offset;
         m_Branched = true;
 
         LOG_JP();
@@ -158,8 +217,7 @@ void CPU::opcodeCALL(bool condition)
     if(condition)
     {
         pushStack(m_Registers.PC);
-        u16 addr = static_cast<u16>(high) << 8 | static_cast<u16>(low);
-        m_Registers.PC = addr;
+        m_Registers.PC = (static_cast<u16>(high) << 8) | low;
 
         LOG_JP();
     }
@@ -184,6 +242,14 @@ void CPU::opcodeRET(bool condiiton)
     }
 }
 
+void CPU::opcodeRST(const u8& val)
+{
+    pushStack(m_Registers.PC);
+    m_Registers.PC = static_cast<u16>(val);
+
+    LOG_JP();
+}
+
 //--------------------------------------Opcodes--------------------------------------//
 
 //0x00
@@ -203,12 +269,16 @@ void CPU::opcode0x01() // LD BC,u16
 
 void CPU::opcode0x02() // LD (BC),A
 {
+    m_MMU->write(m_Registers.BC, m_Registers.A);
 
+    LOG_WRITE(m_Registers.A);
 }
 
 void CPU::opcode0x03() // INC BC
 {
+    m_Registers.BC++;
 
+    LOG_BC_REG();
 }
 
 void CPU::opcode0x04() // INC B
@@ -234,14 +304,21 @@ void CPU::opcode0x06() // LD B,u8
 
 void CPU::opcode0x07() // RLCA
 {
+    // RLC A, except Zero Flag isn't set
 
+    clearAllFlags();
+
+	u8 carry = GET_BIT(m_Registers.A, 7);
+	m_Registers.A = (m_Registers.A << 1) | carry;
+
+	if(carry) setFlag(Flags::Register::Carry);
 }
 
 void CPU::opcode0x08() // LD (u16),SP
 {
     u8 low  = m_MMU->read(m_Registers.PC++);
     u8 high = m_MMU->read(m_Registers.PC++);
-    u16 addr = static_cast<u16>(high) << 8 | low;
+    u16 addr = (static_cast<u16>(high) << 8) | low;
 
     m_MMU->write(addr    , static_cast<u8>(m_Registers.SP    ));
     m_MMU->write(addr + 1, static_cast<u8>(m_Registers.SP >> 8));
@@ -252,17 +329,22 @@ void CPU::opcode0x08() // LD (u16),SP
 
 void CPU::opcode0x09() // ADD HL,BC
 {
-
+    opcodeADD_HL(m_Registers.BC);
 }
 
 void CPU::opcode0x0A() // LD A,(BC)
 {
+    m_Registers.A = m_MMU->read(m_Registers.BC);
 
+    LOG_READ(m_Registers.BC);
+    LOG_A_REG();
 }
 
 void CPU::opcode0x0B() // DEC BC
 {
+    m_Registers.BC--;
 
+    LOG_BC_REG();
 }
 
 void CPU::opcode0x0C() // INC C
@@ -288,14 +370,23 @@ void CPU::opcode0x0E() // LD C,u8
 
 void CPU::opcode0x0F() // RRCA
 {
+    // RRCA, except Zero Flag isn't set
 
+    clearAllFlags();
+
+	u8 carry = GET_BIT(m_Registers.A, 0);
+	m_Registers.A = (carry << 7) | (m_Registers.A >> 1);
+
+	if(carry) setFlag(Flags::Register::Carry);
 }
 
 //0x10
 
 void CPU::opcode0x10() // STOP
 {
+    m_Registers.PC++; //Skip next opcode
 
+    OPCODE("Stopped!");
 }
 
 void CPU::opcode0x11() // LD DE,u16
@@ -308,7 +399,9 @@ void CPU::opcode0x11() // LD DE,u16
 
 void CPU::opcode0x12() // LD (DE),A
 {
+    m_MMU->write(m_Registers.DE, m_Registers.A);
 
+    LOG_WRITE(m_Registers.DE);
 }
 
 void CPU::opcode0x13() // INC DE
@@ -341,9 +434,9 @@ void CPU::opcode0x16() // LD D,u8
 
 void CPU::opcode0x17() // RLA
 {
-    //RL A, except Zero Flag isn't set
+    // RL A, except Zero Flag isn't set
 
-    u8 carry = isFlagSet(Flags::Register::Carry) ? 1 : 0;
+    u8 carry = isFlagSet(Flags::Register::Carry);
 
     clearAllFlags();
 
@@ -362,7 +455,7 @@ void CPU::opcode0x18() // JR i8
 
 void CPU::opcode0x19() // ADD HL,DE
 {
-
+    opcodeADD_HL(m_Registers.DE);
 }
 
 void CPU::opcode0x1A() // LD A,(DE)
@@ -375,7 +468,9 @@ void CPU::opcode0x1A() // LD A,(DE)
 
 void CPU::opcode0x1B() // DEC DE
 {
+    m_Registers.DE--;
 
+    LOG_DE_REG();
 }
 
 void CPU::opcode0x1C() // INC E
@@ -401,7 +496,15 @@ void CPU::opcode0x1E() // LD E,u8
 
 void CPU::opcode0x1F() // RRA
 {
+    // RR A, except Zero Flag isn't set
 
+    u8 carry = isFlagSet(Flags::Register::Carry);
+
+	clearAllFlags();
+
+	if(GET_BIT(m_Registers.A, 0)) setFlag(Flags::Register::Carry);
+
+	m_Registers.A = (carry << 7) | (m_Registers.A >> 1);
 }
 
 //0x20
@@ -415,7 +518,7 @@ void CPU::opcode0x21() // LD HL,u16
 {
     u8 low  = m_MMU->read(m_Registers.PC++);
     u8 high = m_MMU->read(m_Registers.PC++);
-    m_Registers.HL = static_cast<u16>(high) << 8 | static_cast<u16>(low);
+    m_Registers.HL = (static_cast<u16>(high) << 8) | low;
 
     LOG_HL_REG();
 }
@@ -458,7 +561,44 @@ void CPU::opcode0x26() // LD H,u8
 
 void CPU::opcode0x27() // DAA
 {
+    bool halfCarry = isFlagSet(Flags::Register::HalfCarry);
+    bool carry = isFlagSet(Flags::Register::Carry);
+    clearFlag(Flags::Register::Zero | Flags::Register::HalfCarry | Flags::Register::Carry);
 
+    u16 a = static_cast<u16>(m_Registers.A);
+
+    if(!isFlagSet(Flags::Register::Negative))
+    {
+        if(halfCarry || (m_Registers.A & 0x0F) > 0x09)
+        {
+            a = a + 0x06;
+        }
+
+        if(carry || m_Registers.A > 0x99)
+        {
+            a = a + 0x60;
+        }
+    }
+    else
+    {
+        if(halfCarry)
+        {
+            a = (a - 0x06) & 0xFF;
+        }
+
+        if(carry)
+        {
+            a = a - 0x60;
+        }
+    }
+
+    if((a & 0x0100) == 0x0100) setFlag(Flags::Register::Carry);
+    m_Registers.A = static_cast<u8>(a);
+
+    setZeroFromVal(m_Registers.A);
+
+    OPCODE("DAA.");
+    LOG_A_REG();
 }
 
 void CPU::opcode0x28() // JR Z,i8
@@ -468,17 +608,23 @@ void CPU::opcode0x28() // JR Z,i8
 
 void CPU::opcode0x29() // ADD HL,HL
 {
-
+    opcodeADD_HL(m_Registers.HL);
 }
 
 void CPU::opcode0x2A() // LD A,(HL+)
 {
+    m_Registers.A = m_MMU->read(m_Registers.HL++);
 
+    LOG_READ(m_Registers.HL - 1);
+    LOG_HL_REG();
+    LOG_A_REG();
 }
 
 void CPU::opcode0x2B() // DEC HL
 {
+    m_Registers.HL--;
 
+    LOG_HL_REG();
 }
 
 void CPU::opcode0x2C() // INC L
@@ -504,7 +650,11 @@ void CPU::opcode0x2E() // LD L,u8
 
 void CPU::opcode0x2F() // CPL
 {
+    m_Registers.A = ~m_Registers.A;
+    setFlag(Flags::Register::Negative | Flags::Register::HalfCarry);
 
+    OPCODE("Compliment of A.");
+    LOG_A_REG();
 }
 
 //0x30
@@ -518,7 +668,7 @@ void CPU::opcode0x31() // LD SP,u16
 {
     u8 low  = m_MMU->read(m_Registers.PC++);
     u8 high = m_MMU->read(m_Registers.PC++);
-    m_Registers.SP = static_cast<u16>(high) << 8 | static_cast<u16>(low);
+    m_Registers.SP = (static_cast<u16>(high) << 8) | low;
 
     LOG_SP_REG();
 }
@@ -533,17 +683,32 @@ void CPU::opcode0x32() // LD (HL-),A
 
 void CPU::opcode0x33() // INC SP
 {
+    m_Registers.SP++;
 
+    LOG_SP_REG();
 }
 
 void CPU::opcode0x34() // INC (HL)
 {
+    clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry);
+    u8 val = m_MMU->read(m_Registers.HL) + 1;
+    if((val & 0x0F) == 0x00) setFlag(Flags::Register::HalfCarry);
+    setZeroFromVal(val);
+    m_MMU->write(m_Registers.HL, val);
 
+    LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcode0x35() // DEC (HL)
 {
+    clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry);
+    u8 val = m_MMU->read(m_Registers.HL) - 1;
+    setFlag(Flags::Register::Negative);
+    if((val & 0x0F) == 0x0F) setFlag(Flags::Register::HalfCarry);
+    setZeroFromVal(val);
+    m_MMU->write(m_Registers.HL, val);
 
+    LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcode0x36() // LD (HL),u8
@@ -555,7 +720,10 @@ void CPU::opcode0x36() // LD (HL),u8
 
 void CPU::opcode0x37() // SCF
 {
+    clearFlag(Flags::Register::Negative | Flags::Register::HalfCarry);
+    setFlag(Flags::Register::Carry);
 
+    LOG_FLAGS();
 }
 
 void CPU::opcode0x38() // JR C,i8
@@ -565,17 +733,23 @@ void CPU::opcode0x38() // JR C,i8
 
 void CPU::opcode0x39() // ADD HL,SP
 {
-
+    opcodeADD_HL(m_Registers.SP);
 }
 
 void CPU::opcode0x3A() // LD A,(HL-)
 {
+    m_Registers.A = m_MMU->read(m_Registers.HL--);
 
+    LOG_READ(m_Registers.HL + 1);
+    LOG_HL_REG();
+    LOG_A_REG();
 }
 
 void CPU::opcode0x3B() // DEC SP
 {
+    m_Registers.SP--;
 
+    LOG_SP_REG();
 }
 
 void CPU::opcode0x3C() // INC A
@@ -601,7 +775,10 @@ void CPU::opcode0x3E() // LD A,u8
 
 void CPU::opcode0x3F() // CCF
 {
+    clearFlag(Flags::Register::Negative | Flags::Register::HalfCarry);
+    flipFlag(Flags::Register::Carry);
 
+    LOG_FLAGS();
 }
 
 //0x40
@@ -998,7 +1175,7 @@ void CPU::opcode0x75() // LD (HL),L
 
 void CPU::opcode0x76() // HALT
 {
-
+    OPCODE("Halt!");
 }
 
 void CPU::opcode0x77() // LD (HL),A
@@ -1102,7 +1279,7 @@ void CPU::opcode0x86() // ADD A,(HL)
     opcodeADD(m_MMU->read(m_Registers.HL));
 }
 
-void CPU::opcode0x87() // Add A,A
+void CPU::opcode0x87() // ADD A,A
 {
     opcodeADD(m_Registers.A);
 }
@@ -1315,7 +1492,7 @@ void CPU::opcode0xAF() // XOR A,A
 
 void CPU::opcode0xB0() // OR A,B
 {
-
+    opcodeOR(m_Registers.B);
 }
 
 void CPU::opcode0xB1() // OR A,C
@@ -1434,7 +1611,7 @@ void CPU::opcode0xC6() // ADD A,u8
 
 void CPU::opcode0xC7() // RST 00h
 {
-
+    opcodeRST(0x00);
 }
 
 void CPU::opcode0xC8() // RET Z
@@ -1478,7 +1655,7 @@ void CPU::opcode0xCE() // ADC A,u8
 
 void CPU::opcode0xCF() // RST 08h
 {
-
+    opcodeRST(0x08);
 }
 
 //0xD0
@@ -1491,6 +1668,8 @@ void CPU::opcode0xD0() // RET NC
 void CPU::opcode0xD1() // POP DE
 {
     popStack(m_Registers.DE);
+
+    LOG_DE_REG();
 }
 
 void CPU::opcode0xD2() // JP NC,u16
@@ -1520,7 +1699,7 @@ void CPU::opcode0xD6() // SUB A,u8
 
 void CPU::opcode0xD7() // RST 10h
 {
-
+    opcodeRST(0x10);
 }
 
 void CPU::opcode0xD8() // RET C
@@ -1561,7 +1740,7 @@ void CPU::opcode0xDE() // SBC A,u8
 
 void CPU::opcode0xDF() // RST 18h
 {
-
+    opcodeRST(0x18);
 }
 
 //0xE0
@@ -1578,6 +1757,8 @@ void CPU::opcode0xE0() // LD (FF00+u8),A
 void CPU::opcode0xE1() // POP HL
 {
     popStack(m_Registers.HL);
+
+    LOG_HL_REG();
 }
 
 void CPU::opcode0xE2() // LD (FF00+C),A
@@ -1611,12 +1792,15 @@ void CPU::opcode0xE6() // AND A,u8
 
 void CPU::opcode0xE7() // RST 20h
 {
-
+    opcodeRST(0x20);
 }
 
 void CPU::opcode0xE8() // ADD SP,i8
 {
+    i8 offset = static_cast<i8>(m_MMU->read(m_Registers.PC++));
+    m_Registers.SP += offset;
 
+    LOG_SP_REG();
 }
 
 void CPU::opcode0xE9() // JP HL
@@ -1631,7 +1815,7 @@ void CPU::opcode0xEA() // LD (u16),A
 {
     u8 low  = m_MMU->read(m_Registers.PC++);
     u8 high = m_MMU->read(m_Registers.PC++);
-    u16 addr = static_cast<u16>(high) << 8 | low;
+    u16 addr = (static_cast<u16>(high) << 8) | low;
     m_MMU->write(addr, m_Registers.A);
 
     LOG_WRITE(addr);
@@ -1659,7 +1843,7 @@ void CPU::opcode0xEE() // XOR A,u8
 
 void CPU::opcode0xEF() // RST 28h
 {
-
+    opcodeRST(0x28);
 }
 
 //0xF0
@@ -1677,11 +1861,18 @@ void CPU::opcode0xF0() // LD A,(FF00+u8)
 void CPU::opcode0xF1() // POP AF
 {
     popStack(m_Registers.AF);
+    m_Registers.F &= 0xF0; // Correct for lower nibble to always be zero
+
+    LOG_AF_REG();
 }
 
 void CPU::opcode0xF2() // LD A,(FF00+C)
 {
+    u16 addr = 0xFF00 | m_Registers.C;
+    m_Registers.A = m_MMU->read(addr);
 
+    LOG_READ(addr);
+    LOG_A_REG();
 }
 
 void CPU::opcode0xF3() // DI
@@ -1708,22 +1899,34 @@ void CPU::opcode0xF6() // OR A,u8
 
 void CPU::opcode0xF7() // RST 30h
 {
-
+    opcodeRST(0x30);
 }
 
 void CPU::opcode0xF8() // LD HL,SP+i8
 {
+    i8 offset = static_cast<i8>(m_MMU->read(m_Registers.PC++));
+    m_Registers.HL = m_Registers.SP + offset;
 
+    LOG_HL_REG();
 }
 
 void CPU::opcode0xF9() // LD SP,HL
 {
+    m_Registers.SP = m_Registers.HL;
 
+    LOG_SP_REG();
 }
 
 void CPU::opcode0xFA() // LD A,(u16)
 {
+    u8 low  = m_MMU->read(m_Registers.PC++);
+    u8 high = m_MMU->read(m_Registers.PC++);
+    u16 addr = (static_cast<u16>(high) << 8) | low;
 
+    m_Registers.A = m_MMU->read(addr);
+
+    LOG_READ(addr);
+    LOG_A_REG();
 }
 
 void CPU::opcode0xFB() // EI
@@ -1745,10 +1948,10 @@ void CPU::opcode0xFD() // UNUSED
 
 void CPU::opcode0xFE() // CP A,u8
 {
-    opcodeCP(m_Registers.PC++);
+    opcodeCP(m_MMU->read(m_Registers.PC++));
 }
 
 void CPU::opcode0xFF() // RST 38h
 {
-
+    opcodeRST(0x38);
 }

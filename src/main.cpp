@@ -4,6 +4,7 @@
 #include <string>
 
 #include <filesystem>
+#include <fstream>
 
 #include "gameboy.h"
 #include "screen.h"
@@ -27,10 +28,11 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    if(Screen::initScreen())
+    std::ofstream file("./logs/log.log");
+
+    if(optionExists(argv, argv + argc, "-l"))
     {
-        ERROR("Could not Initialize the screen!");
-        return -1;
+        Logger::setDefaultStream(file);
     }
 
     if(optionExists(argv, argv + argc, "-v") | optionExists(argv, argv + argc, "--verbose"))
@@ -38,9 +40,17 @@ int main(int argc, char** argv)
         ENABLE_OP_LOGGING();
     }
 
+    if(Screen::initScreen())
+    {
+        ERROR("Could not Initialize the screen!");
+        return -1;
+    }
+
     Gameboy gameboy;
     gameboy.load(argv[1]);
     gameboy.run();
+
+    file.close();
 
     Screen::destroyScreen();
 

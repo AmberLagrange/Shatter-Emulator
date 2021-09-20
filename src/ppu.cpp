@@ -11,13 +11,14 @@ PPU::PPU()
 
 void PPU::tick(u8 cycles)
 {
+
     //TODO: calculate when to render
     //      currently just hacking together
     //      a render loop to show the nintendo logo
 
     temp += cycles;
 
-    if(temp >= 100000)
+    if(temp >= 1000000)
     {
         temp = 0;
 
