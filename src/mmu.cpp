@@ -114,21 +114,6 @@ u8 MMU::write(const u16& address, const u8& val)
 
     if(address < 0xFF80) // IO
     {
-
-        //Blargg serial out
-        if(address == 0xFF01)
-        {
-            if(val == '\n')
-            {
-                DEBUG(blarggString);
-                blarggString = "";
-            }
-            else
-            {
-                blarggString += val;
-            }
-        }
-
         return m_Memory[address - 0x8000] = val;
     }
 

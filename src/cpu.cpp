@@ -78,8 +78,7 @@ void CPU::reset()
 
 void CPU::handleInterrupts()
 {
-    if(!m_IME)
-        return;
+    if(!m_IME) return;
 
     u8 flags = m_MMU->read(0xFF0F);
 

@@ -20,7 +20,8 @@ class CPU
         inline bool isFlagSet(const Flags::Register& flag)  { return m_Registers.F & flag; }
 
         inline void clearAllFlags()                         { clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry | Flags::Register::Carry); }
-        inline void setZeroFromVal(const u8& val)           { if(!val) setFlag(Flags::Register::Zero); }
+        inline void setZeroFromVal(const u8& val)           { if(!val)
+		setFlag(Flags::Register::Zero); }
 
         inline void setMMU(MMU* mmu) { m_MMU = mmu; }
 

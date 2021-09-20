@@ -71,8 +71,8 @@ void CPU::opcodeADD(const u8& val)
 
 void CPU::opcodeADC(const u8& val)
 {
-    u8 carry = isFlagSet(Flags::Register::Carry);
     u16 a = static_cast<u16>(m_Registers.A);
+    u16 carry = isFlagSet(Flags::Register::Carry);
 
     clearAllFlags();
 
@@ -105,13 +105,13 @@ void CPU::opcodeSUB(const u8& val)
 
 void CPU::opcodeSBC(const u8& val)
 {
-    u8 carry = isFlagSet(Flags::Register::Carry);
     u16 a = static_cast<u16>(m_Registers.A);
+    u16 carry = isFlagSet(Flags::Register::Carry);
 
     clearAllFlags();
     setFlag(Flags::Register::Negative);
 
-    if(a - val - carry > 0x00FF) setFlag(Flags::Register::Carry);
+    if(a < static_cast<u16>(val) + carry) setFlag(Flags::Register::Carry);
     if((a & 0x000F) < (val & 0x0F) + carry) setFlag(Flags::Register::HalfCarry);
 
     m_Registers.A = static_cast<u8>((a - val - carry) & 0x00FF);
@@ -328,10 +328,10 @@ void CPU::opcode0x07() // RLCA
 
     clearAllFlags();
 
-	u8 carry = GET_BIT(m_Registers.A, 7);
-	m_Registers.A = (m_Registers.A << 1) | carry;
+    u8 carry = GET_BIT(m_Registers.A, 7);
+    m_Registers.A = (m_Registers.A << 1) | carry;
 
-	if(carry) setFlag(Flags::Register::Carry);
+    if(carry) setFlag(Flags::Register::Carry);
 }
 
 void CPU::opcode0x08() // LD (u16),SP
@@ -394,10 +394,10 @@ void CPU::opcode0x0F() // RRCA
 
     clearAllFlags();
 
-	u8 carry = GET_BIT(m_Registers.A, 0);
-	m_Registers.A = (carry << 7) | (m_Registers.A >> 1);
+    u8 carry = GET_BIT(m_Registers.A, 0);
+    m_Registers.A = (carry << 7) | (m_Registers.A >> 1);
 
-	if(carry) setFlag(Flags::Register::Carry);
+    if(carry) setFlag(Flags::Register::Carry);
 }
 
 //0x10
@@ -520,11 +520,11 @@ void CPU::opcode0x1F() // RRA
 
     u8 carry = isFlagSet(Flags::Register::Carry);
 
-	clearAllFlags();
+    clearAllFlags();
 
-	if(GET_BIT(m_Registers.A, 0)) setFlag(Flags::Register::Carry);
+    if(GET_BIT(m_Registers.A, 0)) setFlag(Flags::Register::Carry);
 
-	m_Registers.A = (carry << 7) | (m_Registers.A >> 1);
+    m_Registers.A = (carry << 7) | (m_Registers.A >> 1);
 }
 
 //0x20
@@ -581,42 +581,6 @@ void CPU::opcode0x26() // LD H,u8
 
 void CPU::opcode0x27() // DAA
 {
-    bool halfCarry = isFlagSet(Flags::Register::HalfCarry);
-    bool carry = isFlagSet(Flags::Register::Carry);
-    clearFlag(Flags::Register::Zero | Flags::Register::HalfCarry | Flags::Register::Carry);
-
-    u16 a = static_cast<u16>(m_Registers.A);
-
-    if(!isFlagSet(Flags::Register::Negative))
-    {
-        if(halfCarry || (m_Registers.A & 0x0F) > 0x09)
-        {
-            a = a + 0x06;
-        }
-
-        if(carry || m_Registers.A > 0x99)
-        {
-            a = a + 0x60;
-        }
-    }
-    else
-    {
-        if(halfCarry)
-        {
-            a = (a - 0x06) & 0xFF;
-        }
-
-        if(carry)
-        {
-            a = a - 0x60;
-        }
-    }
-
-    if((a & 0x0100) == 0x0100) setFlag(Flags::Register::Carry);
-    m_Registers.A = static_cast<u8>(a);
-
-    setZeroFromVal(m_Registers.A);
-
     OPCODE("DAA.");
     LOG_A_REG();
 }
