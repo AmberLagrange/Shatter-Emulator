@@ -9,20 +9,20 @@
 void CPU::pushStack(const u16& val)
 {
     m_Registers.SP--;
-    m_MMU->write(m_Registers.SP, static_cast<u8>((val & 0x00FF)     ));
+    m_MMU->write(m_Registers.SP, static_cast<u8>((val & 0xFF00) >> 8));
 
     m_Registers.SP--;
-    m_MMU->write(m_Registers.SP, static_cast<u8>((val & 0xFF00) >> 8));
+    m_MMU->write(m_Registers.SP, static_cast<u8>((val & 0x00FF)     ));
 
     LOG_PUSH();
 }
 
 void CPU::popStack(u16& reg)
 {
-    u8 high = m_MMU->read(m_Registers.SP);
+    u8 low  = m_MMU->read(m_Registers.SP);
     m_Registers.SP++;
 
-    u8 low  = m_MMU->read(m_Registers.SP);
+    u8 high = m_MMU->read(m_Registers.SP);
     m_Registers.SP++;
 
     reg = (static_cast<u16>(high) << 8) | low;
@@ -210,6 +210,7 @@ void CPU::opcodeCALL(bool condition)
     {
         pushStack(m_Registers.PC);
         m_Registers.PC = (static_cast<u16>(high) << 8) | low;
+        m_Branched = true;
 
         LOG_JP();
     }
