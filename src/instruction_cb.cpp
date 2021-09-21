@@ -591,7 +591,7 @@ void CPU::opcodeCB0x2E() // SRA (HL)
 
     clearAllFlags();
 
-    if(GET_BIT(val, 7)) setFlag(Flags::Register::Carry);
+    if(GET_BIT(val, 0)) setFlag(Flags::Register::Carry);
     val >>= 1;
 
     if(GET_BIT(val, 6)) val |= 0x80;
@@ -664,12 +664,16 @@ void CPU::opcodeCB0x35() // SWAP L
 
 void CPU::opcodeCB0x36() // SWAP (HL)
 {
+    clearAllFlags();
+
     u8 val = m_MMU->read(m_Registers.HL);
 
     u8 low  = val & 0x0F;
     u8 high = val & 0xF0;
 
     m_MMU->write(m_Registers.HL, (low << 4) | (high >> 4));
+
+    setZeroFromVal((low << 4) | (high >> 4));
 
     LOG_WRITE(m_Registers.HL);
     LOG_FLAGS();
