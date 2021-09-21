@@ -17,117 +17,89 @@ u8 MMU::read(const u16& address)
     {
         return m_Rom.read(address);
     }
-
-    if(address < 0xA000) //VRAM
+    else if(address < 0xA000) //VRAM
     {
         return m_Memory[address - 0x8000];
     }
-
-    if(address < 0xC000) // RAM Bank
+    else if(address < 0xC000) // RAM Bank
     {
         return m_Memory[address - 0x8000];
     }
-
-    if(address < 0xE000) // Internal RAM
+    else if(address < 0xE000) // Internal RAM
     {
         return m_Memory[address - 0x8000];
     }
-
-    if(address < 0xFE00) // Echo of Internal RAM
+    else if(address < 0xFE00) // Echo of Internal RAM
     {
-        //WARN("Reading from echo of RAM at address 0x" << std::setw(4) << std::setfill('0') << std::hex << address << ".");
         return m_Memory[address - 0x8000 - 0x2000]; // Map back into RAM
     }
-
-    if(address < 0xFEA0) // OAM
+    else if(address < 0xFEA0) // OAM
     {
         return m_Memory[address - 0x8000];
     }
-
-    if(address < 0xFF00) // Unusable
+    else if(address < 0xFF00) // Unusable
     {
-        //WARN("Reading from unmapped memory address 0x" << std::setw(4) << std::setfill('0') << std::hex << address << ".");
         return 0xFF;
     }
-
-    if(address < 0xFF80) // IO
+    else if(address < 0xFF80) // IO
     {
         return m_Memory[address - 0x8000];
     }
-
-    if(address < 0xFFFF) // High RAM
+    else if(address < 0xFFFF) // High RAM
     {
         return m_Memory[address - 0x8000];
     }
-
-    if(address == 0xFFFF) // IME
+    else if(address == 0xFFFF) // IME
     {
         return m_CPU->getIME();
     }
 
-    WARN("Reading from unmapped memory address 0x" << std::setw(4) << std::setfill('0') << std::hex << address << ".");
     return 0xFF;
 }
 
-u8 MMU::write(const u16& address, const u8& val)
+void MMU::write(const u16& address, const u8& val)
 {
     if(address < 0x8000) // ROM
     {
-        //WARN("Writing 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(val) << " to rom address 0x"
-        //                  << std::setw(4) << std::setfill('0') << std::hex << address << ".");
-        return 0xFF;
+        if(address < 0x4000) // ROM Bank Swapping
+        {
+            m_Rom.swapBank(val & 0x1F);
+        }
     }
-
-    if(address < 0xA000) //VRAM
+    else if(address < 0xA000) //VRAM
     {
-        return m_Memory[address - 0x8000] = val;
+        m_Memory[address - 0x8000] = val;
     }
-
-    if(address < 0xC000) // RAM Bank
+    else if(address < 0xC000) // RAM Bank
     {
-        return m_Memory[address - 0x8000] = val;
+        m_Memory[address - 0x8000] = val;
     }
-
-    if(address < 0xE000) // Internal RAM
+    else if(address < 0xE000) // Internal RAM
     {
-        return m_Memory[address - 0x8000] = val;
+        m_Memory[address - 0x8000] = val;
     }
-
-    if(address < 0xFE00) // Echo of Internal RAM
+    else if(address < 0xFE00) // Echo of Internal RAM
     {
-        //WARN("Writing 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(val) << " to echo of RAM at address 0x"
-        //                  << std::setw(4) << std::setfill('0') << std::hex << address << ".");
-        return m_Memory[address - 0x8000 - 0x2000] = val; // Map back into RAM
+        m_Memory[address - 0x8000 - 0x2000] = val; // Map back into RAM
     }
-
-    if(address < 0xFEA0) // OAM
+    else if(address < 0xFEA0) // OAM
     {
-        return m_Memory[address - 0x8000] = val;
+        m_Memory[address - 0x8000] = val;
     }
-
-    if(address < 0xFF00) // Unusable
+    else if(address < 0xFF00) // Unusable
     {
-        //WARN("Writing 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(val) << " to unmapped memory address 0x"
-        //                  << std::setw(4) << std::setfill('0') << std::hex << address << ".");
-        return 0xFF;
+        
     }
-
-    if(address < 0xFF80) // IO
+    else if(address < 0xFF80) // IO
     {
-        return m_Memory[address - 0x8000] = val;
+        m_Memory[address - 0x8000] = val;
     }
-
-    if(address < 0xFFFF) // High RAM
+    else if(address < 0xFFFF) // High RAM
     {
-        return m_Memory[address - 0x8000] = val;
+        m_Memory[address - 0x8000] = val;
     }
-
-    if(address == 0xFFFF) // IME
+    else if(address == 0xFFFF) // IME
     {
-        return m_CPU->setIME(val);
+        m_CPU->setIME(val);
     }
-
-    WARN("Writing 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(val) << " to unmapped memory address 0x"
-                      << std::setw(4) << std::setfill('0') << std::hex << address << ".");
-    return 0xFF;
 }

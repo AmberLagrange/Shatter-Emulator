@@ -39,17 +39,18 @@ Additional arguments can be passed as well.
 
 # Future Plans
 
-- [ ] Graphics (Soon)
 - [ ] Memory Bank Controllers
+- [ ] Complete Graphics
+- [ ] Audio
 - [ ] Save States
 - [ ] GameShark Codes
 - [ ] Link Cable
     - [ ] Potentially linking with real Gameboys with [gbplay](https://github.com/mwpenny/gbplay)
-- [ ] Gameboy Color support
+- [ ] Gameboy Color (and other Gameboys) support
 
 # Screenshots
 
-|                        Rudimentary CPU Logging and Screen                        |
-|:--------------------------------------------------------------------------------:|
-|![Initial Logging](./screenshots/Initial%20Logging.png?raw=true "Initial Logging")|
-|         ![Nintendont](./screenshots/Nintendont.png?raw=true "Nintendont")        |
+|                           Garlbed Nintendo Logo and Blargg's CPU Test                          |
+|:----------------------------------------------------------------------------------------------:|
+|                ![Nintendont](./screenshots/Nintendont.png?raw=true "Nintendont")               |
+|![Blargg cpu_instrs](./screenshots/Blargg%20cpu_instrs.png?raw=true "Blargg cpu_instrs")        |

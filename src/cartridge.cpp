@@ -15,7 +15,12 @@ void Cartridge::load(const char* path)
     std::ifstream in(path, std::ios::binary);
     contents.assign((std::istreambuf_iterator<char>(in)), {});
     std::copy(contents.begin(), contents.begin() + 0x4000, m_Rom0);
-    std::copy(contents.begin() + 0x4000, contents.begin() + 0x8000, m_Rom1);
+    swapBank(2);
+}
+
+void Cartridge::swapBank(u8 bankNumber)
+{
+    std::copy(contents.begin() + (0x4000 * bankNumber), contents.begin() + (0x4000 * (bankNumber + 1)), m_Rom1);
 }
 
 u8 Cartridge::read(u16 address)

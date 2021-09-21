@@ -11,6 +11,7 @@ class Cartridge
         Cartridge(const char* path);
 
         void load(const char* path);
+        void swapBank(u8 bankNumber);
 
         u8 read(u16 address);
 

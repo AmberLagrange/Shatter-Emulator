@@ -15,7 +15,7 @@ class MMU
         void load(const char* path);
 
         u8 read(const u16& address);
-        u8 write(const u16& address, const u8& val);
+        void write(const u16& address, const u8& val);
 
         inline void setCPU(CPU* cpu) { m_CPU = cpu; }
         
