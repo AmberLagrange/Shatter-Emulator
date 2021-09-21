@@ -77,7 +77,7 @@ void CPU::opcodeADC(const u8& val)
     clearAllFlags();
 
     if(a + val + carry > 0x00FF) setFlag(Flags::Register::Carry);
-    if((a & 0x000F) + (val & 0x0F) + carry > 0x0F) setFlag(Flags::Register::HalfCarry);
+    if((a & 0x0F) + (val & 0x0F) + carry > 0x0F) setFlag(Flags::Register::HalfCarry);
 
     m_Registers.A = static_cast<u8>(a + val + carry);
     
@@ -582,6 +582,42 @@ void CPU::opcode0x26() // LD H,u8
 
 void CPU::opcode0x27() // DAA
 {
+    u16 a = static_cast<u16>(m_Registers.A);
+
+    if (!isFlagSet(Flags::Register::Negative))
+    {
+        if(isFlagSet(Flags::Register::HalfCarry) || (a & 0x0F) > 0x09 )
+        {
+            a += 0x06;
+        }
+
+        if (isFlagSet(Flags::Register::Carry) || a > 0x9F )
+        {
+            a += 0x60;
+        }
+    }
+    else
+    {
+        if(isFlagSet(Flags::Register::HalfCarry))
+        {
+            a -= 0x06;
+            if(!isFlagSet(Flags::Register::Carry)) a &= 0xFF;
+        }
+
+        if(isFlagSet(Flags::Register::Carry))
+        {
+            a -= 0x60;
+        }
+    }
+
+    clearFlag(Flags::Register::Zero | Flags::Register::HalfCarry);
+
+    if(a & 0x0100) setFlag(Flags::Register::Carry);
+
+    m_Registers.A = static_cast<u16>(a);
+
+    setZeroFromVal(m_Registers.A);
+
     OPCODE("DAA.");
     LOG_A_REG();
 }
