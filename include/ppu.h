@@ -18,10 +18,19 @@ class PPU
         void tick(u8 cycles);
         
     private:
+
+        enum State
+        {
+            HBlank,
+            VBlank,
+            OAM_Search,
+            
+        };
+
         MMU* m_MMU;
 
         u8 m_FrameBuffer[GAMEBOY_WIDTH * GAMEBOY_HEIGHT * 4];
-        u8 m_BackgroundBuffer[256 * 256 * 4];
+        u8 m_BackgroundBuffer[VRAM_WIDTH * VRAM_HEIGHT * 4];
         std::function<void(u8* buffer)> m_DrawCallback;
 
         int temp; // Speed up emulation by not redrawing every tick

@@ -7,7 +7,7 @@
 #include "ppu.h"
 #include "apu.h"
 
-#include "cartridge.h"
+#include "timer.h"
 
 class Gameboy
 {
@@ -30,6 +30,7 @@ class Gameboy
         PPU m_PPU;
         APU m_APU;
 
+        Timer m_Timer;
+
         bool m_Running;
-        bool m_Halted;
 };

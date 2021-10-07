@@ -1198,6 +1198,8 @@ void CPU::opcode0x75() // LD (HL),L
 
 void CPU::opcode0x76() // HALT
 {
+    m_Halted = true;
+    
     OPCODE("Halt!");
 }
 

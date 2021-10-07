@@ -28,6 +28,14 @@
     #define ASSERT(x, msg) ((void)0)
 #endif
 
+#define DIV_REGISTER    0xFF04
+#define TIMA_REGISTER   0xFF05
+#define TMA_REGISTER    0xFF06
+#define TAC_REGISTER    0xFF07
+
+#define IF_REGISTER     0xFF0F
+#define IE_REGISTER     0xFFFF
+
 #define GAMEBOY_WIDTH   160
 #define GAMEBOY_HEIGHT  144
 
@@ -40,6 +48,8 @@
 
 typedef uint8_t u8;
 typedef uint16_t u16;
+typedef uint32_t u32;
 
 typedef int8_t i8;
 typedef int16_t i16;
+typedef int32_t i32;

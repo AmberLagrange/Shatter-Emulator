@@ -22,7 +22,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    if(!std::filesystem::exists(argv[1]))
+    if(!std::filesystem::exists(argv[1]) || std::filesystem::is_directory(argv[1]))
     {
         ERROR("File '" << argv[1] << "' not found!");
         return -1;

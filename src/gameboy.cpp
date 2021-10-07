@@ -3,7 +3,7 @@
 #include "screen.h"
 
 Gameboy::Gameboy()
-    : m_Running(false), m_Halted(false)
+    : m_Running(false)
 {
     m_CPU.setMMU(&m_MMU);
     m_MMU.setCPU(&m_CPU);
@@ -26,10 +26,11 @@ void Gameboy::run()
 
     while(m_Running)
     {
+        Screen::poll();
+
         u8 cycles = m_CPU.tick();
         m_PPU.tick(cycles);
-
-        Screen::poll();
+        m_Timer.update(cycles);
     }
 
     DEBUG("Stopping Gameboy!");

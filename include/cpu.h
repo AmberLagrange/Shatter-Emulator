@@ -14,23 +14,25 @@ class CPU
 
         u8 tick();
 
+        inline void setMMU(MMU* mmu) { m_MMU = mmu; }
+
+        inline bool getIME()         { return m_IME; }
+        inline bool setIME(bool ime) { return m_IME = ime; }
+
+        void raiseInterrupt(const Flags::Interrupt& flag);
+
+    private:
+        void handleInterrupts();
+
+        void reset();
+
         inline void setFlag(const Flags::Register& flag)    { m_Registers.F |= flag; }
         inline void clearFlag(const Flags::Register& flag)  { m_Registers.F &= ~flag; }
         inline void flipFlag(const Flags::Register& flag)   { m_Registers.F ^= flag; }
         inline bool isFlagSet(const Flags::Register& flag)  { return m_Registers.F & flag; }
 
         inline void clearAllFlags()                         { clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry | Flags::Register::Carry); }
-        inline void setZeroFromVal(const u8& val)           { if(!val)
-		setFlag(Flags::Register::Zero); }
-
-        inline void setMMU(MMU* mmu) { m_MMU = mmu; }
-
-        inline bool getIME()         { return m_IME; }
-        inline bool setIME(bool ime) { return m_IME = ime; }
-
-    private:
-        void reset();
-        void handleInterrupts();
+        inline void setZeroFromVal(const u8& val)           { if(!val) setFlag(Flags::Register::Zero); }
 
     private:
         struct Registers
@@ -102,6 +104,8 @@ class CPU
         MMU* m_MMU;
 
         Registers m_Registers;
+
+        bool m_Halted;
         bool m_IME;
         bool m_Branched;
 

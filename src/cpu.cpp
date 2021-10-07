@@ -15,6 +15,8 @@ CPU::CPU()
 
 u8 CPU::tick()
 {
+    if(m_Halted) return 4;
+
     handleInterrupts();
 
     Instruction instruction;
@@ -50,6 +52,54 @@ u8 CPU::tick()
 
     return cycles;
 }
+
+void CPU::raiseInterrupt(const Flags::Interrupt& flag)
+{
+    m_Halted = false;
+
+    m_MMU->write(IF_REGISTER, m_MMU->read(IF_REGISTER) | flag);
+}
+
+void CPU::handleInterrupts()
+{
+    u8 flags = m_MMU->read(IF_REGISTER);
+    u8 enabledFlags = (flags & m_MMU->read(IE_REGISTER));
+
+    if(m_IME && (enabledFlags & 0x1F))
+    {
+        pushStack(m_Registers.PC);
+
+        if(enabledFlags & Flags::Interrupt::VBlank)
+        {
+            flags &= ~Flags::Interrupt::VBlank;
+            m_Registers.PC = 0x0040;
+        }
+        else if(enabledFlags & Flags::Interrupt::LCD_STAT)
+        {
+            flags &= ~Flags::Interrupt::LCD_STAT;
+            m_Registers.PC = 0x0048;
+        }
+        else if(enabledFlags & Flags::Interrupt::Timer)
+        {
+            flags &= ~Flags::Interrupt::Timer;
+            m_Registers.PC = 0x0050;
+        }
+        else if(enabledFlags & Flags::Interrupt::Serial)
+        {
+            flags &= ~Flags::Interrupt::Serial;
+            m_Registers.PC = 0x0058;
+        }
+        else if(enabledFlags & Flags::Interrupt::Joypad)
+        {
+            flags &= ~Flags::Interrupt::Joypad;
+            m_Registers.PC = 0x0060;
+        }
+        
+        m_IME = false;
+        m_MMU->write(IF_REGISTER, flags);
+    }
+}
+
 void CPU::reset()
 {
     DEBUG("CPU Reset sequence:");
@@ -73,19 +123,6 @@ void CPU::reset()
     DEBUG("\tPC Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.PC);
 
     m_IME = false;
+    m_Halted = false;
     m_Branched = false;
-}
-
-void CPU::handleInterrupts()
-{
-    if(!m_IME) return;
-
-    u8 flags = m_MMU->read(0xFF0F);
-
-    if(flags)
-    {
-        DEBUG("Interrupt Flag");
-    }
-
-    m_IME = false;
 }

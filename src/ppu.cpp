@@ -11,20 +11,15 @@ PPU::PPU()
 
 void PPU::tick(u8 cycles)
 {
+    temp -= cycles;
 
-    //TODO: calculate when to render
-    //      currently just hacking together
-    //      a render loop to show the nintendo logo
-
-    temp += cycles;
-
-    if(temp >= 1000000)
+    if(temp <= 0)
     {
-        temp = 0;
+        temp = 1000;
 
         u8 scrollX = m_MMU->read(0xFF43);
-        //u8 scrollY = m_MMU->read(0xFF42);
-        u8 scrollY = 0;
+        u8 scrollY = m_MMU->read(0xFF42);
+        //u8 scrollY = 0;
 
         for(u16 row = 0; row < VRAM_WIDTH; ++row)
         {
