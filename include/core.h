@@ -33,6 +33,9 @@
 #define TMA_REGISTER    0xFF06
 #define TAC_REGISTER    0xFF07
 
+#define SCR_Y_REGISTER  0xFF42
+#define SCR_X_REGISTER  0xFF43
+
 #define IF_REGISTER     0xFF0F
 #define IE_REGISTER     0xFFFF
 

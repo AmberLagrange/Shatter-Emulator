@@ -11,7 +11,7 @@ void MMU::load(const char* path)
     m_Rom.load(path);
 }
 
-u8 MMU::read(const u16& address)
+u8 MMU::read(const u16& address) const
 {
     if(address < 0x8000) // ROM
     {

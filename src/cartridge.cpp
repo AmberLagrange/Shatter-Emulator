@@ -25,7 +25,7 @@ void Cartridge::swapBank(u8 bankNumber)
     std::copy(contents.begin() + (0x4000 * bankNumber), contents.begin() + (0x4000 * (bankNumber + 1)), m_Rom1);
 }
 
-u8 Cartridge::read(u16 address)
+u8 Cartridge::read(u16 address) const
 {
     if(address < 0x4000) return m_Rom0[address];
     return m_Rom1[address - 0x4000];

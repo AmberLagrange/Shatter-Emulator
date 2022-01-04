@@ -16,7 +16,7 @@ class CPU
 
         inline void setMMU(MMU* mmu) { m_MMU = mmu; }
 
-        inline bool getIME()         { return m_IME; }
+        inline bool getIME() const   { return m_IME; }
         inline bool setIME(bool ime) { return m_IME = ime; }
 
         void raiseInterrupt(const Flags::Interrupt& flag);
@@ -29,7 +29,7 @@ class CPU
         inline void setFlag(const Flags::Register& flag)    { m_Registers.F |= flag; }
         inline void clearFlag(const Flags::Register& flag)  { m_Registers.F &= ~flag; }
         inline void flipFlag(const Flags::Register& flag)   { m_Registers.F ^= flag; }
-        inline bool isFlagSet(const Flags::Register& flag)  { return m_Registers.F & flag; }
+        inline bool isFlagSet(const Flags::Register& flag) const  { return m_Registers.F & flag; }
 
         inline void clearAllFlags()                         { clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry | Flags::Register::Carry); }
         inline void setZeroFromVal(const u8& val)           { if(!val) setFlag(Flags::Register::Zero); }

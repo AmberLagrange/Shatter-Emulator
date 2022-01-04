@@ -6,12 +6,26 @@
 
 class Gameboy;
 
-namespace Screen
+class Screen
 {
-    int initScreen();
-    void destroyScreen();
-    void setGameboy(Gameboy* gameboy);
+    public:
+        static void initSDL();
+        static void quitSDL();
+    public:
+        Screen();
+        ~Screen();
 
-    void poll();
-    void draw(u8* buffer);
+        inline void setGameboy(Gameboy* gameboy) { m_Gameboy = gameboy; }
+
+        void poll();
+        void draw(u8* buffer);
+
+    private:
+        Gameboy* m_Gameboy;
+
+        SDL_Window*     m_Window;
+        SDL_Renderer*   m_Renderer;
+        SDL_Texture*    m_Texture;
+
+        int m_Scale = 3;
 };

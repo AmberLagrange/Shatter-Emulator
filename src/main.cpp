@@ -35,16 +35,12 @@ int main(int argc, char** argv)
         Logger::setDefaultStream(file);
     }
 
-    if(optionExists(argv, argv + argc, "-v") | optionExists(argv, argv + argc, "--verbose"))
+    if(optionExists(argv, argv + argc, "-v") || optionExists(argv, argv + argc, "--verbose"))
     {
         ENABLE_OP_LOGGING();
     }
 
-    if(Screen::initScreen())
-    {
-        ERROR("Could not Initialize the screen!");
-        return -1;
-    }
+    Screen::initSDL();
 
     Gameboy gameboy;
     gameboy.load(argv[1]);
@@ -52,7 +48,7 @@ int main(int argc, char** argv)
 
     file.close();
 
-    Screen::destroyScreen();
+    Screen::quitSDL();
 
     return 0;
 }

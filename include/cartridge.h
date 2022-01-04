@@ -13,7 +13,7 @@ class Cartridge
         void load(const char* path);
         void swapBank(u8 bankNumber);
 
-        u8 read(u16 address);
+        u8 read(u16 address) const;
 
     private:
         std::vector<u8> contents;

@@ -15,11 +15,10 @@ void PPU::tick(u8 cycles)
 
     if(temp <= 0)
     {
-        temp = 1000;
+        temp = 100000;
 
-        u8 scrollX = m_MMU->read(0xFF43);
-        u8 scrollY = m_MMU->read(0xFF42);
-        //u8 scrollY = 0;
+        u8 scrollX = m_MMU->read(SCR_X_REGISTER);
+        u8 scrollY = 0;
 
         for(u16 row = 0; row < VRAM_WIDTH; ++row)
         {

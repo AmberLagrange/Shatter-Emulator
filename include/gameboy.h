@@ -2,6 +2,8 @@
 
 #include "core.h"
 
+#include "screen.h"
+
 #include "mmu.h"
 #include "cpu.h"
 #include "ppu.h"
@@ -25,6 +27,8 @@ class Gameboy
         inline APU& getAPU() { return m_APU; }
 
     private:
+        Screen m_Screen;
+
         CPU m_CPU;
         MMU m_MMU;
         PPU m_PPU;
