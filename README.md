@@ -50,7 +50,7 @@ Additional arguments can be passed as well.
 
 # Screenshots
 
-|                           Garlbed Nintendo Logo and Blargg's CPU Test                          |
+|                               Nintendo Logo and Blargg's CPU Test                              |
 |:----------------------------------------------------------------------------------------------:|
-|                ![Nintendont](./screenshots/Nintendont.png?raw=true "Nintendont")               |
+|                   ![Nintendo](./screenshots/Nintendo.png?raw=true "Nintendo")                  |
 |![Blargg cpu_instrs](./screenshots/Blargg%20cpu_instrs.png?raw=true "Blargg cpu_instrs")        |
