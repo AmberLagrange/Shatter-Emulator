@@ -18,25 +18,22 @@ void Gameboy::load(const char* path)
     m_MMU.load(path);
 }
 
-void Gameboy::run()
+void Gameboy::start()
 {
     DEBUG("Starting Gameboy!");
-
     m_Running = true;
+}
 
-    while(m_Running)
-    {
-        m_Screen.poll();
-
-        u8 cycles = m_CPU.tick();
-        m_PPU.tick(cycles);
-        m_Timer.update(cycles);
-    }
-
-    DEBUG("Stopping Gameboy!");
+void Gameboy::tick()
+{
+    u8 cycles = m_CPU.tick();
+    m_PPU.tick(cycles);
+    m_Timer.update(cycles);
+    m_Screen.poll();
 }
 
 void Gameboy::stop()
 {
+    DEBUG("Stopping Gameboy!");
     m_Running = false;
 }

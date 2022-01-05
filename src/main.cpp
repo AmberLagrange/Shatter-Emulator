@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <fstream>
 
+#include "scheduler.h"
 #include "gameboy.h"
 #include "screen.h"
 
@@ -28,10 +29,10 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    std::ofstream file("./logs/log.log");
 
     if(optionExists(argv, argv + argc, "-l"))
     {
+        std::ofstream file("./logs/log.log");
         Logger::setDefaultStream(file);
     }
 
@@ -42,11 +43,19 @@ int main(int argc, char** argv)
 
     Screen::initSDL();
 
-    Gameboy gameboy;
-    gameboy.load(argv[1]);
-    gameboy.run();
+    Scheduler s;
 
-    file.close();
+    Gameboy* g1 = new Gameboy();
+    Gameboy* g2 = new Gameboy();
+
+    g1->load(argv[1]);
+    g2->load(argv[1]);
+
+    s.addGameboy(g1);
+    s.addGameboy(g2);
+
+    s.start();
+    while(s.run()) {}
 
     Screen::quitSDL();
 

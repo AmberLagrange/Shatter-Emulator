@@ -16,25 +16,22 @@ Screen::Screen()
 {
     DEBUG("Initializing Screen!");
     
-    m_Window = SDL_CreateWindow("Shatter Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, GAMEBOY_WIDTH * m_Scale, GAMEBOY_HEIGHT * m_Scale, SDL_WINDOW_SHOWN);
+    m_Window = SDL_CreateWindow("Shatter Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                                GAMEBOY_WIDTH * m_Scale, GAMEBOY_HEIGHT * m_Scale, SDL_WINDOW_SHOWN);
     if(!m_Window)
     {
-        ERROR("Could not create window: " << SDL_GetError());
+        ERROR("\tCould not create window: " << SDL_GetError());
+        return;
     }
-    else
-    {
-        DEBUG("\tWindow Created.");
-    }
+    DEBUG("\tWindow Created.");
 
     m_Renderer = SDL_CreateRenderer(m_Window, -1, SDL_RENDERER_ACCELERATED);
     if(!m_Renderer)
     {
-        ERROR("Could not create renderer: " << SDL_GetError());
+        ERROR("\tCould not create renderer: " << SDL_GetError());
+        return;
     }
-    else
-    {
-        DEBUG("\tRenderer Created.");
-    }
+    DEBUG("\tRenderer Created.");
 
     m_Texture = SDL_CreateTexture(m_Renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, GAMEBOY_WIDTH, GAMEBOY_HEIGHT);
 }
@@ -51,11 +48,11 @@ void Screen::poll()
     SDL_Event e;
     if (SDL_PollEvent(&e))
     {
-        switch(e.type)
+        if(e.type == SDL_WINDOWEVENT
+           && e.window.event == SDL_WINDOWEVENT_CLOSE
+           && SDL_GetWindowID(m_Window) == e.window.windowID)
         {
-            case SDL_QUIT:
-                m_Gameboy->stop();
-                return;
+            m_Gameboy->stop();
         }
     }
 }
