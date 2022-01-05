@@ -22,12 +22,13 @@ class Gameboy
         void tick();
         void stop();
 
-        inline CPU& getCPU() { return m_CPU; }
-        inline MMU& getMMU() { return m_MMU; }
-        inline PPU& getPPU() { return m_PPU; }
-        inline APU& getAPU() { return m_APU; }
-
         inline bool isRunning() { return m_Running; }
+
+        inline u8 read(u16 address) const { return m_MMU.read(address); }
+        inline void write(u16 address, u8 val) { m_MMU.write(address, val); }
+
+        inline bool getIME() { return m_CPU.getIME(); }
+        inline void setIME(bool ime) { m_CPU.setIME(ime); }
     private:
         Screen m_Screen;
 

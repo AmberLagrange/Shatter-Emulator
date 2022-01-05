@@ -1,5 +1,5 @@
 #include "mmu.h"
-#include "cpu.h"
+#include "gameboy.h"
 
 MMU::MMU()
 {
@@ -11,7 +11,7 @@ void MMU::load(const char* path)
     m_Rom.load(path);
 }
 
-u8 MMU::read(const u16& address) const
+u8 MMU::read(u16 address) const
 {
     if(address < 0x8000) // ROM
     {
@@ -51,13 +51,13 @@ u8 MMU::read(const u16& address) const
     }
     else if(address == 0xFFFF) // IME
     {
-        return m_CPU->getIME();
+        return m_Gameboy->getIME();
     }
 
     return 0xFF;
 }
 
-void MMU::write(const u16& address, const u8& val)
+void MMU::write(u16 address, u8 val)
 {
     if(address < 0x8000) // ROM
     {
@@ -100,6 +100,6 @@ void MMU::write(const u16& address, const u8& val)
     }
     else if(address == 0xFFFF) // IME
     {
-        m_CPU->setIME(val);
+        m_Gameboy->setIME(val);
     }
 }

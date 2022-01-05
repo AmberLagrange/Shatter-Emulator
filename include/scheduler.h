@@ -15,7 +15,6 @@ class Scheduler
 
         inline void addGameboy(Gameboy* gb) { m_Gameboys.push_back(gb); }
 
-        void start();
         bool run();
     private:
         std::vector<Gameboy*> m_Gameboys;

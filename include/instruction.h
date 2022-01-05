@@ -11,7 +11,7 @@
     #define INSTRUCTION(mnemonic, op, length, cyclesBranch, cyclesNoBranch) { op, length, cyclesBranch, cyclesNoBranch }
 #endif
 
-class CPU;
+class MMU;
 
 struct Instruction
 {

@@ -5,7 +5,7 @@
 #include "instruction.h"
 #include "flags.h"
 
-class MMU;
+class Gameboy;
 
 class CPU
 {
@@ -14,7 +14,7 @@ class CPU
 
         u8 tick();
 
-        inline void setMMU(MMU* mmu) { m_MMU = mmu; }
+        inline void setGameboy(Gameboy* gb) { m_Gameboy = gb; }
 
         inline bool getIME() const   { return m_IME; }
         inline bool setIME(bool ime) { return m_IME = ime; }
@@ -100,10 +100,10 @@ class CPU
             u16 SP;
             u16 PC;
         };
-        
-        MMU* m_MMU;
 
         Registers m_Registers;
+
+        Gameboy* m_Gameboy;
 
         bool m_Halted;
         bool m_IME;

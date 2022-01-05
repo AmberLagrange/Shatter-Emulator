@@ -1,13 +1,5 @@
 #include "scheduler.h"
 
-void Scheduler::start()
-{
-    for(auto gb : m_Gameboys)
-    {
-        gb->start();
-    }
-}
-
 bool Scheduler::run()
 {
     bool running = false;

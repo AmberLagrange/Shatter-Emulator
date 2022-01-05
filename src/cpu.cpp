@@ -21,11 +21,11 @@ u8 CPU::tick()
 
     Instruction instruction;
     u8 cycles = 0;
-    u8 opcode = m_MMU->read(m_Registers.PC++);
+    u8 opcode = m_Gameboy->read(m_Registers.PC++);
 
     if(opcode == 0xCB)
     {
-        opcode = m_MMU->read(m_Registers.PC++);
+        opcode = m_Gameboy->read(m_Registers.PC++);
         instruction = instructionsCB[opcode];
         cycles += 4; // Add 4 cycles due to the CB prefix
 
@@ -57,13 +57,13 @@ void CPU::raiseInterrupt(const Flags::Interrupt& flag)
 {
     m_Halted = false;
 
-    m_MMU->write(IF_REGISTER, m_MMU->read(IF_REGISTER) | flag);
+    m_Gameboy->write(IF_REGISTER, m_Gameboy->read(IF_REGISTER) | flag);
 }
 
 void CPU::handleInterrupts()
 {
-    u8 flags = m_MMU->read(IF_REGISTER);
-    u8 enabledFlags = (flags & m_MMU->read(IE_REGISTER));
+    u8 flags = m_Gameboy->read(IF_REGISTER);
+    u8 enabledFlags = (flags & m_Gameboy->read(IE_REGISTER));
 
     if(m_IME && (enabledFlags & 0x1F))
     {
@@ -96,7 +96,7 @@ void CPU::handleInterrupts()
         }
         
         m_IME = false;
-        m_MMU->write(IF_REGISTER, flags);
+        m_Gameboy->write(IF_REGISTER, flags);
     }
 }
 

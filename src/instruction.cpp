@@ -1,6 +1,6 @@
 #include "instruction.h"
 #include "cpu.h"
-#include "mmu.h"
+#include "gameboy.h"
 
 #include "opcode_log.h"
 
@@ -9,20 +9,20 @@
 void CPU::pushStack(const u16& val)
 {
     m_Registers.SP--;
-    m_MMU->write(m_Registers.SP, static_cast<u8>((val & 0xFF00) >> 8));
+    m_Gameboy->write(m_Registers.SP, static_cast<u8>((val & 0xFF00) >> 8));
 
     m_Registers.SP--;
-    m_MMU->write(m_Registers.SP, static_cast<u8>((val & 0x00FF)     ));
+    m_Gameboy->write(m_Registers.SP, static_cast<u8>((val & 0x00FF)     ));
 
     LOG_PUSH();
 }
 
 void CPU::popStack(u16& reg)
 {
-    u8 low  = m_MMU->read(m_Registers.SP);
+    u8 low  = m_Gameboy->read(m_Registers.SP);
     m_Registers.SP++;
 
-    u8 high = m_MMU->read(m_Registers.SP);
+    u8 high = m_Gameboy->read(m_Registers.SP);
     m_Registers.SP++;
 
     reg = (static_cast<u16>(high) << 8) | low;
@@ -168,8 +168,8 @@ void CPU::opcodeCP(const u8& val)
 
 void CPU::opcodeJP(bool condition)
 {
-    u8 low  = m_MMU->read(m_Registers.PC++);
-    u8 high = m_MMU->read(m_Registers.PC++);
+    u8 low  = m_Gameboy->read(m_Registers.PC++);
+    u8 high = m_Gameboy->read(m_Registers.PC++);
 
     if(condition)
     {
@@ -186,7 +186,7 @@ void CPU::opcodeJP(bool condition)
 
 void CPU::opcodeJR(bool condition)
 {
-    i8 offset = static_cast<i8>(m_MMU->read(m_Registers.PC++));
+    i8 offset = static_cast<i8>(m_Gameboy->read(m_Registers.PC++));
 
     if(condition)
     {
@@ -203,8 +203,8 @@ void CPU::opcodeJR(bool condition)
 
 void CPU::opcodeCALL(bool condition)
 {
-    u8 low  = m_MMU->read(m_Registers.PC++);
-    u8 high = m_MMU->read(m_Registers.PC++);
+    u8 low  = m_Gameboy->read(m_Registers.PC++);
+    u8 high = m_Gameboy->read(m_Registers.PC++);
 
     if(condition)
     {
@@ -261,7 +261,7 @@ u16 CPU::opcodeADD_SP()
 {
     clearAllFlags();
 
-    i8 offset = static_cast<i8>(m_MMU->read(m_Registers.PC++));
+    i8 offset = static_cast<i8>(m_Gameboy->read(m_Registers.PC++));
 
     if((offset & 0xFF) + (m_Registers.SP & 0x00FF) > 0x00FF) setFlag(Flags::Register::Carry);
     if((offset & 0x0F) + (m_Registers.SP & 0x000F) > 0x000F) setFlag(Flags::Register::HalfCarry);
@@ -282,15 +282,15 @@ void CPU::opcode0x00() // NOP
 
 void CPU::opcode0x01() // LD BC,u16
 {
-    m_Registers.C = m_MMU->read(m_Registers.PC++);
-    m_Registers.B = m_MMU->read(m_Registers.PC++);
+    m_Registers.C = m_Gameboy->read(m_Registers.PC++);
+    m_Registers.B = m_Gameboy->read(m_Registers.PC++);
 
     LOG_BC_REG();
 }
 
 void CPU::opcode0x02() // LD (BC),A
 {
-    m_MMU->write(m_Registers.BC, m_Registers.A);
+    m_Gameboy->write(m_Registers.BC, m_Registers.A);
 
     LOG_WRITE(m_Registers.A);
 }
@@ -318,7 +318,7 @@ void CPU::opcode0x05() // DEC B
 
 void CPU::opcode0x06() // LD B,u8
 {
-    m_Registers.B = m_MMU->read(m_Registers.PC++);
+    m_Registers.B = m_Gameboy->read(m_Registers.PC++);
 
     LOG_B_REG();
 }
@@ -337,12 +337,12 @@ void CPU::opcode0x07() // RLCA
 
 void CPU::opcode0x08() // LD (u16),SP
 {
-    u8 low  = m_MMU->read(m_Registers.PC++);
-    u8 high = m_MMU->read(m_Registers.PC++);
+    u8 low  = m_Gameboy->read(m_Registers.PC++);
+    u8 high = m_Gameboy->read(m_Registers.PC++);
     u16 addr = (static_cast<u16>(high) << 8) | low;
 
-    m_MMU->write(addr    , static_cast<u8>(m_Registers.SP    ));
-    m_MMU->write(addr + 1, static_cast<u8>(m_Registers.SP >> 8));
+    m_Gameboy->write(addr    , static_cast<u8>(m_Registers.SP    ));
+    m_Gameboy->write(addr + 1, static_cast<u8>(m_Registers.SP >> 8));
 
     LOG_WRITE(addr);
     LOG_WRITE(addr + 1);
@@ -355,7 +355,7 @@ void CPU::opcode0x09() // ADD HL,BC
 
 void CPU::opcode0x0A() // LD A,(BC)
 {
-    m_Registers.A = m_MMU->read(m_Registers.BC);
+    m_Registers.A = m_Gameboy->read(m_Registers.BC);
 
     LOG_READ(m_Registers.BC);
     LOG_A_REG();
@@ -384,7 +384,7 @@ void CPU::opcode0x0D() // DEC C
 
 void CPU::opcode0x0E() // LD C,u8
 {
-    m_Registers.C = m_MMU->read(m_Registers.PC++);
+    m_Registers.C = m_Gameboy->read(m_Registers.PC++);
 
     LOG_C_REG();
 }
@@ -412,15 +412,15 @@ void CPU::opcode0x10() // STOP
 
 void CPU::opcode0x11() // LD DE,u16
 {
-    m_Registers.E = m_MMU->read(m_Registers.PC++);
-    m_Registers.D = m_MMU->read(m_Registers.PC++);
+    m_Registers.E = m_Gameboy->read(m_Registers.PC++);
+    m_Registers.D = m_Gameboy->read(m_Registers.PC++);
 
     LOG_DE_REG();
 }
 
 void CPU::opcode0x12() // LD (DE),A
 {
-    m_MMU->write(m_Registers.DE, m_Registers.A);
+    m_Gameboy->write(m_Registers.DE, m_Registers.A);
 
     LOG_WRITE(m_Registers.DE);
 }
@@ -448,7 +448,7 @@ void CPU::opcode0x15() // DEC D
 
 void CPU::opcode0x16() // LD D,u8
 {
-    m_Registers.D = m_MMU->read(m_Registers.PC++);
+    m_Registers.D = m_Gameboy->read(m_Registers.PC++);
 
     LOG_D_REG();
 }
@@ -481,7 +481,7 @@ void CPU::opcode0x19() // ADD HL,DE
 
 void CPU::opcode0x1A() // LD A,(DE)
 {
-    m_Registers.A = m_MMU->read(m_Registers.DE);
+    m_Registers.A = m_Gameboy->read(m_Registers.DE);
 
     LOG_READ(m_Registers.DE);
     LOG_A_REG();
@@ -510,7 +510,7 @@ void CPU::opcode0x1D() // DEC E
 
 void CPU::opcode0x1E() // LD E,u8
 {
-    m_Registers.E = m_MMU->read(m_Registers.PC++);
+    m_Registers.E = m_Gameboy->read(m_Registers.PC++);
 
     LOG_E_REG();
 }
@@ -537,8 +537,8 @@ void CPU::opcode0x20() // JR NZ,i8
 
 void CPU::opcode0x21() // LD HL,u16
 {
-    u8 low  = m_MMU->read(m_Registers.PC++);
-    u8 high = m_MMU->read(m_Registers.PC++);
+    u8 low  = m_Gameboy->read(m_Registers.PC++);
+    u8 high = m_Gameboy->read(m_Registers.PC++);
     m_Registers.HL = (static_cast<u16>(high) << 8) | low;
 
     LOG_HL_REG();
@@ -546,7 +546,7 @@ void CPU::opcode0x21() // LD HL,u16
 
 void CPU::opcode0x22() // LD (HL+),A
 {
-    m_MMU->write(m_Registers.HL++, m_Registers.A);
+    m_Gameboy->write(m_Registers.HL++, m_Registers.A);
 
     LOG_WRITE(m_Registers.HL - 1);
     LOG_HL_REG();
@@ -575,7 +575,7 @@ void CPU::opcode0x25() // DEC H
 
 void CPU::opcode0x26() // LD H,u8
 {
-    m_Registers.H = m_MMU->read(m_Registers.PC++);
+    m_Registers.H = m_Gameboy->read(m_Registers.PC++);
 
     LOG_H_REG();
 }
@@ -634,7 +634,7 @@ void CPU::opcode0x29() // ADD HL,HL
 
 void CPU::opcode0x2A() // LD A,(HL+)
 {
-    m_Registers.A = m_MMU->read(m_Registers.HL++);
+    m_Registers.A = m_Gameboy->read(m_Registers.HL++);
 
     LOG_READ(m_Registers.HL - 1);
     LOG_HL_REG();
@@ -664,7 +664,7 @@ void CPU::opcode0x2D() // DEC L
 
 void CPU::opcode0x2E() // LD L,u8
 {
-    m_Registers.L = m_MMU->read(m_Registers.PC++);
+    m_Registers.L = m_Gameboy->read(m_Registers.PC++);
 
     LOG_L_REG();
 }
@@ -687,8 +687,8 @@ void CPU::opcode0x30() // JR NC,i8
 
 void CPU::opcode0x31() // LD SP,u16
 {
-    u8 low  = m_MMU->read(m_Registers.PC++);
-    u8 high = m_MMU->read(m_Registers.PC++);
+    u8 low  = m_Gameboy->read(m_Registers.PC++);
+    u8 high = m_Gameboy->read(m_Registers.PC++);
     m_Registers.SP = (static_cast<u16>(high) << 8) | low;
 
     LOG_SP_REG();
@@ -696,7 +696,7 @@ void CPU::opcode0x31() // LD SP,u16
 
 void CPU::opcode0x32() // LD (HL-),A
 {
-    m_MMU->write(m_Registers.HL--, m_Registers.A);
+    m_Gameboy->write(m_Registers.HL--, m_Registers.A);
 
     LOG_WRITE(m_Registers.HL + 1);
     LOG_HL_REG();
@@ -712,10 +712,10 @@ void CPU::opcode0x33() // INC SP
 void CPU::opcode0x34() // INC (HL)
 {
     clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry);
-    u8 val = m_MMU->read(m_Registers.HL) + 1;
+    u8 val = m_Gameboy->read(m_Registers.HL) + 1;
     if((val & 0x0F) == 0x00) setFlag(Flags::Register::HalfCarry);
     setZeroFromVal(val);
-    m_MMU->write(m_Registers.HL, val);
+    m_Gameboy->write(m_Registers.HL, val);
 
     LOG_WRITE(m_Registers.HL);
     LOG_FLAGS();
@@ -724,11 +724,11 @@ void CPU::opcode0x34() // INC (HL)
 void CPU::opcode0x35() // DEC (HL)
 {
     clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry);
-    u8 val = m_MMU->read(m_Registers.HL) - 1;
+    u8 val = m_Gameboy->read(m_Registers.HL) - 1;
     setFlag(Flags::Register::Negative);
     if((val & 0x0F) == 0x0F) setFlag(Flags::Register::HalfCarry);
     setZeroFromVal(val);
-    m_MMU->write(m_Registers.HL, val);
+    m_Gameboy->write(m_Registers.HL, val);
 
     LOG_WRITE(m_Registers.HL);
     LOG_FLAGS();
@@ -736,7 +736,7 @@ void CPU::opcode0x35() // DEC (HL)
 
 void CPU::opcode0x36() // LD (HL),u8
 {
-    m_MMU->write(m_Registers.HL, m_MMU->read(m_Registers.PC++));
+    m_Gameboy->write(m_Registers.HL, m_Gameboy->read(m_Registers.PC++));
 
     LOG_WRITE(m_Registers.HL);
 }
@@ -761,7 +761,7 @@ void CPU::opcode0x39() // ADD HL,SP
 
 void CPU::opcode0x3A() // LD A,(HL-)
 {
-    m_Registers.A = m_MMU->read(m_Registers.HL--);
+    m_Registers.A = m_Gameboy->read(m_Registers.HL--);
 
     LOG_READ(m_Registers.HL + 1);
     LOG_HL_REG();
@@ -791,7 +791,7 @@ void CPU::opcode0x3D() // DEC A
 
 void CPU::opcode0x3E() // LD A,u8
 {
-    m_Registers.A = m_MMU->read(m_Registers.PC++);
+    m_Registers.A = m_Gameboy->read(m_Registers.PC++);
 
     LOG_A_REG();
 }
@@ -850,7 +850,7 @@ void CPU::opcode0x45() // LD B,L
 
 void CPU::opcode0x46() // LD B,(HL)
 {
-    m_Registers.B = m_MMU->read(m_Registers.HL);
+    m_Registers.B = m_Gameboy->read(m_Registers.HL);
 
     LOG_READ(m_Registers.HL);
     LOG_B_REG();
@@ -907,7 +907,7 @@ void CPU::opcode0x4D() // LD C,L
 
 void CPU::opcode0x4E() // LD C,(HL)
 {
-    m_Registers.C = m_MMU->read(m_Registers.HL);
+    m_Registers.C = m_Gameboy->read(m_Registers.HL);
 
     LOG_READ(m_Registers.HL);
     LOG_C_REG();
@@ -966,7 +966,7 @@ void CPU::opcode0x55() // LD D,L
 
 void CPU::opcode0x56() // LD D,(HL)
 {
-    m_Registers.D = m_MMU->read(m_Registers.HL);
+    m_Registers.D = m_Gameboy->read(m_Registers.HL);
 
     LOG_READ(m_Registers.HL);
     LOG_D_REG();
@@ -1023,7 +1023,7 @@ void CPU::opcode0x5D() // LD E,L
 
 void CPU::opcode0x5E() // LD E,(HL)
 {
-    m_Registers.E = m_MMU->read(m_Registers.HL);
+    m_Registers.E = m_Gameboy->read(m_Registers.HL);
 
     LOG_READ(m_Registers.HL);
     LOG_E_REG();
@@ -1082,7 +1082,7 @@ void CPU::opcode0x65() // LD H,L
 
 void CPU::opcode0x66() // LD H,(HL)
 {
-    m_Registers.H = m_MMU->read(m_Registers.HL);
+    m_Registers.H = m_Gameboy->read(m_Registers.HL);
 
     LOG_READ(m_Registers.HL);
     LOG_H_REG();
@@ -1139,7 +1139,7 @@ void CPU::opcode0x6D() // LD L,L
 
 void CPU::opcode0x6E() // LD L,(HL)
 {
-    m_Registers.L = m_MMU->read(m_Registers.HL);
+    m_Registers.L = m_Gameboy->read(m_Registers.HL);
 
     LOG_READ(m_Registers.HL);
     LOG_L_REG();
@@ -1156,42 +1156,42 @@ void CPU::opcode0x6F() // LD L,A
 
 void CPU::opcode0x70() // LD (HL),B
 {
-    m_MMU->write(m_Registers.HL, m_Registers.B);
+    m_Gameboy->write(m_Registers.HL, m_Registers.B);
 
     LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcode0x71() // LD (HL),C
 {
-    m_MMU->write(m_Registers.HL, m_Registers.C);
+    m_Gameboy->write(m_Registers.HL, m_Registers.C);
 
     LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcode0x72() // LD (HL),D
 {
-    m_MMU->write(m_Registers.HL, m_Registers.D);
+    m_Gameboy->write(m_Registers.HL, m_Registers.D);
 
     LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcode0x73() // LD (HL),E
 {
-    m_MMU->write(m_Registers.HL, m_Registers.E);
+    m_Gameboy->write(m_Registers.HL, m_Registers.E);
 
     LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcode0x74() // LD (HL),H
 {
-    m_MMU->write(m_Registers.HL, m_Registers.H);
+    m_Gameboy->write(m_Registers.HL, m_Registers.H);
 
     LOG_WRITE(m_Registers.HL);
 }
 
 void CPU::opcode0x75() // LD (HL),L
 {
-    m_MMU->write(m_Registers.HL, m_Registers.L);
+    m_Gameboy->write(m_Registers.HL, m_Registers.L);
 
     LOG_WRITE(m_Registers.HL);
 }
@@ -1205,7 +1205,7 @@ void CPU::opcode0x76() // HALT
 
 void CPU::opcode0x77() // LD (HL),A
 {
-    m_MMU->write(m_Registers.HL, m_Registers.A);
+    m_Gameboy->write(m_Registers.HL, m_Registers.A);
 
     LOG_WRITE(m_Registers.HL);
 }
@@ -1254,7 +1254,7 @@ void CPU::opcode0x7D() // LD A,L
 
 void CPU::opcode0x7E() // LD A,(HL)
 {
-    m_Registers.A = m_MMU->read(m_Registers.HL);
+    m_Registers.A = m_Gameboy->read(m_Registers.HL);
 
     LOG_READ(m_Registers.HL);
     LOG_A_REG();
@@ -1301,7 +1301,7 @@ void CPU::opcode0x85() // Add A,L
 
 void CPU::opcode0x86() // ADD A,(HL)
 {
-    opcodeADD(m_MMU->read(m_Registers.HL));
+    opcodeADD(m_Gameboy->read(m_Registers.HL));
 }
 
 void CPU::opcode0x87() // ADD A,A
@@ -1341,7 +1341,7 @@ void CPU::opcode0x8D() // ADC A,L
 
 void CPU::opcode0x8E() // ADC A,(HL)
 {
-    opcodeADC(m_MMU->read(m_Registers.HL));
+    opcodeADC(m_Gameboy->read(m_Registers.HL));
 }
 
 void CPU::opcode0x8F() // ADC A,A
@@ -1383,7 +1383,7 @@ void CPU::opcode0x95() // SUB A,L
 
 void CPU::opcode0x96() // SUB A,(HL)
 {
-    opcodeSUB(m_MMU->read(m_Registers.HL));
+    opcodeSUB(m_Gameboy->read(m_Registers.HL));
 }
 
 void CPU::opcode0x97() // SUB A,A
@@ -1423,7 +1423,7 @@ void CPU::opcode0x9D() // SBC A,L
 
 void CPU::opcode0x9E() // SBC A,(HL)
 {
-    opcodeSBC(m_MMU->read(m_Registers.HL));
+    opcodeSBC(m_Gameboy->read(m_Registers.HL));
 }
 
 void CPU::opcode0x9F() // SBC A,A
@@ -1465,7 +1465,7 @@ void CPU::opcode0xA5() // AND A,L
 
 void CPU::opcode0xA6() // AND A,(HL)
 {
-    opcodeAND(m_MMU->read(m_Registers.HL));
+    opcodeAND(m_Gameboy->read(m_Registers.HL));
 }
 
 void CPU::opcode0xA7() // AND A,A
@@ -1505,7 +1505,7 @@ void CPU::opcode0xAD() // XOR A,L
 
 void CPU::opcode0xAE() // XOR A,(HL)
 {
-    opcodeXOR(m_MMU->read(m_Registers.HL));
+    opcodeXOR(m_Gameboy->read(m_Registers.HL));
 }
 
 void CPU::opcode0xAF() // XOR A,A
@@ -1547,7 +1547,7 @@ void CPU::opcode0xB5() // OR A,L
 
 void CPU::opcode0xB6() // OR A,(HL)
 {
-    opcodeOR(m_MMU->read(m_Registers.HL));
+    opcodeOR(m_Gameboy->read(m_Registers.HL));
 }
 
 void CPU::opcode0xB7() // OR A,A
@@ -1587,7 +1587,7 @@ void CPU::opcode0xBD() // CP A,L
 
 void CPU::opcode0xBE() // CP A,(HL)
 {
-    opcodeCP(m_MMU->read(m_Registers.HL));
+    opcodeCP(m_Gameboy->read(m_Registers.HL));
 }
 
 void CPU::opcode0xBF() // CP A,A
@@ -1631,7 +1631,7 @@ void CPU::opcode0xC5() // PUSH BC
 
 void CPU::opcode0xC6() // ADD A,u8
 {
-    opcodeADD(m_MMU->read(m_Registers.PC++));
+    opcodeADD(m_Gameboy->read(m_Registers.PC++));
 }
 
 void CPU::opcode0xC7() // RST 00h
@@ -1675,7 +1675,7 @@ void CPU::opcode0xCD() // CALL u16
 
 void CPU::opcode0xCE() // ADC A,u8
 {
-    opcodeADC(m_MMU->read(m_Registers.PC++));
+    opcodeADC(m_Gameboy->read(m_Registers.PC++));
 }
 
 void CPU::opcode0xCF() // RST 08h
@@ -1719,7 +1719,7 @@ void CPU::opcode0xD5() // PUSH DE
 
 void CPU::opcode0xD6() // SUB A,u8
 {
-    opcodeSUB(m_MMU->read(m_Registers.PC++));
+    opcodeSUB(m_Gameboy->read(m_Registers.PC++));
 }
 
 void CPU::opcode0xD7() // RST 10h
@@ -1760,7 +1760,7 @@ void CPU::opcode0xDD() // UNUSED
 
 void CPU::opcode0xDE() // SBC A,u8
 {
-    opcodeSBC(m_MMU->read(m_Registers.PC++));
+    opcodeSBC(m_Gameboy->read(m_Registers.PC++));
 }
 
 void CPU::opcode0xDF() // RST 18h
@@ -1772,9 +1772,9 @@ void CPU::opcode0xDF() // RST 18h
 
 void CPU::opcode0xE0() // LD (FF00+u8),A
 {
-    u8 offset = m_MMU->read(m_Registers.PC++);
+    u8 offset = m_Gameboy->read(m_Registers.PC++);
     u16 addr = 0xFF00 | offset;
-    m_MMU->write(addr, m_Registers.A);
+    m_Gameboy->write(addr, m_Registers.A);
 
     LOG_WRITE(addr);
 }
@@ -1790,7 +1790,7 @@ void CPU::opcode0xE2() // LD (FF00+C),A
 {
     u8 offset = m_Registers.C;
     u16 addr = 0xFF00 | offset;
-    m_MMU->write(addr, m_Registers.A);
+    m_Gameboy->write(addr, m_Registers.A);
 
     LOG_WRITE(addr);
 }
@@ -1812,7 +1812,7 @@ void CPU::opcode0xE5() // PUSH HL
 
 void CPU::opcode0xE6() // AND A,u8
 {
-    opcodeAND(m_MMU->read(m_Registers.PC++));
+    opcodeAND(m_Gameboy->read(m_Registers.PC++));
 }
 
 void CPU::opcode0xE7() // RST 20h
@@ -1837,10 +1837,10 @@ void CPU::opcode0xE9() // JP HL
 
 void CPU::opcode0xEA() // LD (u16),A
 {
-    u8 low  = m_MMU->read(m_Registers.PC++);
-    u8 high = m_MMU->read(m_Registers.PC++);
+    u8 low  = m_Gameboy->read(m_Registers.PC++);
+    u8 high = m_Gameboy->read(m_Registers.PC++);
     u16 addr = (static_cast<u16>(high) << 8) | low;
-    m_MMU->write(addr, m_Registers.A);
+    m_Gameboy->write(addr, m_Registers.A);
 
     LOG_WRITE(addr);
 }
@@ -1862,7 +1862,7 @@ void CPU::opcode0xED() // UNUSED
 
 void CPU::opcode0xEE() // XOR A,u8
 {
-    opcodeXOR(m_MMU->read(m_Registers.PC++));
+    opcodeXOR(m_Gameboy->read(m_Registers.PC++));
 }
 
 void CPU::opcode0xEF() // RST 28h
@@ -1874,9 +1874,9 @@ void CPU::opcode0xEF() // RST 28h
 
 void CPU::opcode0xF0() // LD A,(FF00+u8)
 {
-    u8 offset = m_MMU->read(m_Registers.PC++);
+    u8 offset = m_Gameboy->read(m_Registers.PC++);
     u16 addr = 0xFF00 | offset;
-    m_Registers.A = m_MMU->read(addr);
+    m_Registers.A = m_Gameboy->read(addr);
 
     LOG_READ(addr);
     LOG_A_REG();
@@ -1893,7 +1893,7 @@ void CPU::opcode0xF1() // POP AF
 void CPU::opcode0xF2() // LD A,(FF00+C)
 {
     u16 addr = 0xFF00 | m_Registers.C;
-    m_Registers.A = m_MMU->read(addr);
+    m_Registers.A = m_Gameboy->read(addr);
 
     LOG_READ(addr);
     LOG_A_REG();
@@ -1918,7 +1918,7 @@ void CPU::opcode0xF5() // PUSH AF
 
 void CPU::opcode0xF6() // OR A,u8
 {
-    opcodeOR(m_MMU->read(m_Registers.PC++));
+    opcodeOR(m_Gameboy->read(m_Registers.PC++));
 }
 
 void CPU::opcode0xF7() // RST 30h
@@ -1942,11 +1942,11 @@ void CPU::opcode0xF9() // LD SP,HL
 
 void CPU::opcode0xFA() // LD A,(u16)
 {
-    u8 low  = m_MMU->read(m_Registers.PC++);
-    u8 high = m_MMU->read(m_Registers.PC++);
+    u8 low  = m_Gameboy->read(m_Registers.PC++);
+    u8 high = m_Gameboy->read(m_Registers.PC++);
     u16 addr = (static_cast<u16>(high) << 8) | low;
 
-    m_Registers.A = m_MMU->read(addr);
+    m_Registers.A = m_Gameboy->read(addr);
 
     LOG_READ(addr);
     LOG_A_REG();
@@ -1971,7 +1971,7 @@ void CPU::opcode0xFD() // UNUSED
 
 void CPU::opcode0xFE() // CP A,u8
 {
-    opcodeCP(m_MMU->read(m_Registers.PC++));
+    opcodeCP(m_Gameboy->read(m_Registers.PC++));
 }
 
 void CPU::opcode0xFF() // RST 38h

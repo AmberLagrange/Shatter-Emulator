@@ -29,7 +29,6 @@ int main(int argc, char** argv)
         return -1;
     }
 
-
     if(optionExists(argv, argv + argc, "-l"))
     {
         std::ofstream file("./logs/log.log");
@@ -43,18 +42,15 @@ int main(int argc, char** argv)
 
     Screen::initSDL();
 
+    Gameboy* gb = new Gameboy();
+
+    gb->load(argv[1]);
+    
+    gb->start();
+
     Scheduler s;
+    s.addGameboy(gb);
 
-    Gameboy* g1 = new Gameboy();
-    Gameboy* g2 = new Gameboy();
-
-    g1->load(argv[1]);
-    g2->load(argv[1]);
-
-    s.addGameboy(g1);
-    s.addGameboy(g2);
-
-    s.start();
     while(s.run()) {}
 
     Screen::quitSDL();

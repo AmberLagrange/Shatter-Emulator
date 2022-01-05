@@ -20,7 +20,7 @@ Screen::Screen()
                                 GAMEBOY_WIDTH * m_Scale, GAMEBOY_HEIGHT * m_Scale, SDL_WINDOW_SHOWN);
     if(!m_Window)
     {
-        ERROR("\tCould not create window: " << SDL_GetError());
+        CRITICAL("\tCould not create window: " << SDL_GetError());
         return;
     }
     DEBUG("\tWindow Created.");
@@ -28,7 +28,7 @@ Screen::Screen()
     m_Renderer = SDL_CreateRenderer(m_Window, -1, SDL_RENDERER_ACCELERATED);
     if(!m_Renderer)
     {
-        ERROR("\tCould not create renderer: " << SDL_GetError());
+        CRITICAL("\tCould not create renderer: " << SDL_GetError());
         return;
     }
     DEBUG("\tRenderer Created.");

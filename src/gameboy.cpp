@@ -6,11 +6,9 @@ Gameboy::Gameboy()
     : m_Running(false)
 {
     m_Screen.setGameboy(this);
-
-    m_CPU.setMMU(&m_MMU);
-    m_MMU.setCPU(&m_CPU);
-
-    m_PPU.setMMU(&m_MMU);
+    m_CPU.setGameboy(this);
+    m_MMU.setGameboy(this);
+    m_PPU.setGameboy(this);
     m_PPU.setDrawCallback(std::bind(&Screen::draw, &m_Screen, std::placeholders::_1));
 }
 void Gameboy::load(const char* path)

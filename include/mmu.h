@@ -5,26 +5,24 @@
 #include "cartridge.h"
 
 class Gameboy;
-class CPU;
 
 class MMU
 {
     public:
         MMU();
 
+        inline void setGameboy(Gameboy* gb) { m_Gameboy = gb; }
+
         void load(const char* path);
 
-        u8 read(const u16& address) const;
-        void write(const u16& address, const u8& val);
-
-        inline void setCPU(CPU* cpu) { m_CPU = cpu; }
-        
+        u8 read(u16 address) const;
+        void write(u16 address, u8 val);
     private:
         void reset();
 
     private:
+        Gameboy* m_Gameboy;
         Cartridge m_Rom;
-        CPU* m_CPU;
 
         u8 m_Memory[0x8000] = {};
 };

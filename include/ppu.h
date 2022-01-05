@@ -4,16 +4,15 @@
 
 #include <functional>
 
-class MMU;
+class Gameboy;
 
 class PPU
 {
     public:
         PPU();
 
+        inline void setGameboy(Gameboy* gb) { m_Gameboy = gb; }
         inline void setDrawCallback(std::function<void(u8* buffer)> callback) { m_DrawCallback = callback; }
-
-        inline void setMMU(MMU* mmu) { m_MMU = mmu; }
 
         void tick(u8 cycles);
         
@@ -27,7 +26,7 @@ class PPU
             
         };
 
-        MMU* m_MMU;
+        Gameboy* m_Gameboy;
 
         u8 m_FrameBuffer[GAMEBOY_WIDTH * GAMEBOY_HEIGHT * 4];
         u8 m_BackgroundBuffer[VRAM_WIDTH * VRAM_HEIGHT * 4];

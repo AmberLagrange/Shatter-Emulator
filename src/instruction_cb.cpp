@@ -1,6 +1,6 @@
 #include "instruction.h"
 #include "cpu.h"
-#include "mmu.h"
+#include "gameboy.h"
 
 #include "opcode_log.h"
 
@@ -125,7 +125,7 @@ void CPU::opcodeSET(const u8& bit, u8& reg)
 
 void CPU::opcodeBIT_HL(const u8& bit)
 {
-    u8 val = m_MMU->read(m_Registers.HL);
+    u8 val = m_Gameboy->read(m_Registers.HL);
 
     if(GET_BIT(val, bit)) clearFlag(Flags::Register::Zero);
     else
@@ -137,20 +137,20 @@ void CPU::opcodeBIT_HL(const u8& bit)
 
 void CPU::opcodeRES_HL(const u8& bit)
 {
-    u8 val = m_MMU->read(m_Registers.HL);
+    u8 val = m_Gameboy->read(m_Registers.HL);
 
     val &= ~(0x01 << bit);
 
-    m_MMU->write(m_Registers.HL, val);
+    m_Gameboy->write(m_Registers.HL, val);
 }
 
 void CPU::opcodeSET_HL([[maybe_unused]] const u8& bit)
 {
-    u8 val = m_MMU->read(m_Registers.HL);
+    u8 val = m_Gameboy->read(m_Registers.HL);
 
     val |= (0x01 << bit);
 
-    m_MMU->write(m_Registers.HL, val);
+    m_Gameboy->write(m_Registers.HL, val);
 }
 
 //--------------------------------------CB Opcodes--------------------------------------//
@@ -207,7 +207,7 @@ void CPU::opcodeCB0x05() // RLC L
 
 void CPU::opcodeCB0x06() // RLC (HL)
 {
-    u8 val = m_MMU->read(m_Registers.HL);
+    u8 val = m_Gameboy->read(m_Registers.HL);
     
     clearAllFlags();
 
@@ -218,7 +218,7 @@ void CPU::opcodeCB0x06() // RLC (HL)
     if(carry) setFlag(Flags::Register::Carry);
     setZeroFromVal(val);
 
-    m_MMU->write(m_Registers.HL, val);
+    m_Gameboy->write(m_Registers.HL, val);
 
     LOG_WRITE(m_Registers.HL);
     LOG_FLAGS();
@@ -282,7 +282,7 @@ void CPU::opcodeCB0x0D() // RRC L
 
 void CPU::opcodeCB0x0E() // RRC (HL)
 {
-    u8 val = m_MMU->read(m_Registers.HL);
+    u8 val = m_Gameboy->read(m_Registers.HL);
 
     clearAllFlags();
 
@@ -293,7 +293,7 @@ void CPU::opcodeCB0x0E() // RRC (HL)
     if(carry) setFlag(Flags::Register::Carry);
     setZeroFromVal(val);
 
-    m_MMU->write(m_Registers.HL, val);
+    m_Gameboy->write(m_Registers.HL, val);
 
     LOG_WRITE(m_Registers.HL);
     LOG_FLAGS();
@@ -359,7 +359,7 @@ void CPU::opcodeCB0x15() // RL L
 
 void CPU::opcodeCB0x16() // RL (HL)
 {
-    u8 val = m_MMU->read(m_Registers.HL);
+    u8 val = m_Gameboy->read(m_Registers.HL);
 
     u8 carry = isFlagSet(Flags::Register::Carry);
 
@@ -371,7 +371,7 @@ void CPU::opcodeCB0x16() // RL (HL)
 
     setZeroFromVal(val);
 
-    m_MMU->write(m_Registers.HL, val);
+    m_Gameboy->write(m_Registers.HL, val);
 
     LOG_WRITE(m_Registers.HL);
     LOG_FLAGS();
@@ -435,7 +435,7 @@ void CPU::opcodeCB0x1D() // RR L
 
 void CPU::opcodeCB0x1E() // RR (HL)
 {
-    u8 val = m_MMU->read(m_Registers.HL);
+    u8 val = m_Gameboy->read(m_Registers.HL);
 
     u8 carry = isFlagSet(Flags::Register::Carry);
 
@@ -447,7 +447,7 @@ void CPU::opcodeCB0x1E() // RR (HL)
 
     setZeroFromVal(val);
 
-    m_MMU->write(m_Registers.HL, val);
+    m_Gameboy->write(m_Registers.HL, val);
 
     LOG_WRITE(m_Registers.HL);
     LOG_FLAGS();
@@ -513,7 +513,7 @@ void CPU::opcodeCB0x25() // SLA L
 
 void CPU::opcodeCB0x26() // SLA (HL)
 {
-    u8 val = m_MMU->read(m_Registers.HL);
+    u8 val = m_Gameboy->read(m_Registers.HL);
 
     clearAllFlags();
 
@@ -523,7 +523,7 @@ void CPU::opcodeCB0x26() // SLA (HL)
 
     setZeroFromVal(val);
 
-    m_MMU->write(m_Registers.HL, val);
+    m_Gameboy->write(m_Registers.HL, val);
 
     LOG_WRITE(m_Registers.HL);
     LOG_FLAGS();
@@ -587,7 +587,7 @@ void CPU::opcodeCB0x2D() // SRA L
 
 void CPU::opcodeCB0x2E() // SRA (HL)
 {
-    u8 val = m_MMU->read(m_Registers.HL);
+    u8 val = m_Gameboy->read(m_Registers.HL);
 
     clearAllFlags();
 
@@ -598,7 +598,7 @@ void CPU::opcodeCB0x2E() // SRA (HL)
 
     setZeroFromVal(val);
 
-    m_MMU->write(m_Registers.HL, val);
+    m_Gameboy->write(m_Registers.HL, val);
 
     LOG_WRITE(m_Registers.HL);
     LOG_FLAGS();
@@ -666,12 +666,12 @@ void CPU::opcodeCB0x36() // SWAP (HL)
 {
     clearAllFlags();
 
-    u8 val = m_MMU->read(m_Registers.HL);
+    u8 val = m_Gameboy->read(m_Registers.HL);
 
     u8 low  = val & 0x0F;
     u8 high = val & 0xF0;
 
-    m_MMU->write(m_Registers.HL, (low << 4) | (high >> 4));
+    m_Gameboy->write(m_Registers.HL, (low << 4) | (high >> 4));
 
     setZeroFromVal((low << 4) | (high >> 4));
 
@@ -737,7 +737,7 @@ void CPU::opcodeCB0x3D() // SRL L
 
 void CPU::opcodeCB0x3E() // SRL (HL)
 {
-    u8 val = m_MMU->read(m_Registers.HL);
+    u8 val = m_Gameboy->read(m_Registers.HL);
 
     u8 carry = GET_BIT(val, 0);
 
@@ -748,7 +748,7 @@ void CPU::opcodeCB0x3E() // SRL (HL)
     if(carry) setFlag(Flags::Register::Carry);
     setZeroFromVal(val);
 
-    m_MMU->write(m_Registers.HL, val);
+    m_Gameboy->write(m_Registers.HL, val);
 
     LOG_WRITE(m_Registers.HL);
     LOG_FLAGS();
