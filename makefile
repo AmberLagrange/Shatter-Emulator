@@ -7,27 +7,26 @@ EXE ?= shatter.exe
 RM 		:= rm
 MKDIR_P := mkdir -p
 
-#Compiler and flags
-CXX ?= g++
-CXXFLAGS ?= -Wall -Wextra -Werror -iquote $(INCDIR) -MMD -MP 
-CXXFLAGS += -std=c++17
-CXXFLAGS += -DEXE_NAME=\"$(EXE)\"
-
-#Libraries
-LDFLAGS := -lSDL2main -lSDL2 
-
 #Directories
-INCDIR  ?= ./include
+INCDIR  ?= ./include /usr/include/SDL2
 SRCDIR  ?= ./src
 OBJDIR  ?= ./obj
 BUILDIR ?= ./build
+
+#Compiler and flags
+CXXFLAGS ?= -Wall -Wextra -Werror
+CXXFLAGS += $(INCDIR:%=-iquote %) -MMD -MP -std=c++17 -DEXE_NAME=\"$(EXE)\"
+
+#Libraries
+LDFLAGS ?= 
+LDLIBS  := -lSDL2main -lSDL2
 
 #Files
 SRCS := $(wildcard $(SRCDIR)/*.cpp)
 OBJS := $(SRCS:$(SRCDIR)/%.cpp=%.o)
 DEPS := $(OBJS:%.o=%.d)
 
-.PHONY: all clean release debug mkdir remake
+.PHONY: all clean release debug mkdir remake debugger
 
 all: mkdir release
 
@@ -45,14 +44,14 @@ debug: CXXFLAGS += -g
 
 #Release target
 release: $(RELOBJS)
-	$(CXX) $(RELOBJS) -o $(BUILDIR)/$(RELDIR)/$(EXE) $(LDFLAGS)
+	$(CXX) $(RELOBJS) -o $(BUILDIR)/$(RELDIR)/$(EXE) -fuse-ld=$(LD) $(LDFLAGS) $(LDLIBS)
 
 $(OBJDIR)/$(RELDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 #Debug target
 debug: mkdir $(DBGOBJS)
-	$(CXX) $(DBGOBJS) -o $(BUILDIR)/$(DBGDIR)/$(EXE) $(LDFLAGS)
+	$(CXX) $(DBGOBJS) -o $(BUILDIR)/$(DBGDIR)/$(EXE) -fuse-ld=$(LD) $(LDFLAGS) $(LDLIBS)
 
 $(OBJDIR)/$(DBGDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
@@ -60,6 +59,9 @@ $(OBJDIR)/$(DBGDIR)/%.o: $(SRCDIR)/%.cpp
 #Other targets
 
 remake: clean all
+
+debugger: debug
+	gdb $(BUILDIR)/$(DBGDIR)/$(EXE)
 
 clean:
 	$(RM) -rf $(BUILDIR)
