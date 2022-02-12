@@ -18,7 +18,6 @@ CXXFLAGS ?= -Wall -Wextra -Werror
 CXXFLAGS += $(INCDIR:%=-iquote %) -MMD -MP -std=c++17 -DEXE_NAME=\"$(EXE)\"
 
 #Libraries
-LDFLAGS ?= 
 LDLIBS  := -lSDL2main -lSDL2
 
 #Files
@@ -44,14 +43,14 @@ debug: CXXFLAGS += -g
 
 #Release target
 release: $(RELOBJS)
-	$(CXX) $(RELOBJS) -o $(BUILDIR)/$(RELDIR)/$(EXE) -fuse-ld=$(LD) $(LDFLAGS) $(LDLIBS)
+	$(CXX) $(RELOBJS) -o $(BUILDIR)/$(RELDIR)/$(EXE) $(LDFLAGS) $(LDLIBS)
 
 $(OBJDIR)/$(RELDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 #Debug target
 debug: mkdir $(DBGOBJS)
-	$(CXX) $(DBGOBJS) -o $(BUILDIR)/$(DBGDIR)/$(EXE) -fuse-ld=$(LD) $(LDFLAGS) $(LDLIBS)
+	$(CXX) $(DBGOBJS) -o $(BUILDIR)/$(DBGDIR)/$(EXE) $(LDFLAGS) $(LDLIBS)
 
 $(OBJDIR)/$(DBGDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
@@ -59,9 +58,6 @@ $(OBJDIR)/$(DBGDIR)/%.o: $(SRCDIR)/%.cpp
 #Other targets
 
 remake: clean all
-
-debugger: debug
-	gdb $(BUILDIR)/$(DBGDIR)/$(EXE)
 
 clean:
 	$(RM) -rf $(BUILDIR)
