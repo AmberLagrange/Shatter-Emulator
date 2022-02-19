@@ -2,7 +2,7 @@
 
 #include "core.h"
 
-#include <vector>
+#include <map>
 
 #include "gameboy.h"
 
@@ -13,9 +13,15 @@ class Scheduler
         Scheduler(const Scheduler& s) = delete;
         ~Scheduler() = default;
 
-        inline void addGameboy(Gameboy* gb) { m_Gameboys.push_back(gb); }
+        inline void addGameboy(const char* path) { addGameboy(new Gameboy(path)); }
+        void addGameboy(Gameboy* gb);
+
+        void start();
+
+        void stop();
+        void stop(u32 index);
 
         bool run();
     private:
-        std::vector<Gameboy*> m_Gameboys;
+        std::map<u32, Gameboy*> m_Gameboys;
 };

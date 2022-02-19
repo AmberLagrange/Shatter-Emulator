@@ -23,10 +23,16 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    if(!std::filesystem::exists(argv[1]) || std::filesystem::is_directory(argv[1]))
+    if(!std::filesystem::exists(argv[1]))
     {
         ERROR("File '" << argv[1] << "' not found!");
-        return -1;
+        return -2;
+    }
+
+    if(std::filesystem::is_directory(argv[1]))
+    {
+        ERROR("'" << argv[1] << "' is a directory!");
+        return -3;
     }
 
     if(optionExists(argv, argv + argc, "-l"))
@@ -40,20 +46,16 @@ int main(int argc, char** argv)
         ENABLE_OP_LOGGING();
     }
 
-    Screen::initSDL();
-
-    Gameboy* gb = new Gameboy();
-
-    gb->load(argv[1]);
-    
-    gb->start();
+    Screen::init();
 
     Scheduler s;
-    s.addGameboy(gb);
+
+    s.addGameboy(argv[1]);
+    s.start();
 
     while(s.run()) {}
 
-    Screen::quitSDL();
+    Screen::quit();
 
-    return 0;
+    _Exit(0); // SDL segfaults unless I call _Exit
 }

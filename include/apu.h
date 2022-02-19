@@ -7,7 +7,8 @@ class Gameboy;
 class APU
 {
     public:
-        APU();
+        APU(Gameboy& gb);
         
     private:
+        Gameboy& m_Gameboy [[maybe_unused]];
 };

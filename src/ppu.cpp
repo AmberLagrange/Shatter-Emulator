@@ -2,7 +2,8 @@
 
 #include "gameboy.h"
 
-PPU::PPU()
+PPU::PPU(Gameboy& gb)
+    : m_Gameboy(gb)
 {
     DEBUG("Initializing GPU!");
     temp = 0;
@@ -16,32 +17,32 @@ void PPU::tick(u8 cycles)
     {
         temp = 100000;
 
-        u8 scrollX = m_Gameboy->read(SCR_X_REGISTER);
+        u8 scrollX = m_Gameboy.read(SCR_X_REGISTER);
         u8 scrollY = 0;
 
         for(u16 row = 0; row < VRAM_WIDTH; ++row)
         {
             for(u16 col = 0; col < VRAM_HEIGHT; ++col)
             {
-                u16 tileMap  = GET_BIT(m_Gameboy->read(0xFF40), 3) ? 0x9C00 : 0x9800;
-                u16 tileData = GET_BIT(m_Gameboy->read(0xFF40), 4) ? 0x8000 : 0x8800;
+                u16 tileMap  = GET_BIT(m_Gameboy.read(0xFF40), 3) ? 0x9C00 : 0x9800;
+                u16 tileData = GET_BIT(m_Gameboy.read(0xFF40), 4) ? 0x8000 : 0x8800;
                 
                 u16 xPos = col + scrollX;
                 u16 yPos = row + scrollY;
 
                 if(tileData == 0x8000)
                 {
-                    u8 tileIndex = m_Gameboy->read(tileMap + ((yPos / 8) * 32) + (xPos / 8));
+                    u8 tileIndex = m_Gameboy.read(tileMap + ((yPos / 8) * 32) + (xPos / 8));
                     tileData += tileIndex * 16;
                 }
                 else
                 {
-                    i8 tileIndex = m_Gameboy->read(tileMap + ((yPos / 8) * 32) + (xPos / 8));
+                    i8 tileIndex = m_Gameboy.read(tileMap + ((yPos / 8) * 32) + (xPos / 8));
                     tileData += (tileIndex + 0x80) * 16;
                 }
 
-                u8 low  = m_Gameboy->read(tileData + (yPos % 8 * 2)    );
-                u8 high = m_Gameboy->read(tileData + (yPos % 8 * 2) + 1);
+                u8 low  = m_Gameboy.read(tileData + (yPos % 8 * 2)    );
+                u8 high = m_Gameboy.read(tileData + (yPos % 8 * 2) + 1);
 
                 u8 bit = 7 - (xPos % 8);
                 u8 colour = GET_BIT(low, bit) | (GET_BIT(high, bit) << 1);
@@ -91,7 +92,7 @@ void PPU::tick(u8 cycles)
             }
         }
 
-        m_Gameboy->write(0xFF44, 0x90);
+        m_Gameboy.write(0xFF44, 0x90);
 
         std::invoke(m_DrawCallback, m_FrameBuffer);
     }

@@ -7,7 +7,8 @@
     #define LOG_OP() ((void)0)
 #endif
 
-CPU::CPU()
+CPU::CPU(Gameboy& gb)
+    : m_Gameboy(gb)
 {
     DEBUG("Initializing CPU!");
     reset();
@@ -15,17 +16,17 @@ CPU::CPU()
 
 u8 CPU::tick()
 {
-    if(m_Halted) return 4;
+    if(m_Halted) return 4; // Halted CPU takes 4 ticks
 
     handleInterrupts();
 
     Instruction instruction;
     u8 cycles = 0;
-    u8 opcode = m_Gameboy->read(m_Registers.PC++);
+    u8 opcode = m_Gameboy.read(m_Registers.PC++);
 
     if(opcode == 0xCB)
     {
-        opcode = m_Gameboy->read(m_Registers.PC++);
+        opcode = m_Gameboy.read(m_Registers.PC++);
         instruction = instructionsCB[opcode];
         cycles += 4; // Add 4 cycles due to the CB prefix
 
@@ -57,13 +58,13 @@ void CPU::raiseInterrupt(const Flags::Interrupt& flag)
 {
     m_Halted = false;
 
-    m_Gameboy->write(IF_REGISTER, m_Gameboy->read(IF_REGISTER) | flag);
+    m_Gameboy.write(IF_REGISTER, m_Gameboy.read(IF_REGISTER) | flag);
 }
 
 void CPU::handleInterrupts()
 {
-    u8 flags = m_Gameboy->read(IF_REGISTER);
-    u8 enabledFlags = (flags & m_Gameboy->read(IE_REGISTER));
+    u8 flags = m_Gameboy.read(IF_REGISTER);
+    u8 enabledFlags = (flags & m_Gameboy.read(IE_REGISTER));
 
     if(m_IME && (enabledFlags & 0x1F))
     {
@@ -96,7 +97,7 @@ void CPU::handleInterrupts()
         }
         
         m_IME = false;
-        m_Gameboy->write(IF_REGISTER, flags);
+        m_Gameboy.write(IF_REGISTER, flags);
     }
 }
 
@@ -119,7 +120,7 @@ void CPU::reset()
     m_Registers.SP = 0xFFFE;
     DEBUG("\tSP Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.SP);
 
-    m_Registers.PC = 0x0100;
+    m_Registers.PC = 0x0000;
     DEBUG("\tPC Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.PC);
 
     m_IME = false;

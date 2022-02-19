@@ -10,11 +10,9 @@ class Gameboy;
 class CPU
 {
     public:
-        CPU();
+        CPU(Gameboy& gb);
 
         u8 tick();
-
-        inline void setGameboy(Gameboy* gb) { m_Gameboy = gb; }
 
         inline bool getIME() const   { return m_IME; }
         inline bool setIME(bool ime) { return m_IME = ime; }
@@ -103,7 +101,7 @@ class CPU
 
         Registers m_Registers;
 
-        Gameboy* m_Gameboy;
+        Gameboy& m_Gameboy;
 
         bool m_Halted;
         bool m_IME;

@@ -21,21 +21,21 @@
 #define LOG_HL_REG() OPCODE("HL Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.HL) << ".")
 #define LOG_SP_REG() OPCODE("SP Register updated to: 0x" << std::setw(4) << std::setfill('0') << std::hex << static_cast<u16>(m_Registers.SP) << ".")
 
-#define LOG_WRITE(addr) OPCODE("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Gameboy->read(addr)) \
+#define LOG_WRITE(addr) OPCODE("Wrote 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Gameboy.read(addr)) \
                                           << " to address 0x" << std::setw(4) << addr << ".")
 
-#define LOG_READ(addr) OPCODE("Read 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Gameboy->read(addr)) \
+#define LOG_READ(addr) OPCODE("Read 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(m_Gameboy.read(addr)) \
                                         << " from 0x" << std::setw(4) << std::setfill('0') << std::hex << addr << ".")
 
 #define LOG_PUSH() OPCODE("Pushed 0x" << std::setw(2) << std::setfill('0') << std::hex     \
-                                      << static_cast<u16>(m_Gameboy->read(m_Registers.SP    )) \
+                                      << static_cast<u16>(m_Gameboy.read(m_Registers.SP    )) \
                                       << std::setw(2) << std::setfill('0') << std::hex     \
-                                      << static_cast<u16>(m_Gameboy->read(m_Registers.SP + 1)) << " to the stack.")
+                                      << static_cast<u16>(m_Gameboy.read(m_Registers.SP + 1)) << " to the stack.")
 
 #define LOG_POP() OPCODE("Popped 0x" << std::setw(2) << std::setfill('0') << std::hex     \
-                                     << static_cast<u16>(m_Gameboy->read(m_Registers.SP - 2)) \
+                                     << static_cast<u16>(m_Gameboy.read(m_Registers.SP - 2)) \
                                      << std::setw(2) << std::setfill('0') << std::hex     \
-                                     << static_cast<u16>(m_Gameboy->read(m_Registers.SP - 1)) << " from the stack.")
+                                     << static_cast<u16>(m_Gameboy.read(m_Registers.SP - 1)) << " from the stack.")
 
 #define LOG_JP()  OPCODE("Jumped to: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.PC << ".")
 #define LOG_NJP() OPCODE("Did not jump.")

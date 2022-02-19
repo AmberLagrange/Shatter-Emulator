@@ -9,9 +9,8 @@ class Gameboy;
 class PPU
 {
     public:
-        PPU();
+        PPU(Gameboy& gb);
 
-        inline void setGameboy(Gameboy* gb) { m_Gameboy = gb; }
         inline void setDrawCallback(std::function<void(u8* buffer)> callback) { m_DrawCallback = callback; }
 
         void tick(u8 cycles);
@@ -26,7 +25,7 @@ class PPU
             
         };
 
-        Gameboy* m_Gameboy;
+        Gameboy& m_Gameboy;
 
         u8 m_FrameBuffer[GAMEBOY_WIDTH * GAMEBOY_HEIGHT * 4];
         u8 m_BackgroundBuffer[VRAM_WIDTH * VRAM_HEIGHT * 4];

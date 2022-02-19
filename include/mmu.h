@@ -9,9 +9,7 @@ class Gameboy;
 class MMU
 {
     public:
-        MMU();
-
-        inline void setGameboy(Gameboy* gb) { m_Gameboy = gb; }
+        MMU(Gameboy& gb);
 
         void load(const char* path);
 
@@ -21,7 +19,7 @@ class MMU
         void reset();
 
     private:
-        Gameboy* m_Gameboy;
+        Gameboy& m_Gameboy;
         Cartridge m_Rom;
 
         u8 m_Memory[0x8000] = {};

@@ -1,12 +1,12 @@
 #include "screen.h"
 #include "gameboy.h"
 
-void Screen::initSDL()
+void Screen::init()
 {
     SDL_Init(SDL_INIT_VIDEO);
 }
 
-void Screen::quitSDL()
+void Screen::quit()
 {
     DEBUG("Quitting SDL!");
     SDL_Quit();
@@ -41,20 +41,6 @@ Screen::~Screen()
     SDL_DestroyTexture(m_Texture);
     SDL_DestroyRenderer(m_Renderer);
     SDL_DestroyWindow(m_Window);
-}
-
-void Screen::poll()
-{
-    SDL_Event e;
-    if (SDL_PollEvent(&e))
-    {
-        if(e.type == SDL_WINDOWEVENT
-           && e.window.event == SDL_WINDOWEVENT_CLOSE
-           && SDL_GetWindowID(m_Window) == e.window.windowID)
-        {
-            m_Gameboy->stop();
-        }
-    }
 }
 
 void Screen::draw(u8* buffer)

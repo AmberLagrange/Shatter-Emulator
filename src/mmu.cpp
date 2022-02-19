@@ -1,7 +1,8 @@
 #include "mmu.h"
 #include "gameboy.h"
 
-MMU::MMU()
+MMU::MMU(Gameboy& gb)
+    : m_Gameboy(gb)
 {
     DEBUG("Initializing MMU!");
 }
@@ -51,7 +52,7 @@ u8 MMU::read(u16 address) const
     }
     else if(address == 0xFFFF) // IME
     {
-        return m_Gameboy->getIME();
+        return m_Gameboy.getIME();
     }
 
     return 0xFF;
@@ -100,6 +101,6 @@ void MMU::write(u16 address, u8 val)
     }
     else if(address == 0xFFFF) // IME
     {
-        m_Gameboy->setIME(val);
+        m_Gameboy.setIME(val);
     }
 }

@@ -8,7 +8,7 @@ RM 		:= rm
 MKDIR_P := mkdir -p
 
 #Directories
-INCDIR  ?= ./include /usr/include/SDL2
+INCDIR  ?= ./include
 SRCDIR  ?= ./src
 OBJDIR  ?= ./obj
 BUILDIR ?= ./build
@@ -18,14 +18,14 @@ CXXFLAGS ?= -Wall -Wextra -Werror
 CXXFLAGS += $(INCDIR:%=-iquote %) -MMD -MP -std=c++17 -DEXE_NAME=\"$(EXE)\"
 
 #Libraries
-LDLIBS  := -lSDL2main -lSDL2
+LDLIBS  := -lSDL2 -lSDL2main
 
 #Files
 SRCS := $(wildcard $(SRCDIR)/*.cpp)
 OBJS := $(SRCS:$(SRCDIR)/%.cpp=%.o)
 DEPS := $(OBJS:%.o=%.d)
 
-.PHONY: all clean release debug mkdir remake debugger
+.PHONY: all clean release debug mkdir remake
 
 all: mkdir release
 

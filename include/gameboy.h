@@ -15,6 +15,7 @@ class Gameboy
 {
     public:
         Gameboy();
+        Gameboy(const char* path);
 
         void load(const char* path);
 
@@ -29,13 +30,15 @@ class Gameboy
 
         inline bool getIME() { return m_CPU.getIME(); }
         inline void setIME(bool ime) { m_CPU.setIME(ime); }
-    private:
-        Screen m_Screen;
 
+        inline u32 getWindowID() const { return m_Screen.getWindowID(); }
+    private:
+        APU m_APU;
         CPU m_CPU;
         MMU m_MMU;
         PPU m_PPU;
-        APU m_APU;
+
+        Screen m_Screen;
 
         Timer m_Timer;
 

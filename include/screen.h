@@ -9,20 +9,17 @@ class Gameboy;
 class Screen
 {
     public:
-        static void initSDL();
-        static void quitSDL();
+        static void init();
+        static void quit();
     public:
         Screen();
         ~Screen();
 
-        inline void setGameboy(Gameboy* gameboy) { m_Gameboy = gameboy; }
+        inline u32 getWindowID() const { return (u32)SDL_GetWindowID(m_Window); }
 
         void poll();
         void draw(u8* buffer);
-
     private:
-        Gameboy* m_Gameboy;
-
         SDL_Window*     m_Window;
         SDL_Renderer*   m_Renderer;
         SDL_Texture*    m_Texture;
