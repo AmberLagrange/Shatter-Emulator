@@ -2,7 +2,7 @@
 
 #include "core.h"
 
-#include "cartridge.h"
+#include "cart/cartridge.h"
 
 class Gameboy;
 

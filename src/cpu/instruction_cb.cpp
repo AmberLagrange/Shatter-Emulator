@@ -2,7 +2,7 @@
 #include "cpu.h"
 #include "gameboy.h"
 
-#include "opcode_log.h"
+#include "logging/opcode_log.h"
 
 //--------------------------------------CB Opcode Helpers--------------------------------------//
 

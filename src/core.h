@@ -2,7 +2,7 @@
 
 #define CLOCK_SPEED 4194304
 
-#include "logger.h"
+#include "logging/logger.h"
 
 #include "utils.h"
 
@@ -33,8 +33,14 @@
 #define TMA_REGISTER    0xFF06
 #define TAC_REGISTER    0xFF07
 
-#define SCR_Y_REGISTER  0xFF42
-#define SCR_X_REGISTER  0xFF43
+#define SCY_REGISTER    0xFF42
+#define SCX_REGISTER    0xFF43
+
+#define LY_REGISTER     0xFF44
+#define LYC_REGISTER    0xFF45
+
+#define WY_REGISTER     0xFF4A
+#define WX_REGISTER     0xFF4B
 
 #define IF_REGISTER     0xFF0F
 #define IE_REGISTER     0xFFFF

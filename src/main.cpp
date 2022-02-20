@@ -8,7 +8,7 @@
 
 #include "scheduler.h"
 #include "gameboy.h"
-#include "screen.h"
+#include "video/screen.h"
 
 bool optionExists(char** begin, char** end, const std::string option)
 {

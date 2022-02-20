@@ -1,7 +1,5 @@
 #include "gameboy.h"
 
-#include "screen.h"
-
 Gameboy::Gameboy()
     :   m_APU(*this), m_CPU(*this), m_MMU(*this), m_PPU(*this),
         m_Running(false)

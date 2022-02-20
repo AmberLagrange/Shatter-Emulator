@@ -8,7 +8,6 @@ void Screen::init()
 
 void Screen::quit()
 {
-    DEBUG("Quitting SDL!");
     SDL_Quit();
 }
 

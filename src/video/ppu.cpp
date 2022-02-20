@@ -17,8 +17,8 @@ void PPU::tick(u8 cycles)
     {
         temp = 100000;
 
-        u8 scrollX = m_Gameboy.read(SCR_X_REGISTER);
-        u8 scrollY = 0;
+        u8 scrollX = m_Gameboy.read(SCX_REGISTER);
+        u8 scrollY = m_Gameboy.read(SCY_REGISTER);
 
         for(u16 row = 0; row < VRAM_WIDTH; ++row)
         {
@@ -91,8 +91,6 @@ void PPU::tick(u8 cycles)
                 m_FrameBuffer[(row * GAMEBOY_WIDTH + col) * 4 + 3] = m_BackgroundBuffer[(row * VRAM_WIDTH + col) * 4 + 3];
             }
         }
-
-        m_Gameboy.write(0xFF44, 0x90);
 
         std::invoke(m_DrawCallback, m_FrameBuffer);
     }

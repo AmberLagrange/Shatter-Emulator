@@ -2,14 +2,15 @@
 
 #include "core.h"
 
-#include "screen.h"
+#include "audio/apu.h"
 
 #include "mmu.h"
-#include "cpu.h"
-#include "ppu.h"
-#include "apu.h"
 
-#include "timer.h"
+#include "cpu/cpu.h"
+#include "cpu/timer.h"
+
+#include "video/screen.h"
+#include "video/ppu.h"
 
 class Gameboy
 {

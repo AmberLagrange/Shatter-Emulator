@@ -8,7 +8,7 @@ RM 		:= rm
 MKDIR_P := mkdir -p
 
 #Directories
-INCDIR  ?= ./include
+INCDIR  ?= ./include ./src
 SRCDIR  ?= ./src
 OBJDIR  ?= ./obj
 BUILDIR ?= ./build
@@ -21,9 +21,10 @@ CXXFLAGS += $(INCDIR:%=-iquote %) -MMD -MP -std=c++17 -DEXE_NAME=\"$(EXE)\"
 LDLIBS  := -lSDL2 -lSDL2main
 
 #Files
-SRCS := $(wildcard $(SRCDIR)/*.cpp)
-OBJS := $(SRCS:$(SRCDIR)/%.cpp=%.o)
-DEPS := $(OBJS:%.o=%.d)
+DIRS 	:= audio cart cpu logging video .
+SRCS 	:= $(foreach dir, $(DIRS), $(wildcard $(SRCDIR)/$(dir)/*.cpp))
+OBJS 	:= $(SRCS:$(SRCDIR)/%.cpp=%.o)
+DEPS 	:= $(OBJS:%.o=%.d)
 
 .PHONY: all clean release debug mkdir remake
 
@@ -66,6 +67,7 @@ clean:
 mkdir:
 	$(MKDIR_P) $(BUILDIR) $(BUILDIR)/$(RELDIR) $(BUILDIR)/$(DBGDIR)
 	$(MKDIR_P) $(OBJDIR)  $(OBJDIR)/$(RELDIR)  $(OBJDIR)/$(DBGDIR) 
+	$(foreach dir, $(DIRS), $(MKDIR_P) $(OBJDIR)/$(RELDIR)/$(dir) $(OBJDIR)/$(DBGDIR)/$(dir))
 
 -include $(RELDEPS)
 -include $(DBGDEPS)
