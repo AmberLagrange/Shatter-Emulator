@@ -113,12 +113,12 @@ void CPU::opcodeBIT(const u8& bit, u8& reg)
 
 void CPU::opcodeRES(const u8& bit, u8& reg)
 {
-    reg &= ~(0x01 << bit);
+    CLEAR_BIT(reg, bit);
 }
 
 void CPU::opcodeSET(const u8& bit, u8& reg)
 {
-    reg |= (0x01 << bit);
+    SET_BIT(reg, bit);
 }
 
 //HL variants

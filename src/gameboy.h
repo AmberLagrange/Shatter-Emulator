@@ -32,6 +32,11 @@ class Gameboy
         inline bool getIME() { return m_CPU.getIME(); }
         inline void setIME(bool ime) { m_CPU.setIME(ime); }
 
+        inline void raiseInterrupt(const Flags::Interrupt& flag) { m_CPU.raiseInterrupt(flag); }
+
+        inline void resetDiv() { m_Timer.resetDiv(); }
+        inline void setTimerSpeed(u32 speed) { m_Timer.setSpeed(speed); }
+
         inline u32 getWindowID() const { return m_Screen.getWindowID(); }
     private:
         APU m_APU;
@@ -39,9 +44,9 @@ class Gameboy
         MMU m_MMU;
         PPU m_PPU;
 
-        Screen m_Screen;
-
         Timer m_Timer;
+
+        Screen m_Screen;
 
         bool m_Running;
 };

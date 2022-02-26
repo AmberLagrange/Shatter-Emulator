@@ -15,10 +15,10 @@ void PPU::tick(u8 cycles)
 
     if(temp <= 0)
     {
-        temp = 100000;
+        temp = 69905;
 
         u8 scrollX = m_Gameboy.read(SCX_REGISTER);
-        u8 scrollY = m_Gameboy.read(SCY_REGISTER);
+        u8 scrollY = 0; //m_Gameboy.read(SCY_REGISTER);
 
         for(u16 row = 0; row < VRAM_WIDTH; ++row)
         {
@@ -81,9 +81,9 @@ void PPU::tick(u8 cycles)
             }
         }
 
-        for(u8 row = 0; row < GAMEBOY_HEIGHT; ++row)
+        for(u32 row = 0; row < GAMEBOY_HEIGHT; ++row)
         {
-            for(u8 col = 0; col < GAMEBOY_WIDTH; ++col)
+            for(u32 col = 0; col < GAMEBOY_WIDTH; ++col)
             {
                 m_FrameBuffer[(row * GAMEBOY_WIDTH + col) * 4    ] = m_BackgroundBuffer[(row * VRAM_WIDTH + col) * 4    ];
                 m_FrameBuffer[(row * GAMEBOY_WIDTH + col) * 4 + 1] = m_BackgroundBuffer[(row * VRAM_WIDTH + col) * 4 + 1];

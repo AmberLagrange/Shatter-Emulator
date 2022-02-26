@@ -1,7 +1,5 @@
 #pragma once
 
-#define CLOCK_SPEED 4194304
-
 #include "logging/logger.h"
 
 #include "utils.h"
@@ -27,6 +25,13 @@
 #else
     #define ASSERT(x, msg) ((void)0)
 #endif
+
+#define CLOCK_SPEED     4194304
+
+#define TIMER_SPEED_00  1024
+#define TIMER_SPEED_01  16
+#define TIMER_SPEED_10  64
+#define TIMER_SPEED_11  256
 
 #define DIV_REGISTER    0xFF04
 #define TIMA_REGISTER   0xFF05

@@ -1,12 +1,37 @@
 #include "timer.h"
 
-Timer::Timer()
-    : m_Enabled(true) {}
+#include "gameboy.h"
+#include "flags.h"
 
-void Timer::update([[maybe_unused]] u8 cycles)
+Timer::Timer(Gameboy& gb)
+    : m_Gameboy(gb), m_DIV(0), m_TIMA(0), m_Speed(TIMER_SPEED_00) {}
+
+void Timer::update(u8 cycles)
 {
-    if(m_Enabled)
+    m_DIV += cycles;
+    
+    if(GET_BIT(m_Gameboy.read(TAC_REGISTER), 2)) // Check if the timer is enabled
     {
+        m_TIMA += cycles;
+        while(m_TIMA >= CLOCK_SPEED / m_Speed)
+        {
+            m_TIMA -= m_Speed;
 
+            if(m_Gameboy.read(TIMA_REGISTER) == 0xFF)
+            {
+                m_Gameboy.write(TIMA_REGISTER, m_Gameboy.read(TMA_REGISTER));
+                m_Gameboy.raiseInterrupt(Flags::Interrupt::Timer);
+            }
+            else
+            {
+                m_Gameboy.write(TIMA_REGISTER, m_Gameboy.read(TIMA_REGISTER) + 1);
+            }
+        }
+    }
+
+    if(m_DIV >= 0x0100)
+    {
+        m_DIV -= 0x0100;
+        m_Gameboy.write(DIV_REGISTER, m_Gameboy.read(DIV_REGISTER) + 1);
     }
 }

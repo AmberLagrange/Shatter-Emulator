@@ -15,7 +15,7 @@ class Screen
         Screen();
         ~Screen();
 
-        inline u32 getWindowID() const { return (u32)SDL_GetWindowID(m_Window); }
+        inline u32 getWindowID() const { return static_cast<u32>(SDL_GetWindowID(m_Window)); }
 
         void poll();
         void draw(u8* buffer);

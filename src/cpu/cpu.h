@@ -20,14 +20,14 @@ class CPU
         void raiseInterrupt(const Flags::Interrupt& flag);
 
     private:
-        void handleInterrupts();
+        void handleInterrupts(u8& cycles);
 
         void reset();
 
-        inline void setFlag(const Flags::Register& flag)    { m_Registers.F |= flag; }
-        inline void clearFlag(const Flags::Register& flag)  { m_Registers.F &= ~flag; }
-        inline void flipFlag(const Flags::Register& flag)   { m_Registers.F ^= flag; }
-        inline bool isFlagSet(const Flags::Register& flag) const  { return m_Registers.F & flag; }
+        inline void setFlag(const Flags::Register& flag)            { m_Registers.F |= flag; }
+        inline void clearFlag(const Flags::Register& flag)          { m_Registers.F &= ~flag; }
+        inline void flipFlag(const Flags::Register& flag)           { m_Registers.F ^= flag; }
+        inline bool isFlagSet(const Flags::Register& flag) const    { return m_Registers.F & flag; }
 
         inline void clearAllFlags()                         { clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry | Flags::Register::Carry); }
         inline void setZeroFromVal(const u8& val)           { if(!val) setFlag(Flags::Register::Zero); }

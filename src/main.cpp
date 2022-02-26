@@ -6,6 +6,9 @@
 #include <filesystem>
 #include <fstream>
 
+#include <chrono>
+#include <thread>
+
 #include "scheduler.h"
 #include "gameboy.h"
 #include "video/screen.h"

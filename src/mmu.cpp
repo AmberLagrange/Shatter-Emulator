@@ -46,13 +46,9 @@ u8 MMU::read(u16 address) const
     {
         return m_Memory[address - 0x8000];
     }
-    else if(address < 0xFFFF) // High RAM
+    else
     {
         return m_Memory[address - 0x8000];
-    }
-    else if(address == 0xFFFF) // IME
-    {
-        return m_Gameboy.getIME();
     }
 
     return 0xFF;
@@ -93,14 +89,37 @@ void MMU::write(u16 address, u8 val)
     }
     else if(address < 0xFF80) // IO
     {
-        m_Memory[address - 0x8000] = val;
+        switch(address)
+        {
+            case DIV_REGISTER:
+                m_Gameboy.resetDiv();
+                break;
+            case TAC_REGISTER:
+                m_Memory[address - 0x8000] = val;
+                switch(val & 0x03)
+                {
+                    case 0b00:
+                        m_Gameboy.setTimerSpeed(TIMER_SPEED_00);
+                        break;
+                    case 0b01:
+                        m_Gameboy.setTimerSpeed(TIMER_SPEED_01);
+                        break;
+                    case 0b10:
+                        m_Gameboy.setTimerSpeed(TIMER_SPEED_10);
+                        break;
+                    case 0b11:
+                        m_Gameboy.setTimerSpeed(TIMER_SPEED_11);
+                        break;
+                    default:
+                        ASSERT(false, "Timer Speed Switch branched to invalid case!");
+                }
+                break;
+            default:
+                m_Memory[address - 0x8000] = val;
+        }
     }
-    else if(address < 0xFFFF) // High RAM
+    else
     {
         m_Memory[address - 0x8000] = val;
-    }
-    else if(address == 0xFFFF) // IME
-    {
-        m_Gameboy.setIME(val);
     }
 }

@@ -2,7 +2,7 @@
 
 Gameboy::Gameboy()
     :   m_APU(*this), m_CPU(*this), m_MMU(*this), m_PPU(*this),
-        m_Running(false)
+        m_Timer(*this), m_Running(false)
 {
     m_PPU.setDrawCallback(std::bind(&Screen::draw, &m_Screen, std::placeholders::_1));
 }

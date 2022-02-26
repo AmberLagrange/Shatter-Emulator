@@ -16,12 +16,12 @@ CPU::CPU(Gameboy& gb)
 
 u8 CPU::tick()
 {
+    u8 cycles = 0;
+    handleInterrupts(cycles);
+
     if(m_Halted) return 4; // Halted CPU takes 4 ticks
 
-    handleInterrupts();
-
     Instruction instruction;
-    u8 cycles = 0;
     u8 opcode = m_Gameboy.read(m_Registers.PC++);
 
     if(opcode == 0xCB)
@@ -61,43 +61,51 @@ void CPU::raiseInterrupt(const Flags::Interrupt& flag)
     m_Gameboy.write(IF_REGISTER, m_Gameboy.read(IF_REGISTER) | flag);
 }
 
-void CPU::handleInterrupts()
+void CPU::handleInterrupts(u8& cycles)
 {
     u8 flags = m_Gameboy.read(IF_REGISTER);
     u8 enabledFlags = (flags & m_Gameboy.read(IE_REGISTER));
 
-    if(m_IME && (enabledFlags & 0x1F))
+    if(enabledFlags)
     {
-        pushStack(m_Registers.PC);
+        if(m_IME)
+        {
+            pushStack(m_Registers.PC);
 
-        if(enabledFlags & Flags::Interrupt::VBlank)
-        {
-            flags &= ~Flags::Interrupt::VBlank;
-            m_Registers.PC = 0x0040;
+            if(enabledFlags & Flags::Interrupt::VBlank)
+            {
+                flags &= ~Flags::Interrupt::VBlank;
+                m_Registers.PC = 0x0040;
+            }
+            else if(enabledFlags & Flags::Interrupt::LCD_STAT)
+            {
+                flags &= ~Flags::Interrupt::LCD_STAT;
+                m_Registers.PC = 0x0048;
+            }
+            else if(enabledFlags & Flags::Interrupt::Timer)
+            {
+                flags &= ~Flags::Interrupt::Timer;
+                m_Registers.PC = 0x0050;
+            }
+            else if(enabledFlags & Flags::Interrupt::Serial)
+            {
+                flags &= ~Flags::Interrupt::Serial;
+                m_Registers.PC = 0x0058;
+            }
+            else if(enabledFlags & Flags::Interrupt::Joypad)
+            {
+                flags &= ~Flags::Interrupt::Joypad;
+                m_Registers.PC = 0x0060;
+            }
+            
+            m_IME = false;
+            m_Gameboy.write(IF_REGISTER, flags);
+            cycles += 20;
         }
-        else if(enabledFlags & Flags::Interrupt::LCD_STAT)
+        else if(m_Halted)
         {
-            flags &= ~Flags::Interrupt::LCD_STAT;
-            m_Registers.PC = 0x0048;
+            m_Halted = false;
         }
-        else if(enabledFlags & Flags::Interrupt::Timer)
-        {
-            flags &= ~Flags::Interrupt::Timer;
-            m_Registers.PC = 0x0050;
-        }
-        else if(enabledFlags & Flags::Interrupt::Serial)
-        {
-            flags &= ~Flags::Interrupt::Serial;
-            m_Registers.PC = 0x0058;
-        }
-        else if(enabledFlags & Flags::Interrupt::Joypad)
-        {
-            flags &= ~Flags::Interrupt::Joypad;
-            m_Registers.PC = 0x0060;
-        }
-        
-        m_IME = false;
-        m_Gameboy.write(IF_REGISTER, flags);
     }
 }
 
@@ -120,7 +128,7 @@ void CPU::reset()
     m_Registers.SP = 0xFFFE;
     DEBUG("\tSP Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.SP);
 
-    m_Registers.PC = 0x0000;
+    m_Registers.PC = 0x0100;
     DEBUG("\tPC Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.PC);
 
     m_IME = false;

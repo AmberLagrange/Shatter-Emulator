@@ -2,12 +2,21 @@
 
 #include "core.h"
 
+class Gameboy;
+
 class Timer
 {
     public:
-        Timer();
+        Timer(Gameboy& gb);
 
         void update(u8 cycles);
+        inline void resetDiv() { m_DIV = 0; }
+
+        inline void setSpeed(u32 speed) { m_Speed = speed; }
     private:
-        bool m_Enabled;
+        Gameboy& m_Gameboy;
+
+        u32 m_DIV;
+        u32 m_TIMA;
+        u32 m_Speed;
 };
