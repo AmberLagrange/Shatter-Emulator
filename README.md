@@ -11,26 +11,18 @@ Shatter is a Gameboy emulator written in modern C++ as a means to learn more abo
 
 # Building
 
-Currently Shatter requires ``SDL`` to be installed. To build, simply run:
+Currently Shatter requires ``SDL`` to be installed. To build, simply run cmake with a desired directory:
 
 ``` bash
-$ make
+$ cmake -S <source_directory> -B <build_directory>
 ```
-
-This will build the release version. For the debug version, run:
-
-``` bash
-$ make debug
-```
-
-This will create the executables in ``build/release`` and ``build/debug`` respectively.
 
 # Running
 
 To run Shatter, simply execute the program with the first command line argument being the path of the rom
 you would like to load.
 ``` bash
-$ shatter.exe <path_to_rom>
+$ Shatter <path_to_rom>
 ```
 
 Additional arguments can be passed as well.
