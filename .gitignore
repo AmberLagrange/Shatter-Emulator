@@ -26,10 +26,11 @@
 *.a
 *.lib
 
-# Executables
+# Executables and build directories
 *.exe
 *.out
 *.app
+/build
 
 # Rom Files and Directory
 /roms
