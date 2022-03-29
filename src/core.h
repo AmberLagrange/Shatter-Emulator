@@ -28,10 +28,10 @@
 
 #define CLOCK_SPEED     4194304
 
-#define TIMER_SPEED_00  1024
-#define TIMER_SPEED_01  16
-#define TIMER_SPEED_10  64
-#define TIMER_SPEED_11  256
+#define TIMER_SPEED_00  CLOCK_SPEED / 1024
+#define TIMER_SPEED_01  CLOCK_SPEED / 16
+#define TIMER_SPEED_10  CLOCK_SPEED / 64
+#define TIMER_SPEED_11  CLOCK_SPEED / 256
 
 #define DIV_REGISTER    0xFF04
 #define TIMA_REGISTER   0xFF05
@@ -56,14 +56,17 @@
 #define VRAM_WIDTH      0xFF
 #define VRAM_HEIGHT     0xFF
 
+#define FRAME_BUFFER_SIZE GAMEBOY_WIDTH * GAMEBOY_HEIGHT * 4
+#define BG_BUFFER_SIZE    VRAM_WIDTH    * VRAM_HEIGHT    * 4
+
 #define CLOCK_HZ        4194304
 
-#include <stdint.h>
+#include <cstdint>
 
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
+using u8  = uint8_t;
+using u16 = uint16_t;
+using u32 = uint32_t;
 
-typedef int8_t i8;
-typedef int16_t i16;
-typedef int32_t i32;
+using i8  = int8_t;
+using i16 = int16_t;
+using i32 = int32_t;

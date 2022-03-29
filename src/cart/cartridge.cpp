@@ -15,18 +15,17 @@ void Cartridge::load(const char* path)
     std::ifstream in(path, std::ios::binary);
     contents.assign((std::istreambuf_iterator<char>(in)), {});
 
-    std::copy(contents.begin(), contents.begin() + 0x4000, m_Rom0);
+    std::copy_n(contents.begin(), 0x4000, m_Rom0.begin());
     swapBank(1);
 }
 
 void Cartridge::swapBank(u8 bankNumber)
 {
     //bankNumber %= (contents.size() / 0x8000);
-    std::copy(contents.begin() + (0x4000 * bankNumber), contents.begin() + (0x4000 * (bankNumber + 1)), m_Rom1);
+    std::copy_n(contents.begin() + (0x4000 * bankNumber), 0x4000, m_Rom1.begin());
 }
 
-u8 Cartridge::read(u16 address) const
+auto Cartridge::read(u16 address) const -> u8
 {
-    if(address < 0x4000) return m_Rom0[address];
-    return m_Rom1[address - 0x4000];
+    return (address < 0x4000) ? m_Rom0[address] : m_Rom1[address - 0x4000];
 }

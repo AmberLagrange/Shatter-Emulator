@@ -43,7 +43,7 @@ DBGDEPS := $(DBGOBJS:%.o=%.d)
 debug: CXXFLAGS += -g
 
 #Release target
-release: $(RELOBJS)
+release: mkdir $(RELOBJS)
 	$(CXX) $(RELOBJS) -o $(BUILDIR)/$(RELDIR)/$(EXE) $(LDFLAGS) $(LDLIBS)
 
 $(OBJDIR)/$(RELDIR)/%.o: $(SRCDIR)/%.cpp
@@ -67,7 +67,7 @@ clean:
 mkdir:
 	$(MKDIR_P) $(BUILDIR) $(BUILDIR)/$(RELDIR) $(BUILDIR)/$(DBGDIR)
 	$(MKDIR_P) $(OBJDIR)  $(OBJDIR)/$(RELDIR)  $(OBJDIR)/$(DBGDIR) 
-	$(foreach dir, $(DIRS), $(MKDIR_P) $(OBJDIR)/$(RELDIR)/$(dir) $(OBJDIR)/$(DBGDIR)/$(dir))
+	$(MKDIR_P) $(foreach dir, $(DIRS), $(OBJDIR)/$(RELDIR)/$(dir) $(OBJDIR)/$(DBGDIR)/$(dir))
 
 -include $(RELDEPS)
 -include $(DBGDEPS)

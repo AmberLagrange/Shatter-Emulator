@@ -12,7 +12,7 @@ void MMU::load(const char* path)
     m_Rom.load(path);
 }
 
-u8 MMU::read(u16 address) const
+auto MMU::read(u16 address) const -> u8
 {
     if(address < 0x8000) // ROM
     {
@@ -91,6 +91,9 @@ void MMU::write(u16 address, u8 val)
     {
         switch(address)
         {
+            case 0xFF01:
+                std::cout << val;
+                break;
             case DIV_REGISTER:
                 m_Gameboy.resetDiv();
                 break;

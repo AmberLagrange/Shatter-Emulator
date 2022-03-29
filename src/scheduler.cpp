@@ -2,9 +2,9 @@
 
 #include <SDL2/SDL.h>
 
-void Scheduler::addGameboy(Gameboy* gb)
+void Scheduler::addGameboy(std::unique_ptr<Gameboy> gb)
 {
-    m_Gameboys[gb->getWindowID()] = gb;
+    m_Gameboys[gb->getWindowID()] = std::move(gb);
 }
 
 void Scheduler::start()
@@ -28,7 +28,7 @@ void Scheduler::stop(u32 index)
     m_Gameboys[index]->stop();
 }
 
-bool Scheduler::run()
+auto Scheduler::run() -> bool
 {
     bool running = false;
 
@@ -43,10 +43,9 @@ bool Scheduler::run()
 
     for(auto i = m_Gameboys.begin(); i != m_Gameboys.end();)
     {
-        Gameboy* gb = i->second;
+        auto& gb = i->second;
         if(!gb->isRunning())
         {
-            delete gb;
             i = m_Gameboys.erase(i);
             continue;
         }

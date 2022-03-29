@@ -257,7 +257,7 @@ void CPU::opcodeADD_HL(const u16& val)
     LOG_HL_REG();
 }
 
-u16 CPU::opcodeADD_SP()
+auto CPU::opcodeADD_SP() -> u16
 {
     clearAllFlags();
 

@@ -31,7 +31,8 @@
 *.out
 *.app
 
-# Rom Files
+# Rom Files and Directory
+/roms
 *.gba
 *.gb
 *.rom

@@ -42,9 +42,9 @@ Screen::~Screen()
     SDL_DestroyWindow(m_Window);
 }
 
-void Screen::draw(u8* buffer)
+void Screen::draw(const std::array<u8, FRAME_BUFFER_SIZE>& buffer)
 {
-    SDL_UpdateTexture(m_Texture, NULL, buffer, GAMEBOY_WIDTH * 4);
-    SDL_RenderCopy(m_Renderer, m_Texture, NULL, NULL);
+    SDL_UpdateTexture(m_Texture, nullptr, buffer.data(), GAMEBOY_WIDTH * 4);
+    SDL_RenderCopy(m_Renderer, m_Texture, nullptr, nullptr);
     SDL_RenderPresent(m_Renderer);
 }

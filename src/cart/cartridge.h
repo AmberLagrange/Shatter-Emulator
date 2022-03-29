@@ -2,6 +2,7 @@
 
 #include "core.h"
 
+#include <array>
 #include <vector>
 
 class Cartridge
@@ -13,11 +14,12 @@ class Cartridge
         void load(const char* path);
         void swapBank(u8 bankNumber);
 
-        u8 read(u16 address) const;
+        [[nodiscard]]
+        auto read(u16 address) const -> u8;
 
     private:
         std::vector<u8> contents;
 
-        u8 m_Rom0[0x4000];
-        u8 m_Rom1[0x4000];
+        std::array<u8, 0x4000> m_Rom0 {{}};
+        std::array<u8, 0x4000> m_Rom1 {{}};
 };

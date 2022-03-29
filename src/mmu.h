@@ -2,6 +2,8 @@
 
 #include "core.h"
 
+#include <array>
+
 #include "cart/cartridge.h"
 
 class Gameboy;
@@ -13,7 +15,8 @@ class MMU
 
         void load(const char* path);
 
-        u8 read(u16 address) const;
+        [[nodiscard]]
+        auto read(u16 address) const -> u8;
         void write(u16 address, u8 val);
     private:
         void reset();
@@ -22,5 +25,5 @@ class MMU
         Gameboy& m_Gameboy;
         Cartridge m_Rom;
 
-        u8 m_Memory[0x8000] = {};
+        std::array<u8, 0x8000> m_Memory {{}};
 };

@@ -13,29 +13,30 @@
 #include "gameboy.h"
 #include "video/screen.h"
 
-bool optionExists(char** begin, char** end, const std::string option)
+auto optionExists(char** begin, char** end, const std::string& option) -> bool
 {
     return std::find(begin, end, option) != end;
 }
 
-int main(int argc, char** argv)
+[[noreturn]]
+auto main(int argc, char** argv) -> int
 {
     if(argc < 2)
     {
         ERROR("No file provided!");
-        return -1;
+        _Exit(-1);
     }
 
     if(!std::filesystem::exists(argv[1]))
     {
         ERROR("File '" << argv[1] << "' not found!");
-        return -2;
+        _Exit(-2);
     }
 
     if(std::filesystem::is_directory(argv[1]))
     {
         ERROR("'" << argv[1] << "' is a directory!");
-        return -3;
+        _Exit(-3);
     }
 
     if(optionExists(argv, argv + argc, "-l"))

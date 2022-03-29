@@ -10,7 +10,7 @@ class Timer
         Timer(Gameboy& gb);
 
         void update(u8 cycles);
-        inline void resetDiv() { m_DIV = 0; }
+        inline void resetDiv() { m_DIV = 0; m_TIMA = 0; }
 
         inline void setSpeed(u32 speed) { m_Speed = speed; }
     private:

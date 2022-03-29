@@ -85,7 +85,7 @@ class Logger : std::ostream
             }
         }
 
-        ~Logger()
+        ~Logger() override
         {
             if(m_Open)
             {
@@ -94,7 +94,7 @@ class Logger : std::ostream
         }
 
         template <class T>
-        Logger& operator<<(const T& msg)
+        auto operator<<(const T& msg) -> Logger&
         {
             if(m_Open)
             {
@@ -104,7 +104,7 @@ class Logger : std::ostream
             return *this;
         }
 
-        Logger& operator<<(std::ostream& (*manip)(std::ostream&))
+        auto operator<<(std::ostream& (*manip)(std::ostream&)) -> Logger&
         {
             if(m_Open)
             {

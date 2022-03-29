@@ -13,7 +13,7 @@ void Timer::update(u8 cycles)
     if(GET_BIT(m_Gameboy.read(TAC_REGISTER), 2)) // Check if the timer is enabled
     {
         m_TIMA += cycles;
-        while(m_TIMA >= CLOCK_SPEED / m_Speed)
+        while(m_TIMA >= m_Speed)
         {
             m_TIMA -= m_Speed;
 
@@ -27,6 +27,7 @@ void Timer::update(u8 cycles)
                 m_Gameboy.write(TIMA_REGISTER, m_Gameboy.read(TIMA_REGISTER) + 1);
             }
         }
+        
     }
 
     if(m_DIV >= 0x0100)

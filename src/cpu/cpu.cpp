@@ -14,11 +14,9 @@ CPU::CPU(Gameboy& gb)
     reset();
 }
 
-u8 CPU::tick()
+auto CPU::tick() -> u8
 {
     u8 cycles = 0;
-    handleInterrupts(cycles);
-
     if(m_Halted) return 4; // Halted CPU takes 4 ticks
 
     Instruction instruction;
@@ -134,4 +132,7 @@ void CPU::reset()
     m_IME = false;
     m_Halted = false;
     m_Branched = false;
+
+    m_Gameboy.resetDiv();
+    m_Gameboy.write(TIMA_REGISTER, 0);
 }
