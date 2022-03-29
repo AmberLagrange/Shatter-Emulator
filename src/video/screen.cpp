@@ -1,5 +1,5 @@
-#include "screen.h"
-#include "gameboy.h"
+#include "screen.hpp"
+#include "gameboy.hpp"
 
 void Screen::init()
 {

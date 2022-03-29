@@ -1,8 +1,8 @@
-#include "cartridge.h"
+#include "cartridge.hpp"
 
 #include <algorithm>
-#include <fstream>
 #include <filesystem>
+#include <fstream>
 #include <iterator>
 
 Cartridge::Cartridge(const char* path)
@@ -15,17 +15,17 @@ void Cartridge::load(const char* path)
     std::ifstream in(path, std::ios::binary);
     contents.assign((std::istreambuf_iterator<char>(in)), {});
 
-    std::copy_n(contents.begin(), 0x4000, m_Rom0.begin());
+    std::copy_n(contents.begin(), BANK_SIZE, m_Rom0.begin());
     swapBank(1);
 }
 
 void Cartridge::swapBank(u8 bankNumber)
 {
     //bankNumber %= (contents.size() / 0x8000);
-    std::copy_n(contents.begin() + (0x4000 * bankNumber), 0x4000, m_Rom1.begin());
+    std::copy_n(contents.begin() + (BANK_SIZE * bankNumber), BANK_SIZE, m_Rom1.begin());
 }
 
 auto Cartridge::read(u16 address) const -> u8
 {
-    return (address < 0x4000) ? m_Rom0[address] : m_Rom1[address - 0x4000];
+    return (address < BANK_SIZE) ? m_Rom0.at(address) : m_Rom1.at(address - BANK_SIZE);
 }

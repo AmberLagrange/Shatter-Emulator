@@ -1,5 +1,5 @@
-#include "mmu.h"
-#include "gameboy.h"
+#include "mmu.hpp"
+#include "gameboy.hpp"
 
 MMU::MMU(Gameboy& gb)
     : m_Gameboy(gb)
@@ -14,91 +14,88 @@ void MMU::load(const char* path)
 
 auto MMU::read(u16 address) const -> u8
 {
-    if(address < 0x8000) // ROM
+    if(address < ROM_ADDR)
     {
         return m_Rom.read(address);
     }
-    else if(address < 0xA000) //VRAM
+    else if(address < VRAM_ADDR)
     {
-        return m_Memory[address - 0x8000];
+        return m_Memory.at(address - ROM_SIZE);
     }
-    else if(address < 0xC000) // RAM Bank
+    else if(address < RAM_BANK_ADDR)
     {
-        return m_Memory[address - 0x8000];
+        return m_Memory.at(address - ROM_SIZE);
     }
-    else if(address < 0xE000) // Internal RAM
+    else if(address < INTERNAL_RAM_ADDR)
     {
-        return m_Memory[address - 0x8000];
+        return m_Memory.at(address - ROM_SIZE);
     }
-    else if(address < 0xFE00) // Echo of Internal RAM
+    else if(address < ECHO_RAM_ADDR)
     {
-        return m_Memory[address - 0x8000 - 0x2000]; // Map back into RAM
+        return m_Memory.at(address - ROM_SIZE - INTERNAL_RAM_SIZE); // Map back into RAM
     }
-    else if(address < 0xFEA0) // OAM
+    else if(address < OAM_ADDR)
     {
-        return m_Memory[address - 0x8000];
+        return m_Memory.at(address - ROM_SIZE);
     }
-    else if(address < 0xFF00) // Unusable
+    else if(address < UNUSABLE_ADDR)
     {
-        return 0xFF;
+        return UINT8_MAX;
     }
-    else if(address < 0xFF80) // IO
+    else if(address < IO_ADDR)
     {
-        return m_Memory[address - 0x8000];
+        return m_Memory.at(address - ROM_SIZE);
     }
     else
     {
-        return m_Memory[address - 0x8000];
+        return m_Memory.at(address - ROM_SIZE);
     }
 
-    return 0xFF;
+    return UINT8_MAX;
 }
 
 void MMU::write(u16 address, u8 val)
 {
-    if(address < 0x8000) // ROM
+    if(address < ROM_ADDR)
     {
-        if(address < 0x4000) // ROM Bank Swapping
+        if(address < BANK_SIZE) // ROM Bank Swapping
         {
-            m_Rom.swapBank(val & 0x1F);
+            m_Rom.swapBank(val & 0x1F); //NOLINT(cppcoreguidelines-avoid-magic-numbers)
         }
     }
-    else if(address < 0xA000) //VRAM
+    else if(address < VRAM_ADDR)
     {
-        m_Memory[address - 0x8000] = val;
+        m_Memory.at(address - ROM_SIZE) = val;
     }
-    else if(address < 0xC000) // RAM Bank
+    else if(address < RAM_BANK_ADDR)
     {
-        m_Memory[address - 0x8000] = val;
+        m_Memory.at(address - ROM_SIZE) = val;
     }
-    else if(address < 0xE000) // Internal RAM
+    else if(address < INTERNAL_RAM_ADDR)
     {
-        m_Memory[address - 0x8000] = val;
+        m_Memory.at(address - ROM_SIZE) = val;
     }
-    else if(address < 0xFE00) // Echo of Internal RAM
+    else if(address < ECHO_RAM_ADDR)
     {
-        m_Memory[address - 0x8000 - 0x2000] = val; // Map back into RAM
+        m_Memory.at(address - ROM_SIZE - INTERNAL_RAM_SIZE) = val; // Map back into RAM
     }
-    else if(address < 0xFEA0) // OAM
+    else if(address < OAM_ADDR)
     {
-        m_Memory[address - 0x8000] = val;
+        m_Memory.at(address - ROM_SIZE) = val;
     }
-    else if(address < 0xFF00) // Unusable
+    else if(address < UNUSABLE_ADDR)
     {
         
     }
-    else if(address < 0xFF80) // IO
+    else if(address < IO_ADDR)
     {
         switch(address)
         {
-            case 0xFF01:
-                std::cout << val;
-                break;
             case DIV_REGISTER:
                 m_Gameboy.resetDiv();
                 break;
             case TAC_REGISTER:
-                m_Memory[address - 0x8000] = val;
+                m_Memory.at(address - ROM_SIZE) = val;
                 switch(val & 0x03)
                 {
                     case 0b00:
@@ -118,11 +115,11 @@ void MMU::write(u16 address, u8 val)
                 }
                 break;
             default:
-                m_Memory[address - 0x8000] = val;
+                m_Memory.at(address - ROM_SIZE) = val;
         }
     }
     else
     {
-        m_Memory[address - 0x8000] = val;
+        m_Memory.at(address - ROM_SIZE) = val;
     }
 }

@@ -1,4 +1,6 @@
-#include "core.h"
+#include "core.hpp"
+
+#include <span>
 
 #include <algorithm>
 #include <string>
@@ -9,43 +11,46 @@
 #include <chrono>
 #include <thread>
 
-#include "scheduler.h"
-#include "gameboy.h"
-#include "video/screen.h"
+#include "scheduler.hpp"
+#include "gameboy.hpp"
+#include "video/screen.hpp"
 
-auto optionExists(char** begin, char** end, const std::string& option) -> bool
+auto optionExists(const std::span<char*>& args, const std::string& option) -> bool
 {
-    return std::find(begin, end, option) != end;
+    return std::find(args.begin(), args.end(), option) != args.end();
 }
 
 [[noreturn]]
 auto main(int argc, char** argv) -> int
 {
+    Logger::setDefaultStream(std::cout);
     if(argc < 2)
     {
         ERROR("No file provided!");
         _Exit(-1);
     }
 
-    if(!std::filesystem::exists(argv[1]))
+    auto args = std::span(argv, size_t(argc));
+
+    if(!std::filesystem::exists(args[1]))
     {
-        ERROR("File '" << argv[1] << "' not found!");
+        ERROR("File '" << args[1] << "' not found!");
         _Exit(-2);
     }
 
-    if(std::filesystem::is_directory(argv[1]))
+    if(std::filesystem::is_directory(args[1]))
     {
-        ERROR("'" << argv[1] << "' is a directory!");
+        ERROR("'" << args[1] << "' is a directory!");
         _Exit(-3);
     }
 
-    if(optionExists(argv, argv + argc, "-l"))
+    if(optionExists(args, "-l"))
     {
         std::ofstream file("./logs/log.log");
         Logger::setDefaultStream(file);
     }
 
-    if(optionExists(argv, argv + argc, "-v") || optionExists(argv, argv + argc, "--verbose"))
+    if(optionExists(args, "-v") || optionExists(args, "--verbose"))
     {
         ENABLE_OP_LOGGING();
     }
@@ -54,7 +59,7 @@ auto main(int argc, char** argv) -> int
 
     Scheduler s;
 
-    s.addGameboy(argv[1]);
+    s.addGameboy(args[1]);
     s.start();
 
     while(s.run()) {}

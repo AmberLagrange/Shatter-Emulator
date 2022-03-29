@@ -1,4 +1,4 @@
-#include "logger.h"
+#include "logger.hpp"
 
 #ifdef NDEBUG
     LogLevel Logger::s_LogLevel = LogLevel::Warn;
@@ -7,4 +7,4 @@
 #endif
 
 bool Logger::s_OpcodeLogging = false;
-std::ostream* Logger::s_DefaultStream = &std::cout;
+std::ostream* Logger::s_DefaultStream = nullptr;

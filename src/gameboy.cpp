@@ -1,4 +1,4 @@
-#include "gameboy.h"
+#include "gameboy.hpp"
 
 Gameboy::Gameboy()
     :   m_APU(*this), m_CPU(*this), m_MMU(*this), m_PPU(*this),

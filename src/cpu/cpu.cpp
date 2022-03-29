@@ -1,14 +1,14 @@
-#include "cpu.h"
-#include "gameboy.h"
+#include "cpu.hpp"
+#include "gameboy.hpp"
 
 #ifndef NDEBUG
-    #define LOG_OP() OPCODE(instruction.mnemonic);
+    #define LOG_OP() OPCODE(instruction.mnemonic) //NOLINT(cppcoreguidelines-macro-usage)
 #else
-    #define LOG_OP() ((void)0)
+    #define LOG_OP() ((void)0) //NOLINT(cppcoreguidelines-macro-usage)
 #endif
 
 CPU::CPU(Gameboy& gb)
-    : m_Gameboy(gb)
+    : m_Registers({}), m_Gameboy(gb), m_Halted(false), m_IME(false), m_Branched(false)
 {
     DEBUG("Initializing CPU!");
     reset();
@@ -20,19 +20,19 @@ auto CPU::tick() -> u8
     if(m_Halted) return 4; // Halted CPU takes 4 ticks
 
     Instruction instruction;
-    u8 opcode = m_Gameboy.read(m_Registers.PC++);
+    u8 opcode = m_Gameboy.read(m_Registers.PC()++);
 
-    if(opcode == 0xCB)
+    if(opcode == CB_OPCODE)
     {
-        opcode = m_Gameboy.read(m_Registers.PC++);
-        instruction = instructionsCB[opcode];
+        opcode = m_Gameboy.read(m_Registers.PC()++);
+        instruction = instructionsCB.at(opcode);
         cycles += 4; // Add 4 cycles due to the CB prefix
 
         ASSERT(instruction.op, "Opcode CB 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(opcode) << ": " << instruction.mnemonic);
     }
     else
     {
-        instruction = instructions[opcode];
+        instruction = instructions.at(opcode);
         ASSERT(instruction.op, "Opcode 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(opcode) << ": " << instruction.mnemonic);
     }
     
@@ -68,37 +68,38 @@ void CPU::handleInterrupts(u8& cycles)
     {
         if(m_IME)
         {
-            pushStack(m_Registers.PC);
+            pushStack(m_Registers.PC());
 
             if(enabledFlags & Flags::Interrupt::VBlank)
             {
                 flags &= ~Flags::Interrupt::VBlank;
-                m_Registers.PC = 0x0040;
+                m_Registers.PC() = VBLANK_VECTOR;
             }
             else if(enabledFlags & Flags::Interrupt::LCD_STAT)
             {
                 flags &= ~Flags::Interrupt::LCD_STAT;
-                m_Registers.PC = 0x0048;
+                m_Registers.PC() = LCD_STAT_VECTOR;
             }
             else if(enabledFlags & Flags::Interrupt::Timer)
             {
                 flags &= ~Flags::Interrupt::Timer;
-                m_Registers.PC = 0x0050;
+                m_Registers.PC() = TIMER_VECTOR;
             }
             else if(enabledFlags & Flags::Interrupt::Serial)
             {
                 flags &= ~Flags::Interrupt::Serial;
-                m_Registers.PC = 0x0058;
+                m_Registers.PC() = SERIAL_VECTOR;
             }
             else if(enabledFlags & Flags::Interrupt::Joypad)
             {
                 flags &= ~Flags::Interrupt::Joypad;
-                m_Registers.PC = 0x0060;
+                m_Registers.PC() = JOYPAD_VECTOR;
             }
             
             m_IME = false;
             m_Gameboy.write(IF_REGISTER, flags);
-            cycles += 20;
+            // TODO: Have more accurate cycle updating
+            cycles += 20; //NOLINT(cppcoreguidelines-avoid-magic-numbers)
         }
         else if(m_Halted)
         {
@@ -111,28 +112,414 @@ void CPU::reset()
 {
     DEBUG("CPU Reset sequence:");
 
-    m_Registers.AF = 0x01B0;
-    DEBUG("\tAF Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.AF);
+    m_Registers.AF() = AF_RESET;
+    DEBUG("\tAF Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.AF());
 
-    m_Registers.BC = 0x0013;
-    DEBUG("\tBC Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.BC);
+    m_Registers.BC() = BC_RESET;
+    DEBUG("\tBC Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.BC());
 
-    m_Registers.DE = 0x00D8;
-    DEBUG("\tDE Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.DE);
+    m_Registers.DE() = DE_RESET;
+    DEBUG("\tDE Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.DE());
 
-    m_Registers.HL = 0x014D;
-    DEBUG("\tHL Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.HL);
+    m_Registers.HL() = HL_RESET;
+    DEBUG("\tHL Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.HL());
 
-    m_Registers.SP = 0xFFFE;
-    DEBUG("\tSP Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.SP);
+    m_Registers.SP() = SP_RESET;
+    DEBUG("\tSP Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.SP());
 
-    m_Registers.PC = 0x0100;
-    DEBUG("\tPC Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.PC);
+    m_Registers.PC() = PC_RESET;
+    DEBUG("\tPC Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.PC());
 
-    m_IME = false;
     m_Halted = false;
+    m_IME = false;
     m_Branched = false;
 
     m_Gameboy.resetDiv();
     m_Gameboy.write(TIMA_REGISTER, 0);
+}
+
+//--------------------------------------Registers--------------------------------------//
+
+auto CPU::Registers::A() -> u8&
+{
+    try
+    {
+        return std::get<std::array<u8, 2>>(this->af).at(0);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        u16 af = std::get<u16>(this->af);
+        u8   a = static_cast<u8>(af >> CHAR_BIT);
+        u8   f = static_cast<u8>(af & UINT8_MAX);
+        this->af = std::array<u8, 2> {a, f};
+        return std::get<std::array<u8, 2>>(this->af).at(0);
+    }
+}
+
+auto CPU::Registers::F() -> u8&
+{
+    try
+    {
+        return std::get<std::array<u8, 2>>(this->af).at(1);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        u16 af = std::get<u16>(this->af);
+        u8   a = static_cast<u8>(af >> CHAR_BIT);
+        u8   f = static_cast<u8>(af & UINT8_MAX);
+        this->af = std::array<u8, 2> {a, f};
+        return std::get<std::array<u8, 2>>(this->af).at(1);
+    }
+}
+
+auto CPU::Registers::AF() -> u16&
+{
+    try
+    {
+        return std::get<u16>(this->af);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        std::array<u8, 2>& af = std::get<std::array<u8, 2>>(this->af);
+        u16 a = static_cast<u16>(af.at(0) << CHAR_BIT);
+        u16 f = static_cast<u16>(af.at(1)            );
+        this->af = static_cast<u16>(a | f);
+        return std::get<u16>(this->af);
+    }
+}
+
+auto CPU::Registers::A() const -> u8
+{
+    try
+    {
+        return std::get<std::array<u8, 2>>(this->af).at(0);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        u16 af = std::get<u16>(this->af);
+        u8   a = static_cast<u8>(af >> CHAR_BIT);
+        u8   f = static_cast<u8>(af & UINT8_MAX);
+        this->af = std::array<u8, 2> {a, f};
+        return std::get<std::array<u8, 2>>(this->af).at(0);
+    }
+}
+
+auto CPU::Registers::F() const -> u8
+{
+    try
+    {
+        return std::get<std::array<u8, 2>>(this->af).at(1);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        u16 af = std::get<u16>(this->af);
+        u8   a = static_cast<u8>(af >> CHAR_BIT);
+        u8   f = static_cast<u8>(af & UINT8_MAX);
+        this->af = std::array<u8, 2> {a, f};
+        return std::get<std::array<u8, 2>>(this->af).at(1);
+    }
+}
+
+auto CPU::Registers::AF() const -> u16
+{
+    try
+    {
+        return std::get<u16>(this->af);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        std::array<u8, 2>& af = std::get<std::array<u8, 2>>(this->af);
+        u16 a = static_cast<u16>(af.at(0) << CHAR_BIT);
+        u16 f = static_cast<u16>(af.at(1)             );
+        this->af = static_cast<u16>(a | f);
+        return std::get<u16>(this->af);
+    }
+}
+
+auto CPU::Registers::B() -> u8&
+{
+    try
+    {
+        return std::get<std::array<u8, 2>>(this->bc).at(0);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        u16 bc = std::get<u16>(this->bc);
+        u8   b = static_cast<u8>(bc >> CHAR_BIT);
+        u8   c = static_cast<u8>(bc & UINT8_MAX);
+        this->bc = std::array<u8, 2> {b, c};
+        return std::get<std::array<u8, 2>>(this->bc).at(0);
+    }
+}
+
+auto CPU::Registers::C() -> u8&
+{
+    try
+    {
+        return std::get<std::array<u8, 2>>(this->bc).at(1);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        u16 bc = std::get<u16>(this->bc);
+        u8   b = static_cast<u8>(bc >> CHAR_BIT);
+        u8   c = static_cast<u8>(bc & UINT8_MAX);
+        this->bc = std::array<u8, 2> {b, c};
+        return std::get<std::array<u8, 2>>(this->bc).at(1);
+    }
+}
+
+auto CPU::Registers::BC() -> u16&
+{
+    try
+    {
+        return std::get<u16>(this->bc);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        std::array<u8, 2>& bc = std::get<std::array<u8, 2>>(this->bc);
+        u16 b = static_cast<u16>(bc.at(0) << CHAR_BIT);
+        u16 c = static_cast<u16>(bc.at(1)            );
+        this->bc = static_cast<u16>(b | c);
+        return std::get<u16>(this->bc);
+    }
+}
+
+auto CPU::Registers::B() const -> u8
+{
+    try
+    {
+        return std::get<std::array<u8, 2>>(this->bc).at(0);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        u16 bc = std::get<u16>(this->bc);
+        u8   b = static_cast<u8>(bc >> CHAR_BIT);
+        u8   c = static_cast<u8>(bc & UINT8_MAX);
+        this->bc = std::array<u8, 2> {b, c};
+        return std::get<std::array<u8, 2>>(this->bc).at(0);
+    }
+}
+
+auto CPU::Registers::C() const -> u8
+{
+    try
+    {
+        return std::get<std::array<u8, 2>>(this->bc).at(1);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        u16 bc = std::get<u16>(this->bc);
+        u8   b = static_cast<u8>(bc >> CHAR_BIT);
+        u8   c = static_cast<u8>(bc & UINT8_MAX);
+        this->bc = std::array<u8, 2> {b, c};
+        return std::get<std::array<u8, 2>>(this->bc).at(1);
+    }
+}
+
+auto CPU::Registers::BC() const -> u16
+{
+    try
+    {
+        return std::get<u16>(this->bc);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        std::array<u8, 2>& bc = std::get<std::array<u8, 2>>(this->bc);
+        u16 b = static_cast<u16>(bc.at(0) << CHAR_BIT);
+        u16 c = static_cast<u16>(bc.at(1)            );
+        this->bc = static_cast<u16>(b | c);
+        return std::get<u16>(this->bc);
+    }
+}
+
+auto CPU::Registers::D() -> u8&
+{
+    try
+    {
+        return std::get<std::array<u8, 2>>(this->de).at(0);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        u16 de = std::get<u16>(this->de);
+        u8   d = static_cast<u8>(de >> CHAR_BIT);
+        u8   e = static_cast<u8>(de & UINT8_MAX);
+        this->de = std::array<u8, 2> {d, e};
+        return std::get<std::array<u8, 2>>(this->de).at(0);
+    }
+}
+
+auto CPU::Registers::E() -> u8&
+{
+    try
+    {
+        return std::get<std::array<u8, 2>>(this->de).at(1);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        u16 de = std::get<u16>(this->de);
+        u8   d = static_cast<u8>(de >> CHAR_BIT);
+        u8   e = static_cast<u8>(de & UINT8_MAX);
+        this->de = std::array<u8, 2> {d, e};
+        return std::get<std::array<u8, 2>>(this->de).at(1);
+    }
+}
+
+auto CPU::Registers::DE() -> u16&
+{
+    try
+    {
+        return std::get<u16>(this->de);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        std::array<u8, 2>& de = std::get<std::array<u8, 2>>(this->de);
+        u16 d = static_cast<u16>(de.at(0) << CHAR_BIT);
+        u16 e = static_cast<u16>(de.at(1)            );
+        this->de = static_cast<u16>(d | e);
+        return std::get<u16>(this->de);
+    }
+}
+
+auto CPU::Registers::D() const -> u8
+{
+    try
+    {
+        return std::get<std::array<u8, 2>>(this->de).at(0);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        u16 de = std::get<u16>(this->de);
+        u8   d = static_cast<u8>(de >> CHAR_BIT);
+        u8   e = static_cast<u8>(de & UINT8_MAX);
+        this->de = std::array<u8, 2> {d, e};
+        return std::get<std::array<u8, 2>>(this->de).at(0);
+    }
+}
+
+auto CPU::Registers::E() const -> u8
+{
+    try
+    {
+        return std::get<std::array<u8, 2>>(this->de).at(1);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        u16 de = std::get<u16>(this->de);
+        u8   d = static_cast<u8>(de >> CHAR_BIT);
+        u8   e = static_cast<u8>(de & UINT8_MAX);
+        this->de = std::array<u8, 2> {d, e};
+        return std::get<std::array<u8, 2>>(this->de).at(1);
+    }
+}
+
+auto CPU::Registers::DE() const -> u16
+{
+    try
+    {
+        return std::get<u16>(this->de);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        std::array<u8, 2>& de = std::get<std::array<u8, 2>>(this->de);
+        u16 d = static_cast<u16>(de.at(0) << CHAR_BIT);
+        u16 e = static_cast<u16>(de.at(1)            );
+        this->de = static_cast<u16>(d | e);
+        return std::get<u16>(this->de);
+    }
+}
+
+auto CPU::Registers::H() -> u8&
+{
+    try
+    {
+        return std::get<std::array<u8, 2>>(this->hl).at(0);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        u16 hl = std::get<u16>(this->hl);
+        u8   h = static_cast<u8>(hl >> CHAR_BIT);
+        u8   l = static_cast<u8>(hl & UINT8_MAX);
+        this->hl = std::array<u8, 2> {h, l};
+        return std::get<std::array<u8, 2>>(this->hl).at(0);
+    }
+}
+
+auto CPU::Registers::L() -> u8&
+{
+    try
+    {
+        return std::get<std::array<u8, 2>>(this->hl).at(1);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        u16 hl = std::get<u16>(this->hl);
+        u8   h = static_cast<u8>(hl >> CHAR_BIT);
+        u8   l = static_cast<u8>(hl & UINT8_MAX);
+        this->hl = std::array<u8, 2> {h, l};
+        return std::get<std::array<u8, 2>>(this->hl).at(1);
+    }
+}
+
+auto CPU::Registers::HL() -> u16&
+{
+    try
+    {
+        return std::get<u16>(this->hl);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        std::array<u8, 2>& hl = std::get<std::array<u8, 2>>(this->hl);
+        u16 h = static_cast<u16>(hl.at(0) << CHAR_BIT);
+        u16 l = static_cast<u16>(hl.at(1)            );
+        this->hl = static_cast<u16>(h | l);
+        return std::get<u16>(this->hl);
+    }
+}
+
+auto CPU::Registers::H() const -> u8
+{
+    try
+    {
+        return std::get<std::array<u8, 2>>(this->hl).at(0);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        u16 hl = std::get<u16>(this->hl);
+        u8   h = static_cast<u8>(hl >> CHAR_BIT);
+        u8   l = static_cast<u8>(hl & UINT8_MAX);
+        this->hl = std::array<u8, 2> {h, l};
+        return std::get<std::array<u8, 2>>(this->hl).at(0);
+    }
+}
+
+auto CPU::Registers::L() const -> u8
+{
+    try
+    {
+        return std::get<std::array<u8, 2>>(this->hl).at(1);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        u16 hl = std::get<u16>(this->hl);
+        u8   h = static_cast<u8>(hl >> CHAR_BIT);
+        u8   l = static_cast<u8>(hl & UINT8_MAX);
+        this->hl = std::array<u8, 2> {h, l};
+        return std::get<std::array<u8, 2>>(this->hl).at(1);
+    }
+}
+
+auto CPU::Registers::HL() const -> u16
+{
+    try
+    {
+        return std::get<u16>(this->hl);
+    }
+    catch(std::bad_variant_access ex)
+    {
+        std::array<u8, 2>& hl = std::get<std::array<u8, 2>>(this->hl);
+        u16 h = static_cast<u16>(hl.at(0) << CHAR_BIT);
+        u16 l = static_cast<u16>(hl.at(1)            );
+        this->hl = static_cast<u16>(h | l);
+        return std::get<u16>(this->hl);
+    }
 }

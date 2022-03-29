@@ -1,7 +1,7 @@
-#include "timer.h"
+#include "timer.hpp"
 
-#include "gameboy.h"
-#include "flags.h"
+#include "gameboy.hpp"
+#include "flags.hpp"
 
 Timer::Timer(Gameboy& gb)
     : m_Gameboy(gb), m_DIV(0), m_TIMA(0), m_Speed(TIMER_SPEED_00) {}
@@ -17,7 +17,7 @@ void Timer::update(u8 cycles)
         {
             m_TIMA -= m_Speed;
 
-            if(m_Gameboy.read(TIMA_REGISTER) == 0xFF)
+            if(m_Gameboy.read(TIMA_REGISTER) == UINT8_MAX)
             {
                 m_Gameboy.write(TIMA_REGISTER, m_Gameboy.read(TMA_REGISTER));
                 m_Gameboy.raiseInterrupt(Flags::Interrupt::Timer);

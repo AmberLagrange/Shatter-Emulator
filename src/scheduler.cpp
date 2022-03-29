@@ -1,4 +1,4 @@
-#include "scheduler.h"
+#include "scheduler.hpp"
 
 #include <SDL2/SDL.h>
 

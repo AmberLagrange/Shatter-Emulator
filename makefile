@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 
 #App name
-EXE ?= shatter.exe
+EXE ?= shatter
 
 #Executables
 RM 		:= rm
@@ -14,8 +14,8 @@ OBJDIR  ?= ./obj
 BUILDIR ?= ./build
 
 #Compiler and flags
-CXXFLAGS ?= -Wall -Wextra -Werror
-CXXFLAGS += $(INCDIR:%=-iquote %) -MMD -MP -std=c++17 -DEXE_NAME=\"$(EXE)\"
+CXXFLAGS ?= -Wall -Wextra -Werror -pedantic-errors
+CXXFLAGS += $(INCDIR:%=-iquote %) -MMD -MP -std=c++20 -DEXE_NAME=\"$(EXE)\"
 
 #Libraries
 LDLIBS  := -lSDL2 -lSDL2main

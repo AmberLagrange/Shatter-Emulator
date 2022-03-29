@@ -1,4 +1,4 @@
-#include "apu.h"
+#include "apu.hpp"
 
 APU::APU(Gameboy& gb)
     : m_Gameboy(gb)
