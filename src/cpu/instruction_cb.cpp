@@ -1,5 +1,6 @@
 #include "instruction.hpp"
 #include "cpu.hpp"
+
 #include "gameboy.hpp"
 
 #include "logging/opcode_log.hpp"

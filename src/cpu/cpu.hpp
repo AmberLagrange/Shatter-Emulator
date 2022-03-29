@@ -4,9 +4,10 @@
 
 #include <array>
 
-#include "flags.hpp"
 #include "instruction.hpp"
 #include "registers.hpp"
+
+#include "flags.hpp"
 
 class Gameboy;
 

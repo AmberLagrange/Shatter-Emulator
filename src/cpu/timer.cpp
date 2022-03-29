@@ -1,7 +1,8 @@
 #include "timer.hpp"
 
-#include "gameboy.hpp"
 #include "flags.hpp"
+
+#include "gameboy.hpp"
 
 Timer::Timer(Gameboy& gb)
     : m_Gameboy(gb), m_DIV(0), m_TIMA(0), m_Speed(TIMER_SPEED_00) {}
