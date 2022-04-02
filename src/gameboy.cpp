@@ -37,3 +37,48 @@ void Gameboy::stop()
     DEBUG("Stopping Gameboy!");
     m_Running = false;
 }
+
+auto Gameboy::isRunning() const -> bool
+{
+    return m_Running;
+}
+
+auto Gameboy::read(u16 address) const -> u8
+{
+    return m_MMU.read(address);
+}
+
+void Gameboy::write(u16 address, u8 val)
+{
+    m_MMU.write(address, val);
+}
+
+auto Gameboy::getIME() const -> bool
+{
+    return m_CPU.getIME();
+}
+
+void Gameboy::setIME(bool ime)
+{
+    m_CPU.setIME(ime);
+}
+
+void Gameboy::raiseInterrupt(const Flags::Interrupt& flag)
+{
+    m_CPU.raiseInterrupt(flag);
+}
+
+void Gameboy::resetDiv()
+{
+    m_Timer.resetDiv();
+}
+
+void Gameboy::setTimerSpeed(u32 speed)
+{
+    m_Timer.setSpeed(speed);
+}
+
+auto Gameboy::getWindowID() const -> u32
+{
+    return m_Screen.getWindowID();
+}

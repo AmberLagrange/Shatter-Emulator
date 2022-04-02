@@ -50,10 +50,12 @@ auto main(int argc, char** argv) -> int
         Logger::setDefaultStream(file);
     }
 
-    if(optionExists(args, "-v") || optionExists(args, "--verbose"))
-    {
-        ENABLE_OP_LOGGING();
-    }
+    #ifndef NDEBUG
+        if(optionExists(args, "-v") || optionExists(args, "--verbose"))
+        {
+            ENABLE_OP_LOGGING();
+        }
+    #endif
 
     Screen::init();
 

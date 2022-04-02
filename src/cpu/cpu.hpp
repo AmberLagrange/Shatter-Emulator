@@ -16,26 +16,63 @@ class CPU
     public:
         CPU(Gameboy& gb);
 
+        /**
+         * @brief Interrupt Master Enable (IME) Getter
+         * 
+         * @return m_IME
+         */
+        [[nodiscard]] auto getIME() const   -> bool;
+
+        /**
+         * @brief Interrupt Master Enable (IME) Setter
+         * 
+         * @param ime The value to update the IME to
+         */
+        void setIME(bool ime);
+
+        /**
+         * @brief Emulates a single instruction being executed
+         * 
+         * @return The number of cycles the instruction took
+         */
         auto tick() -> u8;
 
-        [[nodiscard]]
-        inline auto getIME() const   -> bool { return m_IME; }
-        inline auto setIME(bool ime) -> bool { return m_IME = ime; }
-
+        /**
+         * @brief Raise an interrupt with a given flag
+         * 
+         * @param flag The interrupt flag to raise
+         */
         void raiseInterrupt(const Flags::Interrupt& flag);
+
+        /**
+         * @brief   
+         * 
+         * @param cycles The  number of cycles the instruction took to execute
+         */
         void handleInterrupts(u8& cycles);
 
     private:
+        /**
+         * @brief Reset the CPU to its startup state
+         * 
+         */
         void reset();
 
-        [[nodiscard]]
-        inline auto isFlagSet(const Flags::Register& flag) const -> bool { return m_Registers.F() & flag; }
-        inline void setFlag(const Flags::Register& flag)                 { m_Registers.F() |= flag; }
-        inline void clearFlag(const Flags::Register& flag)               { m_Registers.F() &= ~flag; }
-        inline void flipFlag(const Flags::Register& flag)                { m_Registers.F() ^= flag; }
+        /**
+         * @brief Check if a given register flag is set
+         * 
+         * @param flag 
+         * @return true 
+         * @return false 
+         */
+        [[nodiscard]] auto isFlagSet(const Flags::Register& flag) const -> bool;
 
-        inline void clearAllFlags()                         { clearFlag(Flags::Register::Zero | Flags::Register::Negative | Flags::Register::HalfCarry | Flags::Register::Carry); }
-        inline void setZeroFromVal(const u8& val)           { if(!val) setFlag(Flags::Register::Zero); }
+        void   setFlag(const Flags::Register& flag);
+        void clearFlag(const Flags::Register& flag);
+        void  flipFlag(const Flags::Register& flag);
+
+        void clearAllFlags();
+        void setZeroFromVal(const u8& val);
 
     private:
         Registers m_Registers;
@@ -62,8 +99,8 @@ class CPU
         void opcodeSBC(const u8& val);
         void opcodeAND(const u8& val);
         void opcodeXOR(const u8& val);
-        void opcodeOR(const u8& val);
-        void opcodeCP(const u8& val);
+        void  opcodeOR(const u8& val);
+        void  opcodeCP(const u8& val);
 
         void opcodeJP(bool condition);
         void opcodeJR(bool condition);

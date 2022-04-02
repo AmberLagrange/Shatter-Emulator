@@ -15,7 +15,7 @@
 
 namespace Flags
 {
-    enum Register
+    enum Register : u8
     {
         Zero        = 0b10000000,
         Negative    = 0b01000000,
@@ -24,7 +24,7 @@ namespace Flags
         FlagNone    = 0b00000000
     };
 
-    enum Interrupt
+    enum Interrupt : u8
     {
         VBlank      = 0b00000001,
         LCD_STAT    = 0b00000010,
@@ -37,64 +37,20 @@ namespace Flags
 
 //--------------------------------------Register Flags--------------------------------------//
 
-inline auto operator|(const Flags::Register& flag1, const Flags::Register& flag2) -> Flags::Register            
-{
-    return static_cast<Flags::Register>(static_cast<u8>(flag1) | static_cast<u8>(flag2));
-}
+auto operator|(const Flags::Register& flag1, const Flags::Register& flag2) -> Flags::Register;
+auto operator&(const Flags::Register& flag1, const Flags::Register& flag2) -> Flags::Register;
+auto operator^(const Flags::Register& flag1, const Flags::Register& flag2) -> Flags::Register;
 
-inline auto operator|=(Flags::Register& flag1, const Flags::Register& flag2) -> Flags::Register&            
-{
-    return flag1 = static_cast<Flags::Register>(static_cast<u8>(flag1) | static_cast<u8>(flag2));
-}
-
-inline auto operator&(const Flags::Register& flag1, const Flags::Register& flag2) -> Flags::Register            
-{
-    return static_cast<Flags::Register>(static_cast<u8>(flag1) & static_cast<u8>(flag2));
-}
-
-inline auto operator&=(Flags::Register& flag1, const Flags::Register& flag2) -> Flags::Register&            
-{
-    return flag1 = static_cast<Flags::Register>(static_cast<u8>(flag1) & static_cast<u8>(flag2));
-}
-
-inline auto operator^(const Flags::Register& flag1, const Flags::Register& flag2) -> Flags::Register            
-{
-    return static_cast<Flags::Register>(static_cast<u8>(flag1) ^ static_cast<u8>(flag2));
-}
-
-inline auto operator^=(Flags::Register& flag1, const Flags::Register& flag2) -> Flags::Register&            
-{
-    return flag1 = static_cast<Flags::Register>(static_cast<u8>(flag1) ^ static_cast<u8>(flag2));
-}
+auto operator|=(Flags::Register& flag1, const Flags::Register flag2) -> Flags::Register&;
+auto operator&=(Flags::Register& flag1, const Flags::Register flag2) -> Flags::Register&;
+auto operator^=(Flags::Register& flag1, const Flags::Register flag2) -> Flags::Register&;
 
 //--------------------------------------Interrupt Flags--------------------------------------//
 
-inline auto operator|(const Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt            
-{
-    return static_cast<Flags::Interrupt>(static_cast<u8>(flag1) | static_cast<u8>(flag2));
-}
+auto operator|(const Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt;
+auto operator&(const Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt;
+auto operator^(const Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt;
 
-inline auto operator|=(Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt&            
-{
-    return flag1 = static_cast<Flags::Interrupt>(static_cast<u8>(flag1) | static_cast<u8>(flag2));
-}
-
-inline auto operator&(const Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt            
-{
-    return static_cast<Flags::Interrupt>(static_cast<u8>(flag1) & static_cast<u8>(flag2));
-}
-
-inline auto operator&=(Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt&            
-{
-    return flag1 = static_cast<Flags::Interrupt>(static_cast<u8>(flag1) & static_cast<u8>(flag2));
-}
-
-inline auto operator^(const Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt            
-{
-    return static_cast<Flags::Interrupt>(static_cast<u8>(flag1) ^ static_cast<u8>(flag2));
-}
-
-inline auto operator^=(Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt&            
-{
-    return flag1 = static_cast<Flags::Interrupt>(static_cast<u8>(flag1) ^ static_cast<u8>(flag2));
-}
+auto operator|=(Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt&;
+auto operator&=(Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt&;
+auto operator^=(Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt&;

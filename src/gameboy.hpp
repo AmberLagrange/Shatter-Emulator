@@ -24,23 +24,22 @@ class Gameboy
         void tick();
         void stop();
 
-        inline auto isRunning() -> bool { return m_Running; }
+        auto isRunning() const -> bool;
+
+        [[nodiscard]]auto read(u16 address) const -> u8;
+
+        void write(u16 address, u8 val);
+
+        [[nodiscard]] auto getIME() const -> bool;
+        void setIME(bool ime);
+
+        void raiseInterrupt(const Flags::Interrupt& flag);
+
+        void resetDiv();
+        void setTimerSpeed(u32 speed);
 
         [[nodiscard]]
-        inline auto read(u16 address) const -> u8 { return m_MMU.read(address); }
-        inline void write(u16 address, u8 val)    { m_MMU.write(address, val); }
-
-        [[nodiscard]]
-        inline auto getIME() const -> bool { return m_CPU.getIME(); }
-        inline void setIME(bool ime)       { m_CPU.setIME(ime); }
-
-        inline void raiseInterrupt(const Flags::Interrupt& flag) { m_CPU.raiseInterrupt(flag); }
-
-        inline void resetDiv() { m_Timer.resetDiv(); }
-        inline void setTimerSpeed(u32 speed) { m_Timer.setSpeed(speed); }
-
-        [[nodiscard]]
-        inline auto getWindowID() const -> u32 { return m_Screen.getWindowID(); }
+        auto getWindowID() const -> u32;
     private:
         APU m_APU;
         CPU m_CPU;

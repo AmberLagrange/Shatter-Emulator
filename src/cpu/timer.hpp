@@ -16,7 +16,7 @@ class Timer
     private:
         Gameboy& m_Gameboy;
 
-        u32 m_DIV;
+        u16 m_DIV;
         u32 m_TIMA;
         u32 m_Speed;
 };

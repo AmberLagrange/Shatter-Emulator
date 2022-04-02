@@ -2,10 +2,10 @@
 
 #include "gameboy.hpp"
 
-#ifndef NDEBUG
-    #define LOG_OP() OPCODE(instruction.mnemonic) //NOLINT(cppcoreguidelines-macro-usage)
-#else
+#ifdef NDEBUG
     #define LOG_OP() ((void)0) //NOLINT(cppcoreguidelines-macro-usage)
+#else
+    #define LOG_OP() OPCODE(instruction.mnemonic) //NOLINT(cppcoreguidelines-macro-usage)
 #endif
 
 CPU::CPU(Gameboy& gb)
@@ -15,10 +15,20 @@ CPU::CPU(Gameboy& gb)
     reset();
 }
 
+auto CPU::getIME() const -> bool
+{
+    return m_IME;
+}
+
+void CPU::setIME(bool ime)
+{
+    m_IME = ime;
+}
+
 auto CPU::tick() -> u8
 {
     u8 cycles = 0;
-    if(m_Halted) return 4; // Halted CPU takes 4 ticks
+    if(m_Halted) return 4; // Halted CPU takes 4 cycles
 
     Instruction instruction;
     u8 opcode = m_Gameboy.read(m_Registers.PC()++);
@@ -137,4 +147,37 @@ void CPU::reset()
 
     m_Gameboy.resetDiv();
     m_Gameboy.write(TIMA_REGISTER, 0);
+}
+
+auto CPU::isFlagSet(const Flags::Register& flag) const -> bool
+{
+    return m_Registers.F() & flag;
+}
+
+void CPU::setFlag(const Flags::Register& flag)
+{
+    m_Registers.F() |= flag;
+}
+
+void CPU::clearFlag(const Flags::Register& flag)
+{
+    m_Registers.F() &= ~flag;
+}
+
+void CPU::flipFlag(const Flags::Register& flag)
+{
+    m_Registers.F() ^= flag;
+}
+
+void CPU::clearAllFlags()
+{
+    clearFlag(Flags::Register::Zero      |
+              Flags::Register::Negative  |
+              Flags::Register::HalfCarry |
+              Flags::Register::Carry);
+}
+
+void CPU::setZeroFromVal(const u8& val)
+{
+    if(!val) setFlag(Flags::Register::Zero);
 }

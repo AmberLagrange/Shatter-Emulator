@@ -8,7 +8,9 @@
     #define IS_LITTLE_ENDIAN
 #endif
 
-#ifndef NDEBUG
+#ifdef NDEBUG
+    #define ASSERT(x, msg) ((void)0) //NOLINT(cppcoreguidelines-macro-usage)
+#else
     #ifndef EXE_NAME
         #define EXE_NAME "executible" //NOLINT(cppcoreguidelines-macro-usage)
     #endif
@@ -22,8 +24,6 @@
         CRITICAL(msg);                                                      \
         std::abort();                                                       \
     }
-#else
-    #define ASSERT(x, msg) ((void)0) //NOLINT(cppcoreguidelines-macro-usage)
 #endif
 
 #include <cstdint>

@@ -31,9 +31,9 @@ void Timer::update(u8 cycles)
         
     }
 
-    if(m_DIV >= 0x0100)
+    if(m_DIV & 0xFF00)
     {
-        m_DIV -= 0x0100;
+        m_DIV &= 0x00FF;
         m_Gameboy.write(DIV_REGISTER, m_Gameboy.read(DIV_REGISTER) + 1);
     }
 }

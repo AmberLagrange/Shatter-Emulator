@@ -15,8 +15,7 @@ class MMU
 
         void load(const char* path);
 
-        [[nodiscard]]
-        auto read(u16 address) const -> u8;
+        [[nodiscard]] auto read(u16 address) const -> u8;
         void write(u16 address, u8 val);
     private:
         void reset();
