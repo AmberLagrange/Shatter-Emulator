@@ -34,8 +34,6 @@ class Cartridge
         [[nodiscard]] auto read(u16 address) const -> u8;
 
     private:
-        std::vector<u8> contents;
-
-        std::array<u8, BANK_SIZE> m_Rom0 {{}};
-        std::array<u8, BANK_SIZE> m_Rom1 {{}};
+        std::vector<u8> m_Data;
+        u8 m_BankNumber;
 };

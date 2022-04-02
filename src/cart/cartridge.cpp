@@ -13,19 +13,17 @@ Cartridge::Cartridge(const char* path)
 void Cartridge::load(const char* path)
 {
     std::ifstream in(path, std::ios::binary);
-    contents.assign((std::istreambuf_iterator<char>(in)), {});
-
-    std::copy_n(contents.begin(), BANK_SIZE, m_Rom0.begin());
-    swapBank(1);
+    m_Data.assign((std::istreambuf_iterator<char>(in)), {});
+    m_BankNumber = 0;
 }
 
 void Cartridge::swapBank(u8 bankNumber)
 {
-    //bankNumber %= (contents.size() / 0x8000);
-    std::copy_n(contents.begin() + (BANK_SIZE * bankNumber), BANK_SIZE, m_Rom1.begin());
+    // Subtract 1 from the bankNumber to eumlate 0 indexing, as bank 0 will never swap.
+    m_BankNumber = bankNumber - 1;
 }
 
 auto Cartridge::read(u16 address) const -> u8
 {
-    return (address < BANK_SIZE) ? m_Rom0.at(address) : m_Rom1.at(address - BANK_SIZE);
+    return (address < BANK_SIZE) ? m_Data.at(address) : m_Data.at(address + BANK_SIZE * m_BankNumber);
 }
