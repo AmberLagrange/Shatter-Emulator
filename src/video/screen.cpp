@@ -42,6 +42,11 @@ Screen::~Screen()
     SDL_DestroyWindow(m_Window);
 }
 
+auto Screen::getWindowID() const -> u32
+{
+    return static_cast<u32>(SDL_GetWindowID(m_Window));
+}
+
 void Screen::draw(const std::array<u8, FRAME_BUFFER_SIZE>& buffer)
 {
     SDL_UpdateTexture(m_Texture, nullptr, buffer.data(), GAMEBOY_WIDTH * 4);

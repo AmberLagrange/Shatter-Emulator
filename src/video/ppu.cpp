@@ -9,6 +9,11 @@ PPU::PPU(Gameboy& gb)
     temp = 0;
 }
 
+void PPU::setDrawCallback(std::function<void(std::array<u8, FRAME_BUFFER_SIZE> buffer)> callback)
+{
+    m_DrawCallback = callback;
+}
+
 void PPU::tick(u8 cycles)
 {
     temp -= cycles;

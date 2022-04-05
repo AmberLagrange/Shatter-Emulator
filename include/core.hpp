@@ -63,14 +63,14 @@ constexpr u8 TIMER_VECTOR       = 0x50;
 constexpr u8 SERIAL_VECTOR      = 0x58;
 constexpr u8 JOYPAD_VECTOR      = 0x60;
 
-constexpr u8 RST_0x00           = 0x00;
-constexpr u8 RST_0x08           = 0x08;
-constexpr u8 RST_0x10           = 0x10;
-constexpr u8 RST_0x18           = 0x18;
-constexpr u8 RST_0x20           = 0x20;
-constexpr u8 RST_0x28           = 0x28;
-constexpr u8 RST_0x30           = 0x30;
-constexpr u8 RST_0x38           = 0x38;
+constexpr u8 RST_0x00           = 0x0000;
+constexpr u8 RST_0x08           = 0x0008;
+constexpr u8 RST_0x10           = 0x0010;
+constexpr u8 RST_0x18           = 0x0018;
+constexpr u8 RST_0x20           = 0x0020;
+constexpr u8 RST_0x28           = 0x0028;
+constexpr u8 RST_0x30           = 0x0030;
+constexpr u8 RST_0x38           = 0x0038;
 
 //Registers
 constexpr u16 DIV_REGISTER      = 0xFF04;

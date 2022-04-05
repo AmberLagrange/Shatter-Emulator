@@ -37,20 +37,113 @@ namespace Flags
 
 //--------------------------------------Register Flags--------------------------------------//
 
+
+/**
+ * @brief Ors two Register Flags together
+ * 
+ * @param flag1 The first flag
+ * @param flag2 The second flag
+ * @return The or'd result
+ */
 auto operator|(const Flags::Register& flag1, const Flags::Register& flag2) -> Flags::Register;
+
+/**
+ * @brief Ands two Register Flags together
+ * 
+ * @param flag1 The first flag
+ * @param flag2 The second flag
+ * @return The and'd result
+ */
 auto operator&(const Flags::Register& flag1, const Flags::Register& flag2) -> Flags::Register;
+
+/**
+ * @brief Xors two Register Flags together
+ * 
+ * @param flag1 The first flag
+ * @param flag2 The second flag
+ * @return The xor'd result
+ */
 auto operator^(const Flags::Register& flag1, const Flags::Register& flag2) -> Flags::Register;
 
+/**
+ * @brief Ors two Register Flags together and stores the result in the first flag
+ * 
+ * @param flag1 The first flag
+ * @param flag2 The second flag
+ * @return The updated flag
+ */
 auto operator|=(Flags::Register& flag1, const Flags::Register flag2) -> Flags::Register&;
+
+/**
+ * @brief Ands two Register Flags together and stores the result in the first flag
+ * 
+ * @param flag1 The first flag
+ * @param flag2 The second flag
+ * @return The updated flag
+ */
 auto operator&=(Flags::Register& flag1, const Flags::Register flag2) -> Flags::Register&;
+
+/**
+ * @brief Xors two Register Flags together and stores the result in the first flag
+ * 
+ * @param flag1 The first flag
+ * @param flag2 The second flag
+ * @return The updated flag
+ */
 auto operator^=(Flags::Register& flag1, const Flags::Register flag2) -> Flags::Register&;
 
 //--------------------------------------Interrupt Flags--------------------------------------//
 
+/**
+ * @brief Ors two Interrupt Flags together
+ * 
+ * @param flag1 The first flag
+ * @param flag2 The second flag
+ * @return The or'd result
+ */
 auto operator|(const Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt;
+
+/**
+ * @brief Ands two Interrupt Flags together
+ * 
+ * @param flag1 The first flag
+ * @param flag2 The second flag
+ * @return The and'd result
+ */
 auto operator&(const Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt;
+
+/**
+ * @brief Xors two Interrupt Flags together
+ * 
+ * @param flag1 The first flag
+ * @param flag2 The second flag
+ * @return The xor'd result
+ */
 auto operator^(const Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt;
 
+/**
+ * @brief Ors two Interrupt Flags together and stores the result in the first flag
+ * 
+ * @param flag1 The first flag
+ * @param flag2 The second flag
+ * @return The updated flag
+ */
 auto operator|=(Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt&;
+
+/**
+ * @brief Ands two Interrupt Flags together and stores the result in the first flag
+ * 
+ * @param flag1 The first flag
+ * @param flag2 The second flag
+ * @return The updated flag
+ */
 auto operator&=(Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt&;
+
+/**
+ * @brief Xors two Interrupt Flags together and stores the result in the first flag
+ * 
+ * @param flag1 The first flag
+ * @param flag2 The second flag
+ * @return The updated flag
+ */
 auto operator^=(Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt&;

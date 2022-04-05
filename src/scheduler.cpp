@@ -2,6 +2,11 @@
 
 #include <SDL2/SDL.h>
 
+void Scheduler::addGameboy(const char* path)
+{
+    addGameboy(std::make_unique<Gameboy>(path));
+}
+
 void Scheduler::addGameboy(std::unique_ptr<Gameboy> gb)
 {
     m_Gameboys[gb->getWindowID()] = std::move(gb);

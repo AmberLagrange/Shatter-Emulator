@@ -17,10 +17,18 @@ class Screen
         Screen();
         ~Screen();
 
-        [[nodiscard]]
-        inline auto getWindowID() const -> u32 { return static_cast<u32>(SDL_GetWindowID(m_Window)); }
+        /**
+         * @brief Get the SDL Window ID of the screen
+         * 
+         * @return The SDL Window ID 
+         */
+        [[nodiscard]] auto getWindowID() const -> u32;
 
-        void poll();
+        /**
+         * @brief Draws the buffer to the screen
+         * 
+         * @param buffer The buffer to draw
+         */
         void draw(const std::array<u8, FRAME_BUFFER_SIZE>& buffer);
     private:
         SDL_Window*     m_Window;

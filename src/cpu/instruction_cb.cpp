@@ -102,7 +102,7 @@ void CPU::opcodeSRL(u8& reg)
     setZeroFromVal(reg);
 }
 
-void CPU::opcodeBIT(const u8& bit, u8& reg)
+void CPU::opcodeBIT(u8 bit, u8& reg)
 {
     if(GET_BIT(reg, bit)) clearFlag(Flags::Register::Zero);
     else
@@ -112,19 +112,19 @@ void CPU::opcodeBIT(const u8& bit, u8& reg)
     setFlag(Flags::Register::HalfCarry);
 }
 
-void CPU::opcodeRES(const u8& bit, u8& reg)
+void CPU::opcodeRES(u8 bit, u8& reg)
 {
     CLEAR_BIT(reg, bit);
 }
 
-void CPU::opcodeSET(const u8& bit, u8& reg)
+void CPU::opcodeSET(u8 bit, u8& reg)
 {
     SET_BIT(reg, bit);
 }
 
 //HL variants
 
-void CPU::opcodeBIT_HL(const u8& bit)
+void CPU::opcodeBIT_HL(u8 bit)
 {
     u8 val = m_Gameboy.read(m_Registers.HL());
 
@@ -136,7 +136,7 @@ void CPU::opcodeBIT_HL(const u8& bit)
     setFlag(Flags::Register::HalfCarry);
 }
 
-void CPU::opcodeRES_HL(const u8& bit)
+void CPU::opcodeRES_HL(u8 bit)
 {
     u8 val = m_Gameboy.read(m_Registers.HL());
 
@@ -145,7 +145,7 @@ void CPU::opcodeRES_HL(const u8& bit)
     m_Gameboy.write(m_Registers.HL(), val);
 }
 
-void CPU::opcodeSET_HL([[maybe_unused]] const u8& bit)
+void CPU::opcodeSET_HL([[maybe_unused]] u8 bit)
 {
     u8 val = m_Gameboy.read(m_Registers.HL());
 

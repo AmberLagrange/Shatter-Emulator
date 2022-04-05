@@ -53,7 +53,7 @@ auto main(int argc, char** argv) -> int
     #ifndef NDEBUG
         if(optionExists(args, "-v") || optionExists(args, "--verbose"))
         {
-            ENABLE_OP_LOGGING();
+            Logger::enableOpcodeLogging();
         }
     #endif
 

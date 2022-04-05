@@ -7,7 +7,7 @@
 
 //--------------------------------------Opcode Helpers--------------------------------------//
 
-void CPU::pushStack(const u16& val)
+void CPU::pushStack(u16 val)
 {
     m_Registers.SP()--;
     m_Gameboy.write(m_Registers.SP(), static_cast<u8>(val >> CHAR_BIT));
@@ -55,7 +55,7 @@ void CPU::opcodeDEC(u8& reg)
     LOG_FLAGS();
 }
 
-void CPU::opcodeADD(const u8& val)
+void CPU::opcodeADD(u8 val)
 {
     clearAllFlags();
 
@@ -70,7 +70,7 @@ void CPU::opcodeADD(const u8& val)
     LOG_A_REG();
 }
 
-void CPU::opcodeADC(const u8& val)
+void CPU::opcodeADC(u8 val)
 {
     u16 a = static_cast<u16>(m_Registers.A());
     u16 carry = isFlagSet(Flags::Register::Carry);
@@ -88,7 +88,7 @@ void CPU::opcodeADC(const u8& val)
     LOG_A_REG();
 }
 
-void CPU::opcodeSUB(const u8& val)
+void CPU::opcodeSUB(u8 val)
 {
     clearAllFlags();
 
@@ -104,7 +104,7 @@ void CPU::opcodeSUB(const u8& val)
     LOG_A_REG();
 }
 
-void CPU::opcodeSBC(const u8& val)
+void CPU::opcodeSBC(u8 val)
 {
     u16 a = static_cast<u16>(m_Registers.A());
     u16 carry = isFlagSet(Flags::Register::Carry);
@@ -120,7 +120,7 @@ void CPU::opcodeSBC(const u8& val)
     setZeroFromVal(m_Registers.A());
 }
 
-void CPU::opcodeAND(const u8& val)
+void CPU::opcodeAND(u8 val)
 {   
     m_Registers.A() &= val;
 
@@ -132,7 +132,7 @@ void CPU::opcodeAND(const u8& val)
     LOG_A_REG();
 }
 
-void CPU::opcodeXOR(const u8& val)
+void CPU::opcodeXOR(u8 val)
 {
     m_Registers.A() ^= val;
 
@@ -143,7 +143,7 @@ void CPU::opcodeXOR(const u8& val)
     LOG_A_REG();
 }
 
-void CPU::opcodeOR(const u8& val)
+void CPU::opcodeOR(u8 val)
 {
     m_Registers.A() |= val;
 
@@ -154,7 +154,7 @@ void CPU::opcodeOR(const u8& val)
     LOG_A_REG();
 }
 
-void CPU::opcodeCP(const u8& val)
+void CPU::opcodeCP(u8 val)
 {
     clearAllFlags();
     setFlag(Flags::Register::Negative);
@@ -236,17 +236,17 @@ void CPU::opcodeRET(bool condiiton)
     }
 }
 
-void CPU::opcodeRST(const u8& val)
+void CPU::opcodeRST(u16 val)
 {
     pushStack(m_Registers.PC());
-    m_Registers.PC() = static_cast<u16>(val);
+    m_Registers.PC() = val;
 
     LOG_JP();
 }
 
 // 16 bit variants
 
-void CPU::opcodeADD_HL(const u16& val)
+void CPU::opcodeADD_HL(u16 val)
 {
     clearFlag(Flags::Register::Negative | Flags::Register::HalfCarry | Flags::Register::Carry);
     if(m_Registers.HL() > 0xFFFF - val) setFlag(Flags::Register::Carry);

@@ -45,7 +45,7 @@ class CPU
         void raiseInterrupt(const Flags::Interrupt& flag);
 
         /**
-         * @brief   
+         * @brief Handle any interrupts that may have been risen
          * 
          * @param cycles The  number of cycles the instruction took to execute
          */
@@ -61,18 +61,44 @@ class CPU
         /**
          * @brief Check if a given register flag is set
          * 
-         * @param flag 
-         * @return true 
-         * @return false 
+         * @param flag The register flag to check
+         * @return the state of the flag
          */
         [[nodiscard]] auto isFlagSet(const Flags::Register& flag) const -> bool;
 
-        void   setFlag(const Flags::Register& flag);
+        /**
+         * @brief Set a given flag
+         * 
+         * @param flag The register flag to set
+         */
+        void setFlag(const Flags::Register& flag);
+
+        /**
+         * @brief Clear a given flag
+         * 
+         * @param flag The register flag to clear
+         */
         void clearFlag(const Flags::Register& flag);
+
+        /**
+         * @brief Flip a given flag
+         * 
+         * @param flag The given flag to flip
+         */
         void  flipFlag(const Flags::Register& flag);
 
+        /**
+         * @brief Clear all register flags
+         * 
+         */
         void clearAllFlags();
-        void setZeroFromVal(const u8& val);
+
+        /**
+         * @brief Set the Zero flag if val is zero
+         * 
+         * @param val The value to check if zero
+         */
+        void setZeroFromVal(u8 val);
 
     private:
         Registers m_Registers;
@@ -86,58 +112,265 @@ class CPU
     private:
         //--------------------------------------Opcode Helpers--------------------------------------//
 
-        void pushStack(const u16& val);
+        /**
+         * @brief Push a value to the stack
+         * 
+         * @param val The value to push to the stack
+         */
+        void pushStack(u16 val);
+
+        /**
+         * @brief Pop a value from the stack
+         * 
+         * @param reg The value popped from the stack
+         */
         void popStack(u16& reg);
 
+        /**
+         * @brief INC opcode helper function. Increments a given register
+         * 
+         * @param reg The register to increment
+         */
         void opcodeINC(u8& reg);
+
+        /**
+         * @brief DEC opcode helper function. Decrements a given register
+         * 
+         * @param reg The register to decrement
+         */
         void opcodeDEC(u8& reg);
     
+        /**
+         * @brief ADD opcode helper function. Adds to the A register
+         * 
+         * @param val The value to add to A
+         */
+        void opcodeADD(u8 val);
 
-        void opcodeADD(const u8& val);
-        void opcodeADC(const u8& val);
-        void opcodeSUB(const u8& val);
-        void opcodeSBC(const u8& val);
-        void opcodeAND(const u8& val);
-        void opcodeXOR(const u8& val);
-        void  opcodeOR(const u8& val);
-        void  opcodeCP(const u8& val);
+        /**
+         * @brief ADC opcode helper function. Adds with carry to the A register
+         * 
+         * @param val The value to add with carry to A
+         */
+        void opcodeADC(u8 val);
 
+        /**
+         * @brief SUB opcode helper function. Subtracts from the A register
+         * 
+         * @param val The value to subtract from A
+         */
+        void opcodeSUB(u8 val);
+
+        /**
+         * @brief SBC opcode helper function. Subtracts with carry from the A register
+         * 
+         * @param val The value to subtract with carry from A
+         */
+        void opcodeSBC(u8 val);
+
+        /**
+         * @brief AND opcode helper function. Ands with the A register
+         * 
+         * @param val The value to and with A
+         */
+        void opcodeAND(u8 val);
+
+        /**
+         * @brief XOR opcode helper function. Xors with the A register
+         * 
+         * @param val The value to xor with A
+         */
+        void opcodeXOR(u8 val);
+
+        /**
+         * @brief OR opcode helper function. Ors with the A register
+         * 
+         * @param val The value to or with A
+         */
+        void opcodeOR(u8 val);
+
+        /**
+         * @brief CP opcode helper function. Compares with the A register
+         * (subtracts to set flags but doesn't update A)
+         * 
+         * @param val The value to compare with A
+         */
+        void opcodeCP(u8 val);
+
+        /**
+         * @brief JP opcode helper function. Jumps to a memory address if a given
+         * condition is true
+         * 
+         * @param condition The condition to check
+         */
         void opcodeJP(bool condition);
+
+        /**
+         * @brief JR opcode helper function. Jumps relatively to a memory address
+         * if a given condition is true
+         * 
+         * @param condition The condition to check
+         */
         void opcodeJR(bool condition);
 
+        /**
+         * @brief CALL opcode helper function. Calls a subroutine at a memory address
+         * if a given condition is true
+         * 
+         * @param condition The condition to check
+         */
         void opcodeCALL(bool condition);
+
+        /**
+         * @brief RET opcode helper function. Returns from a subroutine if a given
+         * condition is true
+         * 
+         * @param condiiton The condition to check
+         */
         void opcodeRET(bool condiiton);
 
-        void opcodeRST(const u8& val);
+        /**
+         * @brief RST helper function. Jumps to a specified reset vector
+         * 
+         * @param val The reset vector to jump to
+         */
+        void opcodeRST(u16 val);
 
-        // 16 bit variants
+        //-------------------------16 bit variants-------------------------//
 
-        void opcodeADD_HL(const u16& val);
+        /**
+         * @brief ADD opcode helper function. Adds to the HL register
+         * 
+         * @param val The value to add to HL
+         */
+        void opcodeADD_HL(u16 val);
+
+        /**
+         * @brief ADD opcode helper function. Adds the next byte in memory
+         * to the the value of the SP register. Does not modify SP
+         * 
+         * @return u16 The SP register with the byte added to it
+         */
         auto opcodeADD_SP() -> u16;
 
         //--------------------------------------CB Opcode Helpers--------------------------------------//
 
+        /**
+         * @brief RLC opcode helper function. Rotates left circularly
+         * the given register
+         * 
+         * @param reg The register to rotate left circularly
+         */
         void opcodeRLC(u8& reg);
+
+        /**
+         * @brief RRC opcode helper function. Rotates right circularly
+         * the given register
+         * 
+         * @param reg The register to rotate right circularly
+         */
         void opcodeRRC(u8& reg);
 
+        /**
+         * @brief RL opcode helper function. Rotates left the given register
+         * 
+         * @param reg The register to rotate left
+         */
         void opcodeRL(u8& reg);
+
+        /**
+         * @brief RR opcode helper function. Rotates right the given register
+         * 
+         * @param reg The register to rotate right
+         */
         void opcodeRR(u8& reg);
 
+        /**
+         * @brief SLA opcode helper function. Shifts the given register to
+         * the left (with bit 7 shifted into the carry) and zeroes bit 0
+         * 
+         * @param reg The register to shift left
+         */
         void opcodeSLA(u8& reg);
+
+        /**
+         * @brief SRA opcode helper function. Shifts the given register to
+         * the right (with bit 0 shifted into the carry) and retains bit 7's
+         * original value
+         * 
+         * @param reg 
+         */
         void opcodeSRA(u8& reg);
 
+        /**
+         * @brief SWAP opcode helper function. Swaps the high nibble with
+         * the low nibble of the given register
+         * 
+         * @param reg The register to swap
+         */
         void opcodeSWAP(u8& reg);
+
+        /**
+         * @brief SRL opcode helper function. Shifts the given register to
+         * the right (with bit 0 shifted into the carry) and zeroes bit 7
+         * 
+         * @param reg 
+         */
         void opcodeSRL(u8& reg);
 
-        void opcodeBIT(const u8& bit, u8& reg);
-        void opcodeRES(const u8& bit, u8& reg);
-        void opcodeSET(const u8& bit, u8& reg);
+        /**
+         * @brief BIT opcode helper function. Checks if the requested
+         * bit is zero in a given register, then updates the zero flag
+         * 
+         * @param bit The bit to check
+         * @param reg The register to check
+         */
+        void opcodeBIT(u8 bit, u8& reg);
+
+        /**
+         * @brief RES opcode helper function. Sets the requested bit
+         * in the given register to 0
+         * 
+         * @param bit The bit to set
+         * @param reg The register to update
+         */
+        void opcodeRES(u8 bit, u8& reg);
+
+        /**
+         * @brief SET opcode helper function. Sets the requested bit
+         * in a given register to 1
+         * 
+         * @param bit The bit to set
+         * @param reg The register to update
+         */
+        void opcodeSET(u8 bit, u8& reg);
 
         // 16 bit variants
 
-        void opcodeBIT_HL(const u8& bit);
-        void opcodeRES_HL(const u8& bit);
-        void opcodeSET_HL(const u8& bit);
+        /**
+         * @brief BIT opcode helper function. Checks if the requested
+         * bit is zero in the memory location specified by HL is zero,
+         * then updates the zero flag
+         * 
+         * @param bit The bit to check
+         */
+        void opcodeBIT_HL(u8 bit);
+
+        /**
+         * @brief RES opcode helper function. Sets the requested bit
+         * at the memory location specified by HL to 0
+         * 
+         * @param bit The bit to set
+         */
+        void opcodeRES_HL(u8 bit);
+
+        /**
+         * @brief SET opcode helper function. Sets the requested bit
+         * at the memory location specified by HL to 1
+         * 
+         * @param bit The bit to set
+         */
+        void opcodeSET_HL(u8 bit);
 
         //--------------------------------------Opcodes--------------------------------------//
 

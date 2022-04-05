@@ -177,7 +177,7 @@ void CPU::clearAllFlags()
               Flags::Register::Carry);
 }
 
-void CPU::setZeroFromVal(const u8& val)
+void CPU::setZeroFromVal(u8 val)
 {
     if(!val) setFlag(Flags::Register::Zero);
 }
