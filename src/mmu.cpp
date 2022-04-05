@@ -9,14 +9,15 @@ MMU::MMU(Gameboy& gb)
 
 void MMU::load(const char* path)
 {
-    m_Rom.load(path);
+    m_Rom = std::make_unique<MBC1>();
+    m_Rom->load(path);
 }
 
 auto MMU::read(u16 address) const -> u8
 {
     if(address < ROM_ADDR)
     {
-        return m_Rom.read(address);
+        return m_Rom->read(address);
     }
     else if(address < VRAM_ADDR)
     {
@@ -58,10 +59,7 @@ void MMU::write(u16 address, u8 val)
 {
     if(address < ROM_ADDR)
     {
-        if(address < BANK_SIZE) // ROM Bank Swapping
-        {
-            m_Rom.swapBank(val & 0x1F); //NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        }
+        m_Rom->write(address, val);
     }
     else if(address < VRAM_ADDR)
     {

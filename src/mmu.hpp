@@ -4,7 +4,7 @@
 
 #include <array>
 
-#include "cart/cartridge.hpp"
+#include "cart/mbc1.hpp"
 
 class Gameboy;
 
@@ -37,7 +37,7 @@ class MMU
         void write(u16 address, u8 val);
     private:
         Gameboy& m_Gameboy;
-        Cartridge m_Rom;
+        std::unique_ptr<MBC> m_Rom;
 
         std::array<u8, RAM_SIZE> m_Memory {{}};
 };
