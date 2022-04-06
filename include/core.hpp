@@ -107,6 +107,9 @@ constexpr u8 VRAM_HEIGHT        = 0xFF;
 constexpr u32 FRAME_BUFFER_SIZE = GAMEBOY_WIDTH * GAMEBOY_HEIGHT * 4;
 constexpr u32 BG_BUFFER_SIZE    = VRAM_WIDTH    * VRAM_HEIGHT    * 4;
 
+//Cartridge Header
+constexpr u16 CART_TYPE         = 0x0147;
+
 //MMU Addresses
 constexpr u32 ROM_SIZE          = 0x8000;
 constexpr u32 RAM_SIZE          = 0x8000;

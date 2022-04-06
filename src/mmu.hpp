@@ -3,6 +3,7 @@
 #include "core.hpp"
 
 #include <array>
+#include <memory>
 
 #include "cart/mbc1.hpp"
 

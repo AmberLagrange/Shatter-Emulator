@@ -9,8 +9,24 @@ MMU::MMU(Gameboy& gb)
 
 void MMU::load(const char* path)
 {
-    m_Rom = std::make_unique<MBC1>();
-    m_Rom->load(path);
+    Rom data = MBC::loadRom(path);
+
+    u8 cartType = static_cast<Cart::Type>(data.at(CART_TYPE));
+
+    switch(cartType)
+    {
+        case Cart::Type::ROM_ONLY:
+            m_Rom = std::make_unique<MBC>();
+            break;
+        case Cart::Type::MBC1:
+            m_Rom = std::make_unique<MBC1>();
+            break;
+        default:
+            m_Rom = std::make_unique<MBC>();
+
+    }
+
+    m_Rom->load(data);
 }
 
 auto MMU::read(u16 address) const -> u8
