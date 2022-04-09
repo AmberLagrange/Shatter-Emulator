@@ -2,6 +2,8 @@
 
 //-------------------------Helper Functions-------------------------//
 
+#ifndef UNSAFE
+
 auto Registers::getHigh(Register& reg) -> u8&
 {
     return std::visit([&reg] (auto&& arg) -> u8&
@@ -198,10 +200,154 @@ auto Registers::HL() const -> u16
 
 auto Registers::SP() const -> u16
 {
-    return sp;
+    return const_cast<Registers*>(this)->SP();
 }
 
 auto Registers::PC() const -> u16
 {
+    return const_cast<Registers*>(this)->PC();
+}
+
+#else
+
+auto Registers::A() -> u8&
+{
+    return a;
+}
+
+auto Registers::F() -> u8&
+{
+    return f;
+}
+
+auto Registers::AF() -> u16&
+{
+    return af;
+}
+
+auto Registers::B() -> u8&
+{
+    return b;
+}
+
+auto Registers::C() -> u8&
+{
+    return c;
+}
+
+auto Registers::BC() -> u16&
+{
+    return bc;
+}
+
+auto Registers::D() -> u8&
+{
+    return d;
+}
+
+auto Registers::E() -> u8&
+{
+    return e;
+}
+
+auto Registers::DE() -> u16&
+{
+    return de;
+}
+
+auto Registers::H() -> u8&
+{
+    return h;
+}
+
+auto Registers::L() -> u8&
+{
+    return l;
+}
+
+auto Registers::HL() -> u16&
+{
+    return hl;
+}
+
+auto Registers::SP() -> u16&
+{
+    return sp;
+}
+
+auto Registers::PC() -> u16&
+{
     return pc;
 }
+
+auto Registers::A() const -> u8
+{
+    return const_cast<Registers*>(this)->A();
+}
+
+auto Registers::F() const -> u8
+{
+    return const_cast<Registers*>(this)->F();
+}
+
+auto Registers::AF() const -> u16
+{
+    return const_cast<Registers*>(this)->AF();
+}
+
+auto Registers::B() const -> u8
+{
+    return const_cast<Registers*>(this)->B();
+}
+
+auto Registers::C() const -> u8
+{
+    return const_cast<Registers*>(this)->C();
+}
+
+auto Registers::BC() const -> u16
+{
+    return const_cast<Registers*>(this)->BC();
+}
+
+auto Registers::D() const -> u8
+{
+    return const_cast<Registers*>(this)->D();
+}
+
+auto Registers::E() const -> u8
+{
+    return const_cast<Registers*>(this)->E();
+}
+
+auto Registers::DE() const -> u16
+{
+    return const_cast<Registers*>(this)->DE();
+}
+
+auto Registers::H() const -> u8
+{
+    return const_cast<Registers*>(this)->H();
+}
+
+auto Registers::L() const -> u8
+{
+    return const_cast<Registers*>(this)->L();
+}
+
+auto Registers::HL() const -> u16
+{
+    return const_cast<Registers*>(this)->HL();
+}
+
+auto Registers::SP() const -> u16
+{
+    return const_cast<Registers*>(this)->SP();
+}
+
+auto Registers::PC() const -> u16
+{
+    return const_cast<Registers*>(this)->PC();
+}
+
+#endif

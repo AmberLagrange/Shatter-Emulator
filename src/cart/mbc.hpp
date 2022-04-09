@@ -8,7 +8,7 @@
 #include <iterator>
 #include <vector>
 
-using Rom = std::vector<u8>;
+using Data = std::vector<u8>;
 
 namespace Cart
 {
@@ -26,7 +26,7 @@ namespace Cart
 class MBC
 {
     public:
-        static auto loadRom(const char* path) -> Rom;
+        static auto getCartType(const char* path) -> Cart::Type;
     public:
         MBC() = default;
 
@@ -36,13 +36,6 @@ class MBC
          * @param path The filepath to the rom 
          */
         virtual void load(const char* path);
-
-        /**
-         * @brief Load a previously loaded rom file into the MBC
-         * 
-         * @param data The data already loaded
-         */
-        virtual void load(const Rom& data);
 
         /**
          * @brief Reads a byte from the specified memory address
@@ -60,5 +53,5 @@ class MBC
          */
         virtual void write(u16 address, u8 val);
     protected:
-        Rom m_Data;
+        Data m_Data;
 };

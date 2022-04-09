@@ -45,3 +45,6 @@
 
 #vscode
 .vscode/
+
+#clangd
+.cache/

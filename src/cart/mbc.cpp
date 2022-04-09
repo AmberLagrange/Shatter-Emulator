@@ -1,22 +1,20 @@
 #include "mbc.hpp"
 
-auto MBC::loadRom(const char* path) -> std::vector<u8>
+auto MBC::getCartType(const char* path) -> Cart::Type
 {
-    std::vector<u8> data;
-    std::ifstream in(path, std::ios::binary);
-    data.assign((std::istreambuf_iterator<char>(in)), {});
+    std::ifstream rom(path, std::ios::in | std::ios::binary);
+    rom.seekg(CART_TYPE);
 
-    return data;
+    char cartType = -1;
+    rom.read(&cartType, 1);
+
+    return static_cast<Cart::Type>(cartType);
 }
 
 void MBC::load(const char* path)
 {
-    m_Data = loadRom(path);
-}
-
-void MBC::load(const Rom& data)
-{
-    m_Data = data;
+    std::ifstream rom(path, std::ios::in | std::ios::binary);
+    m_Data.assign((std::istreambuf_iterator<char>(rom)), {});
 }
 
 auto MBC::read(u16 address) const -> u8
