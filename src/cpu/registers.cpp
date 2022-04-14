@@ -136,78 +136,6 @@ auto Registers::PC() -> u16&
     return pc;
 }
 
-//-------------------------Const Versions-------------------------//
-
-auto Registers::A() const -> u8
-{
-    return const_cast<Registers*>(this)->A();
-}
-
-auto Registers::F() const -> u8
-{
-    return const_cast<Registers*>(this)->F();
-}
-
-auto Registers::AF() const -> u16
-{
-    return const_cast<Registers*>(this)->AF();
-}
-
-auto Registers::B() const -> u8
-{
-    return const_cast<Registers*>(this)->B();
-}
-
-auto Registers::C() const -> u8
-{
-    return const_cast<Registers*>(this)->C();
-}
-
-auto Registers::BC() const -> u16
-{
-    return const_cast<Registers*>(this)->BC();
-}
-
-auto Registers::D() const -> u8
-{
-    return const_cast<Registers*>(this)->D();
-}
-
-auto Registers::E() const -> u8
-{
-    return const_cast<Registers*>(this)->E();
-}
-
-auto Registers::DE() const -> u16
-{
-    return const_cast<Registers*>(this)->DE();
-}
-
-auto Registers::H() const -> u8
-{
-    return const_cast<Registers*>(this)->H();
-}
-
-auto Registers::L() const -> u8
-{
-    return const_cast<Registers*>(this)->L();
-}
-
-auto Registers::HL() const -> u16
-{
-    return const_cast<Registers*>(this)->HL();
-}
-
-auto Registers::SP() const -> u16
-{
-    return const_cast<Registers*>(this)->SP();
-}
-
-auto Registers::PC() const -> u16
-{
-    return const_cast<Registers*>(this)->PC();
-}
-
 #else
 
 auto Registers::A() -> u8&
@@ -280,6 +208,10 @@ auto Registers::PC() -> u16&
     return pc;
 }
 
+#endif
+
+//-------------------------Const Versions-------------------------//
+
 auto Registers::A() const -> u8
 {
     return const_cast<Registers*>(this)->A();
@@ -349,5 +281,3 @@ auto Registers::PC() const -> u16
 {
     return const_cast<Registers*>(this)->PC();
 }
-
-#endif
