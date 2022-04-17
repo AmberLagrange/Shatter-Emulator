@@ -47,8 +47,8 @@ void PPU::tick(u8 cycles)
                     tileData += (tileIndex + 0x80) * 16;
                 }
 
-                u8 low  = m_Gameboy.read(tileData + (yPos % 8 * 2)    );
-                u8 high = m_Gameboy.read(tileData + (yPos % 8 * 2) + 1);
+                u8 low  = m_Gameboy.read(tileData + ((yPos % 8) * 2)    );
+                u8 high = m_Gameboy.read(tileData + ((yPos % 8) * 2) + 1);
 
                 u8 bit = 7 - (xPos % 8);
                 u8 colour = GET_BIT(low, bit) | (GET_BIT(high, bit) << 1);

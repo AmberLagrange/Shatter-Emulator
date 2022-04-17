@@ -1,4 +1,5 @@
 #include "mmu.hpp"
+#include "core.hpp"
 #include "gameboy.hpp"
 
 MMU::MMU(Gameboy& gb)

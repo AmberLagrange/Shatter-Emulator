@@ -1,5 +1,6 @@
 #include "timer.hpp"
 
+#include "core.hpp"
 #include "flags.hpp"
 
 #include "gameboy.hpp"
@@ -10,30 +11,33 @@ Timer::Timer(Gameboy& gb)
 void Timer::update(u8 cycles)
 {
     m_DIV += cycles;
-    
-    if(GET_BIT(m_Gameboy.read(TAC_REGISTER), 2)) // Check if the timer is enabled
+
+    while(m_DIV >= 0x0100)
+    {
+        m_DIV -= 0x0100;
+        m_Gameboy.write(DIV_REGISTER, m_Gameboy.read(DIV_REGISTER) + 1);
+    }
+
+    if(GET_BIT(m_Gameboy.read(TAC_REGISTER), 2))
     {
         m_TIMA += cycles;
+
         while(m_TIMA >= m_Speed)
         {
             m_TIMA -= m_Speed;
-
-            if(m_Gameboy.read(TIMA_REGISTER) == UINT8_MAX)
+            u8 tima = m_Gameboy.read(TIMA_REGISTER);
+            
+            if(tima == 0xFF)
             {
-                m_Gameboy.write(TIMA_REGISTER, m_Gameboy.read(TMA_REGISTER));
+                tima = m_Gameboy.read(TMA_REGISTER);
                 m_Gameboy.raiseInterrupt(Flags::Interrupt::Timer);
             }
             else
             {
-                m_Gameboy.write(TIMA_REGISTER, m_Gameboy.read(TIMA_REGISTER) + 1);
+                tima++;
             }
-        }
-        
-    }
 
-    if(m_DIV & 0xFF00)
-    {
-        m_DIV &= 0x00FF;
-        m_Gameboy.write(DIV_REGISTER, m_Gameboy.read(DIV_REGISTER) + 1);
+            m_Gameboy.write(TIMA_REGISTER, tima);
+        }
     }
 }

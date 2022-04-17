@@ -48,10 +48,10 @@ constexpr auto FLIP_BIT(u8& x, u8 n)  -> u8&  { return x ^= (0x01 << n); }
 //Clock and Timers
 constexpr u32 CLOCK_SPEED       = 4194304;
 
-constexpr u32 TIMER_SPEED_00    = CLOCK_SPEED / 1024;
-constexpr u32 TIMER_SPEED_01    = CLOCK_SPEED / 16;
-constexpr u32 TIMER_SPEED_10    = CLOCK_SPEED / 64;
-constexpr u32 TIMER_SPEED_11    = CLOCK_SPEED / 256;
+constexpr u32 TIMER_SPEED_00    = 1024;
+constexpr u32 TIMER_SPEED_01    = 16;
+constexpr u32 TIMER_SPEED_10    = 64;
+constexpr u32 TIMER_SPEED_11    = 256;
 
 //Opcode
 constexpr u8 CB_OPCODE          = 0xCB;

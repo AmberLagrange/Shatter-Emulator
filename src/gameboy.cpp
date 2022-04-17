@@ -27,9 +27,9 @@ void Gameboy::start()
 void Gameboy::tick()
 {
     u8 cycles = m_CPU.tick();
+    m_CPU.handleInterrupts(cycles);
     m_Timer.update(cycles);
     m_PPU.tick(cycles);
-    m_CPU.handleInterrupts(cycles);
 }
 
 void Gameboy::stop()
