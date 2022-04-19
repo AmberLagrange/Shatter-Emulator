@@ -78,7 +78,7 @@ constexpr u16 TIMA_REGISTER     = 0xFF05;
 constexpr u16 TMA_REGISTER      = 0xFF06;
 constexpr u16 TAC_REGISTER      = 0xFF07;
 
-constexpr u16 LCD_CTRL_REGISTER = 0xFF40;
+constexpr u16 LCDC_REGISTER     = 0xFF40;
 constexpr u16 LCD_STAT_REGISTER = 0xFF41;
 constexpr u16 SCY_REGISTER      = 0xFF42;
 constexpr u16 SCX_REGISTER      = 0xFF43;
@@ -93,20 +93,27 @@ constexpr u16 IF_REGISTER       = 0xFF0F;
 constexpr u16 IE_REGISTER       = 0xFFFF;
 
 //Graphics Data
-constexpr u16 TILE_MAP_LOW      = 0x9800;
-constexpr u16 TILE_MAP_HIGH     = 0x9C00;
-constexpr u16 TILE_DATA_LOW     = 0x8800;
-constexpr u16 TILE_DATA_HIGH    = 0x8000;
+constexpr u16 TILE_DATA_ZERO    = 0x8000;
+constexpr u16 TILE_DATA_ONE     = 0x8800;
+
+constexpr u8  TILE_ONE_OFFSET   = 128;
+
+constexpr u16 TILE_MAP_ZERO     = 0x9C00;
+constexpr u16 TILE_MAP_ONE      = 0x9800;
+
+constexpr u16 BG_WIDTH          = 0x0100;
+constexpr u16 BG_HEIGHT         = 0x0100;
+
+constexpr u8  BG_TILE_WIDTH     = 8;
+constexpr u8  BG_TILE_HEIGHT    = 8;
+constexpr u8  BG_TILES_PER_LINE = 32;
+constexpr u8  BYTES_PER_TILE    = 16;
 
 constexpr u8 GAMEBOY_WIDTH      = 160;
 constexpr u8 GAMEBOY_HEIGHT     = 144;
 constexpr u8 VBLANK_HEIGHT      = 154;
 
-constexpr u16 VRAM_WIDTH         = 0x0100;
-constexpr u16 VRAM_HEIGHT        = 0x0100;
-
 constexpr u32 FRAME_BUFFER_SIZE = GAMEBOY_WIDTH * GAMEBOY_HEIGHT * 4;
-constexpr u32 BG_BUFFER_SIZE    = VRAM_WIDTH    * VRAM_HEIGHT    * 4;
 
 //Cartridge Header
 constexpr u16 CART_TYPE         = 0x0147;

@@ -1,6 +1,7 @@
 #include "ppu.hpp"
 
 #include "core.hpp"
+#include "flags.hpp"
 #include "gameboy.hpp"
 
 PPU::PPU(Gameboy& gb)
@@ -23,14 +24,21 @@ void PPU::tick(u8 cycles)
         case Mode::HBlank:
             if(m_Cycles >= CYCLES_PER_HBLANK)
             {
+                m_Cycles -= CYCLES_PER_HBLANK;
+
                 drawBackgroundLine(m_Line);
                 drawWindowLine(m_Line);
-                m_Cycles -= CYCLES_PER_HBLANK;
+                
                 m_Line++;
 
-                if(m_Line == GAMEBOY_HEIGHT)
+                if (m_Line == GAMEBOY_HEIGHT)
                 {
+                    m_Gameboy.raiseInterrupt(Flags::Interrupt::VBlank);
+
                     m_Mode = Mode::VBlank;
+                } else
+                {
+                    m_Mode = Mode::OAM_Scan;
                 }
             }
             break;
@@ -40,66 +48,84 @@ void PPU::tick(u8 cycles)
                 m_Cycles -= CYCLES_PER_LINE;
                 m_Line++;
 
-                if(m_Line == VBLANK_HEIGHT)
+                if (m_Line == VBLANK_HEIGHT)
                 {
                     drawSprites();
-
+                    
                     std::invoke(m_DrawCallback, m_FrameBuffer);
+
                     m_Line = 0;
                     m_Mode = Mode::OAM_Scan;
-                }
+                };
             }
             break;
         case Mode::OAM_Scan:
-            if(m_Cycles >= CYCLES_PER_OAM_SCAN)
+            if (m_Cycles >= CYCLES_PER_OAM_SCAN)
             {
                 m_Cycles -= CYCLES_PER_OAM_SCAN;
-                m_Mode = Mode::Drawing;
+                m_Mode = Mode::Transfer;
             }
             break;
-        case Mode::Drawing:
-            if(m_Cycles >= CYCLES_PER_DRAWING)
+        case Mode::Transfer:
+            if (m_Cycles >= CYCLES_PER_TRANSFER)
             {
-                m_Cycles -= CYCLES_PER_DRAWING;
+                m_Cycles -= CYCLES_PER_TRANSFER;
                 m_Mode = Mode::HBlank;
             }
             break;
         default:
             ASSERT(false, "Invalid PPU Mode!");
     }
+
+    m_Gameboy.write(LY_REGISTER, m_Line);
 }
 
 void PPU::drawBackgroundLine(u8 line)
 {
+    u8 lcdc = m_Gameboy.read(LCDC_REGISTER);
+
     u8 scrollX = m_Gameboy.read(SCX_REGISTER);
     u8 scrollY = m_Gameboy.read(SCY_REGISTER);
 
-    for(u16 col = 0; col < GAMEBOY_WIDTH; ++col)
+    u16 tileMapAddress  = GET_BIT(lcdc, 3) ? TILE_MAP_ZERO  : TILE_MAP_ONE;
+    u16 tileDataAddress = GET_BIT(lcdc, 4) ? TILE_DATA_ZERO : TILE_DATA_ONE;
+
+    bool usingTileDataZero = (tileDataAddress == TILE_DATA_ZERO);
+
+    for(u8 col = 0; col < GAMEBOY_WIDTH; ++col)
     {
-        u16 tileMap  = GET_BIT(m_Gameboy.read(LCD_CTRL_REGISTER), 3) ? TILE_MAP_HIGH  : TILE_MAP_LOW;
-        u16 tileData = GET_BIT(m_Gameboy.read(LCD_CTRL_REGISTER), 4) ? TILE_DATA_HIGH : TILE_DATA_LOW;
-                
-        u16 xPos = (col  + scrollX) % VRAM_WIDTH;
-        u16 yPos = (line + scrollY) % VRAM_HEIGHT;
+        // get the x and y position in the background
+        u8 xPos = col  + scrollX;
+        u8 yPos = line + scrollY;
 
-        if(tileData == TILE_DATA_HIGH)
-        {
-            u8 tileIndex = m_Gameboy.read(tileMap + ((yPos / 8) * 32) + (xPos / 8));
-            tileData += tileIndex * 16;
-        }
-        else
-        {
-            i8 tileIndex = m_Gameboy.read(tileMap + ((yPos / 8) * 32) + (xPos / 8));
-            tileData += (tileIndex + 0x80) * 16;
-        }
+        // get the x and y position of the tile within the background
+        u8 tileXPos = xPos / BG_TILE_WIDTH;
+        u8 tileYPos = yPos / BG_TILE_HEIGHT;
 
-        u8 low  = m_Gameboy.read(tileData + ((yPos % 8) * 2)    );
-        u8 high = m_Gameboy.read(tileData + ((yPos % 8) * 2) + 1);
+        // get the x and y position of the pixel within the tile
+        u8 pixelXPos = xPos % BG_TILE_WIDTH;
+        u8 pixelYPos = yPos % BG_TILE_HEIGHT;
 
-        u8 bit = 7 - (xPos % 8);
-        u8 colour = GET_BIT(low, bit) | (GET_BIT(high, bit) << 1);
+        // get the tile index number and the tile within the tile map
+        u16 tileIndex = tileXPos + tileYPos * BG_TILES_PER_LINE;
+        u8  tileID    = m_Gameboy.read(tileMapAddress + tileIndex);
+
+        // get the memory offset of the tile in the tile data
+        // if we're using tile data one we need treat the offset as signed from 128
+        u16 tileDataOffset = usingTileDataZero
+                           ? (tileID                                   ) * BYTES_PER_TILE
+                           : (static_cast<i8>(tileID) + TILE_ONE_OFFSET) * BYTES_PER_TILE;
+
+        // add 2 bytes/line based on the y offset into the tile
+        u16 tileAddress = tileDataAddress + tileDataOffset + 2 * pixelYPos;
+
+        u8 low  = m_Gameboy.read(tileAddress    );
+        u8 high = m_Gameboy.read(tileAddress + 1);
 
         // TODO: Colour pallets
+        u8 bit = 7 - pixelXPos;
+        u8 colour = GET_BIT(low, bit) | (GET_BIT(high, bit) << 1);
+        
         u8 red, green, blue; // NOLINT(cppcoreguidelines-init-variables)
 
         if(colour == 0)
@@ -127,16 +153,107 @@ void PPU::drawBackgroundLine(u8 line)
             blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
         }
 
-        m_FrameBuffer.at((line * GAMEBOY_WIDTH + col) * 4    ) = red;
-        m_FrameBuffer.at((line * GAMEBOY_WIDTH + col) * 4 + 1) = green;
-        m_FrameBuffer.at((line * GAMEBOY_WIDTH + col) * 4 + 2) = blue;
-        m_FrameBuffer.at((line * GAMEBOY_WIDTH + col) * 4 + 3) = 0xFF;
+        m_FrameBuffer.at((col + line * GAMEBOY_WIDTH) * 4    ) = red;
+        m_FrameBuffer.at((col + line * GAMEBOY_WIDTH) * 4 + 1) = green;
+        m_FrameBuffer.at((col + line * GAMEBOY_WIDTH) * 4 + 2) = blue;
+        m_FrameBuffer.at((col + line * GAMEBOY_WIDTH) * 4 + 3) = 0xFF;
     }
 }
 
 void PPU::drawWindowLine(u8 line)
 {
+    u8 lcdc = m_Gameboy.read(LCDC_REGISTER);
 
+    if(!GET_BIT(lcdc, 5)) // Window not rendering
+    {
+        return;
+    }
+
+    u8 windowX = m_Gameboy.read(WX_REGISTER) - 7; // window x scroll has an offset of 7
+
+    if(windowX >= GAMEBOY_WIDTH) // Don't render the window if it's to the right of the screen
+    {
+        return;
+    }
+
+    u8 windowY = m_Gameboy.read(WY_REGISTER);
+
+    if(windowY >= GAMEBOY_HEIGHT || windowY > line) // Don't render the window if it's below the screen (or we're not at the scanline yet)
+    {
+        return;
+    }
+
+    u16 tileDataAddress = GET_BIT(lcdc, 4) ? TILE_DATA_ZERO : TILE_DATA_ONE;
+    u16 tileMapAddress  = GET_BIT(lcdc, 6) ? TILE_MAP_ZERO  : TILE_MAP_ONE;
+
+    bool usingTileDataZero = (tileDataAddress == TILE_DATA_ZERO);
+
+    for(u8 col = 0; col < GAMEBOY_WIDTH; ++col)
+    {
+        // get the x and y position in the background
+        u8 xPos = col  + windowX;
+        u8 yPos = line + windowY;
+
+        // get the x and y position of the tile within the background
+        u8 tileXPos = xPos / BG_TILE_WIDTH;
+        u8 tileYPos = yPos / BG_TILE_HEIGHT;
+
+        // get the x and y position of the pixel within the tile
+        u8 pixelXPos = xPos % BG_TILE_WIDTH;
+        u8 pixelYPos = yPos % BG_TILE_HEIGHT;
+
+        // get the tile index number and the tile within the tile map
+        u16 tileIndex = tileXPos + tileYPos * BG_TILES_PER_LINE;
+        u8  tileID    = m_Gameboy.read(tileMapAddress + tileIndex);
+
+        // get the memory offset of the tile in the tile data
+        // if we're using tile data one we need treat the offset as signed from 128
+        u16 tileDataOffset = usingTileDataZero
+                           ? (tileID                                   ) * BYTES_PER_TILE
+                           : (static_cast<i8>(tileID) + TILE_ONE_OFFSET) * BYTES_PER_TILE;
+
+        // add 2 bytes/line based on the y offset into the tile
+        u16 tileAddress = tileDataAddress + tileDataOffset + 2 * pixelYPos;
+
+        u8 low  = m_Gameboy.read(tileAddress    );
+        u8 high = m_Gameboy.read(tileAddress + 1);
+
+        // TODO: Colour pallets
+        u8 bit = 7 - pixelXPos;
+        u8 colour = GET_BIT(low, bit) | (GET_BIT(high, bit) << 1);
+        
+        u8 red, green, blue; // NOLINT(cppcoreguidelines-init-variables)
+
+        if(colour == 0)
+        {
+            red     = 0x9B; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+            green   = 0xBC; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+            blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        }
+        else if(colour == 1)
+        {
+            red     = 0x30; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+            green   = 0x62; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+            blue    = 0x30; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        }
+        else if(colour == 2)
+        {
+            red     = 0x8B; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+            green   = 0xAC; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+            blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        }
+        else
+        {
+            red     = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+            green   = 0x38; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+            blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        }
+
+        m_FrameBuffer.at((col + line * GAMEBOY_WIDTH) * 4    ) = red;
+        m_FrameBuffer.at((col + line * GAMEBOY_WIDTH) * 4 + 1) = green;
+        m_FrameBuffer.at((col + line * GAMEBOY_WIDTH) * 4 + 2) = blue;
+        m_FrameBuffer.at((col + line * GAMEBOY_WIDTH) * 4 + 3) = 0xFF;
+    }
 }
 
 void PPU::drawSprites()
