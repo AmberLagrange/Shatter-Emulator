@@ -5,6 +5,8 @@
 #include <array>
 #include <variant>
 
+#define UNSAFE
+
 class Registers
 {
     public:

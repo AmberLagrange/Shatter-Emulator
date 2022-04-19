@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "cart/mbc1.hpp"
+#include "cart/mbc3.hpp"
 
 class Gameboy;
 

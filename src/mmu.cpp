@@ -12,17 +12,28 @@ MMU::MMU(Gameboy& gb)
 
 void MMU::load(const char* path)
 {
-    u8 cartType = static_cast<Cart::Type>(MBC::getCartType(path));
+    Cart::Type type = MBC::getCartType(path);
 
-    switch(cartType)
+    switch(type)
     {
         case Cart::Type::ROM_ONLY:
+            DEBUG("ROM Only!");
             m_Rom = std::make_unique<MBC>();
             break;
         case Cart::Type::MBC1:
+            DEBUG("MBC1!");
             m_Rom = std::make_unique<MBC1>();
             break;
+        case Cart::Type::MBC3_TIMER_BATTERY:
+        case Cart::Type::MBC3_TIMER_RAM_BATTERY_2:
+        case Cart::Type::MBC3:
+        case Cart::Type::MBC3_RAM_2:
+        case Cart::Type::MBC3_RAM_BATTERY_2:
+            DEBUG("MBC3!");
+            m_Rom = std::make_unique<MBC3>();
+            break;
         default:
+            WARN("Unknown MBC Type: 0x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(type) << ", falling back to ROM Only!");
             m_Rom = std::make_unique<MBC>();
     }
 
