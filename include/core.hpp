@@ -79,7 +79,13 @@ constexpr u16 TMA_REGISTER      = 0xFF06;
 constexpr u16 TAC_REGISTER      = 0xFF07;
 
 constexpr u16 LCDC_REGISTER     = 0xFF40;
-constexpr u16 LCD_STAT_REGISTER = 0xFF41;
+
+constexpr u16 STAT_REGISTER     = 0xFF41;
+constexpr u8  STAT_HBLANK_BIT   = 3;
+constexpr u8  STAT_VBLANK_BIT   = 4;
+constexpr u8  STAT_OAM_BIT      = 5;
+constexpr u8  STAT_LYC_BIT      = 6;
+
 constexpr u16 SCY_REGISTER      = 0xFF42;
 constexpr u16 SCX_REGISTER      = 0xFF43;
 

@@ -33,12 +33,36 @@ void PPU::tick(u8 cycles)
 
                 if (m_Line == GAMEBOY_HEIGHT)
                 {
+                    m_Mode = Mode::VBlank;
                     m_Gameboy.raiseInterrupt(Flags::Interrupt::VBlank);
 
-                    m_Mode = Mode::VBlank;
+                    u8 stat = m_Gameboy.read(STAT_REGISTER);
+
+                    SET_BIT(stat, 0);
+                    CLEAR_BIT(stat, 1);
+
+                    // STAT interrupt checks OAM bit as well
+                    if(GET_BIT(stat, STAT_VBLANK_BIT) || GET_BIT(stat, STAT_OAM_BIT))
+                    {
+                        m_Gameboy.raiseInterrupt(Flags::Interrupt::LCD_STAT);
+                    }
+
+                    m_Gameboy.write(STAT_REGISTER, stat);
                 } else
                 {
                     m_Mode = Mode::OAM_Scan;
+
+                    u8 stat = m_Gameboy.read(STAT_REGISTER);
+
+                    CLEAR_BIT(stat, 0);
+                    SET_BIT(stat, 1);
+
+                    if(GET_BIT(stat, STAT_OAM_BIT))
+                    {
+                        m_Gameboy.raiseInterrupt(Flags::Interrupt::LCD_STAT);
+                    }
+
+                    m_Gameboy.write(STAT_REGISTER, stat);
                 }
             }
             break;
@@ -50,12 +74,23 @@ void PPU::tick(u8 cycles)
 
                 if (m_Line == VBLANK_HEIGHT)
                 {
-                    drawSprites();
-                    
-                    std::invoke(m_DrawCallback, m_FrameBuffer);
-
-                    m_Line = 0;
                     m_Mode = Mode::OAM_Scan;
+
+                    drawSprites();
+                    std::invoke(m_DrawCallback, m_FrameBuffer);
+                    m_Line = 0;
+                    
+                    u8 stat = m_Gameboy.read(STAT_REGISTER);
+                    
+                    CLEAR_BIT(stat, 0);
+                    SET_BIT(stat, 1);
+
+                    if(GET_BIT(stat, STAT_OAM_BIT))
+                    {
+                        m_Gameboy.raiseInterrupt(Flags::Interrupt::LCD_STAT);
+                    }
+
+                    m_Gameboy.write(STAT_REGISTER, stat);
                 };
             }
             break;
@@ -63,14 +98,45 @@ void PPU::tick(u8 cycles)
             if (m_Cycles >= CYCLES_PER_OAM_SCAN)
             {
                 m_Cycles -= CYCLES_PER_OAM_SCAN;
+
                 m_Mode = Mode::Transfer;
+                
+                u8 stat = m_Gameboy.read(STAT_REGISTER);
+                
+                SET_BIT(stat, 0);
+                SET_BIT(stat, 1);
+
+                m_Gameboy.write(STAT_REGISTER, stat);
             }
             break;
         case Mode::Transfer:
             if (m_Cycles >= CYCLES_PER_TRANSFER)
             {
                 m_Cycles -= CYCLES_PER_TRANSFER;
+
                 m_Mode = Mode::HBlank;
+                
+                u8 stat = m_Gameboy.read(STAT_REGISTER);
+                
+                CLEAR_BIT(stat, 0);
+                CLEAR_BIT(stat, 1);
+
+                if(GET_BIT(stat, STAT_HBLANK_BIT))
+                {
+                    m_Gameboy.raiseInterrupt(Flags::Interrupt::LCD_STAT);
+                }
+
+                // LYC enabled
+                if(GET_BIT(stat, STAT_LYC_BIT))
+                {
+                    u8 lyc = m_Gameboy.read(LYC_REGISTER);
+                    if(m_Line == lyc)
+                    {
+                        m_Gameboy.raiseInterrupt(Flags::Interrupt::LCD_STAT);
+                    }
+                }
+
+                m_Gameboy.write(STAT_REGISTER, stat);
             }
             break;
         default:
