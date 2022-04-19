@@ -42,7 +42,8 @@ Additional arguments can be passed as well.
 
 # Screenshots
 
-|                               Nintendo Logo and Blargg's CPU Test                              |
+|                   Nintendo Logo, Blargg's CPU Test and Dr. Mario Title Screen                  |
 |:----------------------------------------------------------------------------------------------:|
 |                   ![Nintendo](./screenshots/Nintendo.png?raw=true "Nintendo")                  |
-|![Blargg cpu_instrs](./screenshots/Blargg%20cpu_instrs.png?raw=true "Blargg cpu_instrs")        |
+|    ![Blargg cpu_instrs](./screenshots/Blargg%20cpu_instrs.png?raw=true "Blargg cpu_instrs")    |
+|      ![Dr. Mario Title](./screenshots/Dr.%20Mario%20Title.png?raw=true "Dr. Mario Title")      |
