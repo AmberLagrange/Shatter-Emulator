@@ -100,9 +100,10 @@ constexpr u16 TILE_DATA_HIGH    = 0x8000;
 
 constexpr u8 GAMEBOY_WIDTH      = 160;
 constexpr u8 GAMEBOY_HEIGHT     = 144;
+constexpr u8 VBLANK_HEIGHT      = 154;
 
-constexpr u8 VRAM_WIDTH         = 0xFF;
-constexpr u8 VRAM_HEIGHT        = 0xFF;
+constexpr u16 VRAM_WIDTH         = 0x0100;
+constexpr u16 VRAM_HEIGHT        = 0x0100;
 
 constexpr u32 FRAME_BUFFER_SIZE = GAMEBOY_WIDTH * GAMEBOY_HEIGHT * 4;
 constexpr u32 BG_BUFFER_SIZE    = VRAM_WIDTH    * VRAM_HEIGHT    * 4;
