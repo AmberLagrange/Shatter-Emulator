@@ -58,7 +58,7 @@ auto Scheduler::run() -> bool
         }
 
         running = true;
-        gb->tick();
+        gb->renderFrame();
         ++i;
     }
 

@@ -38,6 +38,12 @@ class Gameboy
         void tick();
 
         /**
+         * @brief Renders a single frame of the gameboy
+         * 
+         */
+        void renderFrame();
+
+        /**
          * @brief Stops the Gameboy
          * 
          */

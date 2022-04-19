@@ -34,6 +34,14 @@ void Gameboy::tick()
     m_PPU.tick(cycles);
 }
 
+void Gameboy::renderFrame()
+{
+    for(int i = 0; i < 6400; ++i)
+    {
+        tick();
+    }
+}
+
 void Gameboy::stop()
 {
     DEBUG("Stopping Gameboy!");
