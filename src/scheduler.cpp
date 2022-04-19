@@ -1,3 +1,5 @@
+#include "core.hpp"
+
 #include "scheduler.hpp"
 
 #include <SDL2/SDL.h>

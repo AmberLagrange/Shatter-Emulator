@@ -1,3 +1,5 @@
+#include "core.hpp"
+
 #include "instruction.hpp"
 #include "cpu.hpp"
 

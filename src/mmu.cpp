@@ -1,4 +1,7 @@
+#include "core.hpp"
+
 #include "mmu.hpp"
+
 #include "gameboy.hpp"
 
 MMU::MMU(Gameboy& gb)
@@ -58,6 +61,10 @@ auto MMU::read(u16 address) const -> u8
     }
     else if(address < IO_ADDR)
     {
+        if(address == 0xFF00)
+        {
+            return 0xFF;
+        }
         return m_Memory.at(address - ROM_SIZE);
     }
     else

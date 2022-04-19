@@ -1,3 +1,5 @@
+#include "core.hpp"
+
 #include "mbc1.hpp"
 
 MBC1::MBC1()

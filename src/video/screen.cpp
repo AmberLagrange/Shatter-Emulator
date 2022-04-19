@@ -1,4 +1,7 @@
+#include "core.hpp"
+
 #include "screen.hpp"
+
 #include "gameboy.hpp"
 
 void Screen::init()

@@ -1,3 +1,5 @@
+#include "core.hpp"
+
 #include "mbc.hpp"
 
 auto MBC::getCartType(const char* path) -> Cart::Type

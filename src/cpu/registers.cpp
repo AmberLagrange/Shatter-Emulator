@@ -1,3 +1,5 @@
+#include "core.hpp"
+
 #include "registers.hpp"
 
 //-------------------------Helper Functions-------------------------//

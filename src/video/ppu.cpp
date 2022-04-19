@@ -1,6 +1,7 @@
+#include "core.hpp"
+
 #include "ppu.hpp"
 
-#include "core.hpp"
 #include "flags.hpp"
 #include "gameboy.hpp"
 
@@ -31,7 +32,7 @@ void PPU::tick(u8 cycles)
                 
                 m_Line++;
 
-                if (m_Line == GAMEBOY_HEIGHT)
+                if(m_Line == GAMEBOY_HEIGHT)
                 {
                     m_Mode = Mode::VBlank;
                     m_Gameboy.raiseInterrupt(Flags::Interrupt::VBlank);
@@ -48,7 +49,8 @@ void PPU::tick(u8 cycles)
                     }
 
                     m_Gameboy.write(STAT_REGISTER, stat);
-                } else
+                }
+                else
                 {
                     m_Mode = Mode::OAM_Scan;
 
@@ -72,7 +74,7 @@ void PPU::tick(u8 cycles)
                 m_Cycles -= CYCLES_PER_LINE;
                 m_Line++;
 
-                if (m_Line == VBLANK_HEIGHT)
+                if(m_Line == VBLANK_HEIGHT)
                 {
                     m_Mode = Mode::OAM_Scan;
 
@@ -110,7 +112,7 @@ void PPU::tick(u8 cycles)
             }
             break;
         case Mode::Transfer:
-            if (m_Cycles >= CYCLES_PER_TRANSFER)
+            if(m_Cycles >= CYCLES_PER_TRANSFER)
             {
                 m_Cycles -= CYCLES_PER_TRANSFER;
 
@@ -132,7 +134,12 @@ void PPU::tick(u8 cycles)
                     u8 lyc = m_Gameboy.read(LYC_REGISTER);
                     if(m_Line == lyc)
                     {
+                        SET_BIT(stat, STAT_LCY_LY_BIT);
                         m_Gameboy.raiseInterrupt(Flags::Interrupt::LCD_STAT);
+                    }
+                    else
+                    {
+                        CLEAR_BIT(stat, STAT_LCY_LY_BIT);
                     }
                 }
 

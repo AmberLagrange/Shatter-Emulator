@@ -1,3 +1,5 @@
+#include "core.hpp"
+
 #include "cpu.hpp"
 
 #include "gameboy.hpp"

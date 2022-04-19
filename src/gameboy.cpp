@@ -1,3 +1,5 @@
+#include "core.hpp"
+
 #include "gameboy.hpp"
 
 Gameboy::Gameboy()

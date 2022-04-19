@@ -1,3 +1,5 @@
+#include "core.hpp"
+
 #include "apu.hpp"
 
 APU::APU(Gameboy& gb)
