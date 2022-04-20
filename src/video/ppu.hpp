@@ -5,6 +5,8 @@
 #include <array>
 #include <functional>
 
+#include "video_defs.hpp"
+
 class Gameboy;
 
 class PPU
@@ -26,23 +28,11 @@ class PPU
          * @param cycles The amount of cycles that has passed
          */
         void tick(u8 cycles);
-        
-    private:
-        enum class Mode
-        {
-            HBlank,     // Mode 0
-            VBlank,     // Mode 1
-            OAM_Scan,   // Mode 2
-            Transfer    // Mode 3
-        };
 
-        struct Colour
-        {
-            u8 red;
-            u8 green;
-            u8 blue;
-            u8 alpha;
-        };
+        /**
+         * @brief Returns the state the PPU is in
+        **/
+        auto getMode() -> VideoMode;
 
     private:
         void drawBackgroundLine(u8 line);
@@ -57,7 +47,7 @@ class PPU
         std::array<u8, FRAME_BUFFER_SIZE> m_FrameBuffer      {{}};
         std::function<void(std::array<u8, FRAME_BUFFER_SIZE> buffer)> m_DrawCallback;
 
-        Mode m_Mode;
+        VideoMode m_Mode;
         u16 m_Cycles;
         u8 m_Line;
 

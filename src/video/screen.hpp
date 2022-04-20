@@ -18,13 +18,6 @@ class Screen
         ~Screen();
 
         /**
-         * @brief Get the SDL Window ID of the screen
-         * 
-         * @return The SDL Window ID 
-         */
-        [[nodiscard]] auto getWindowID() const -> u32;
-
-        /**
          * @brief Draws the buffer to the screen
          * 
          * @param buffer The buffer to draw

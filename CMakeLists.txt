@@ -12,7 +12,7 @@ add_executable("${PROJECT_NAME}"
     src/cpu/cpu.cpp src/cpu/instruction_cb.cpp src/cpu/instruction.cpp src/cpu/registers.cpp src/cpu/timer.cpp
     src/logging/logger.cpp
     src/video/ppu.cpp src/video/screen.cpp
-    src/flags.cpp src/gameboy.cpp src/main.cpp src/mmu.cpp src/scheduler.cpp)
+    src/flags.cpp src/gameboy.cpp src/main.cpp src/mmu.cpp)
 
 target_precompile_headers(Shatter PRIVATE include/core.hpp)
 

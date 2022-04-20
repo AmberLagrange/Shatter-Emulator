@@ -11,7 +11,6 @@
 #include <chrono>
 #include <thread>
 
-#include "scheduler.hpp"
 #include "gameboy.hpp"
 #include "video/screen.hpp"
 
@@ -59,12 +58,24 @@ auto main(int argc, char** argv) -> int
 
     Screen::init();
 
-    Scheduler s;
+    Gameboy gb;
+    gb.load(args[1]);
+    gb.start();
 
-    s.addGameboy(args[1]);
-    s.start();
+    while(gb.isRunning())
+    {
+        SDL_Event e;
+        if (SDL_PollEvent(&e))
+        {
+            if(e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_CLOSE)
+            {
+                gb.stop();
+                break;
+            }
+        }
 
-    while(s.run()) {}
+        gb.renderFrame();
+    }
 
     Screen::quit();
 

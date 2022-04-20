@@ -36,7 +36,12 @@ void Gameboy::tick()
 
 void Gameboy::renderFrame()
 {
-    for(int i = 0; i < 6400; ++i)
+    while(m_PPU.getMode() != VideoMode::VBlank)
+    {
+        tick();
+    }
+
+    while(m_PPU.getMode() == VideoMode::VBlank)
     {
         tick();
     }
@@ -86,9 +91,4 @@ void Gameboy::resetDiv()
 void Gameboy::setTimerSpeed(u32 speed)
 {
     m_Timer.setSpeed(speed);
-}
-
-auto Gameboy::getWindowID() const -> u32
-{
-    return m_Screen.getWindowID();
 }

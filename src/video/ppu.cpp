@@ -6,7 +6,7 @@
 #include "gameboy.hpp"
 
 PPU::PPU(Gameboy& gb)
-    : m_Gameboy(gb), m_Mode(Mode::OAM_Scan), m_Cycles(0)
+    : m_Gameboy(gb), m_Mode(VideoMode::OAM_Scan), m_Cycles(0)
 {
     DEBUG("Initializing GPU!");
 }
@@ -22,7 +22,7 @@ void PPU::tick(u8 cycles)
 
     switch(m_Mode)
     {
-        case Mode::HBlank:
+        case VideoMode::HBlank:
             if(m_Cycles >= CYCLES_PER_HBLANK)
             {
                 m_Cycles -= CYCLES_PER_HBLANK;
@@ -34,7 +34,7 @@ void PPU::tick(u8 cycles)
 
                 if(m_Line == GAMEBOY_HEIGHT)
                 {
-                    m_Mode = Mode::VBlank;
+                    m_Mode = VideoMode::VBlank;
                     m_Gameboy.raiseInterrupt(Flags::Interrupt::VBlank);
 
                     u8 stat = m_Gameboy.read(STAT_REGISTER);
@@ -52,7 +52,7 @@ void PPU::tick(u8 cycles)
                 }
                 else
                 {
-                    m_Mode = Mode::OAM_Scan;
+                    m_Mode = VideoMode::OAM_Scan;
 
                     u8 stat = m_Gameboy.read(STAT_REGISTER);
 
@@ -68,7 +68,7 @@ void PPU::tick(u8 cycles)
                 }
             }
             break;
-        case Mode::VBlank:
+        case VideoMode::VBlank:
             if(m_Cycles >= CYCLES_PER_LINE)
             {
                 m_Cycles -= CYCLES_PER_LINE;
@@ -76,7 +76,7 @@ void PPU::tick(u8 cycles)
 
                 if(m_Line == VBLANK_HEIGHT)
                 {
-                    m_Mode = Mode::OAM_Scan;
+                    m_Mode = VideoMode::OAM_Scan;
 
                     drawSprites();
                     std::invoke(m_DrawCallback, m_FrameBuffer);
@@ -96,12 +96,12 @@ void PPU::tick(u8 cycles)
                 };
             }
             break;
-        case Mode::OAM_Scan:
+        case VideoMode::OAM_Scan:
             if (m_Cycles >= CYCLES_PER_OAM_SCAN)
             {
                 m_Cycles -= CYCLES_PER_OAM_SCAN;
 
-                m_Mode = Mode::Transfer;
+                m_Mode = VideoMode::Transfer;
                 
                 u8 stat = m_Gameboy.read(STAT_REGISTER);
                 
@@ -111,12 +111,12 @@ void PPU::tick(u8 cycles)
                 m_Gameboy.write(STAT_REGISTER, stat);
             }
             break;
-        case Mode::Transfer:
+        case VideoMode::Transfer:
             if(m_Cycles >= CYCLES_PER_TRANSFER)
             {
                 m_Cycles -= CYCLES_PER_TRANSFER;
 
-                m_Mode = Mode::HBlank;
+                m_Mode = VideoMode::HBlank;
                 
                 u8 stat = m_Gameboy.read(STAT_REGISTER);
                 
@@ -151,6 +151,11 @@ void PPU::tick(u8 cycles)
     }
 
     m_Gameboy.write(LY_REGISTER, m_Line);
+}
+
+auto PPU::getMode() -> VideoMode
+{
+    return m_Mode;
 }
 
 void PPU::drawBackgroundLine(u8 line)

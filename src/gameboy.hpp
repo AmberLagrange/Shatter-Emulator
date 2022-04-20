@@ -105,13 +105,6 @@ class Gameboy
          * @param speed The speed to be set
          */
         void setTimerSpeed(u32 speed);
-
-        /**
-         * @brief Get the SDL Window ID of the screen
-         * 
-         * @return The SDL Window ID 
-         */
-        [[nodiscard]] auto getWindowID() const -> u32;
     private:
         APU m_APU;
         CPU m_CPU;
