@@ -172,15 +172,15 @@ void PPU::drawBackgroundLine(u8 line)
         u8 yPos = line + scrollY;
 
         // get the x and y position of the tile within the background
-        u8 tileXPos = xPos / BG_TILE_WIDTH;
-        u8 tileYPos = yPos / BG_TILE_HEIGHT;
+        u8 tileXPos = xPos / TILE_WIDTH;
+        u8 tileYPos = yPos / TILE_HEIGHT;
 
         // get the x and y position of the pixel within the tile
-        u8 pixelXPos = xPos % BG_TILE_WIDTH;
-        u8 pixelYPos = yPos % BG_TILE_HEIGHT;
+        u8 pixelXPos = xPos % TILE_WIDTH;
+        u8 pixelYPos = yPos % TILE_HEIGHT;
 
         // get the tile index number and the tile within the tile map
-        u16 tileIndex = tileXPos + tileYPos * BG_TILES_PER_LINE;
+        u16 tileIndex = tileXPos + tileYPos * TILES_PER_LINE;
         u8  tileID    = m_Gameboy.read(tileMapAddress + tileIndex);
 
         // get the memory offset of the tile in the tile data
@@ -195,41 +195,8 @@ void PPU::drawBackgroundLine(u8 line)
         u8 low  = m_Gameboy.read(tileAddress    );
         u8 high = m_Gameboy.read(tileAddress + 1);
 
-        // TODO: Colour pallets
-        u8 bit = 7 - pixelXPos;
-        u8 colour = GET_BIT(low, bit) | (GET_BIT(high, bit) << 1);
-        
-        u8 red, green, blue; // NOLINT(cppcoreguidelines-init-variables)
-
-        if(colour == 0)
-        {
-            red     = 0x9B; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-            green   = 0xBC; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-            blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        }
-        else if(colour == 1)
-        {
-            red     = 0x30; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-            green   = 0x62; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-            blue    = 0x30; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        }
-        else if(colour == 2)
-        {
-            red     = 0x8B; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-            green   = 0xAC; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-            blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        }
-        else
-        {
-            red     = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-            green   = 0x38; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-            blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        }
-
-        m_FrameBuffer.at((col + line * GAMEBOY_WIDTH) * 4    ) = red;
-        m_FrameBuffer.at((col + line * GAMEBOY_WIDTH) * 4 + 1) = green;
-        m_FrameBuffer.at((col + line * GAMEBOY_WIDTH) * 4 + 2) = blue;
-        m_FrameBuffer.at((col + line * GAMEBOY_WIDTH) * 4 + 3) = 0xFF;
+        Colour c = getColour(pixelXPos, tileAddress);
+        drawPixel(col, line, c);
     }
 }
 
@@ -268,15 +235,15 @@ void PPU::drawWindowLine(u8 line)
         u8 yPos = line + windowY;
 
         // get the x and y position of the tile within the background
-        u8 tileXPos = xPos / BG_TILE_WIDTH;
-        u8 tileYPos = yPos / BG_TILE_HEIGHT;
+        u8 tileXPos = xPos / TILE_WIDTH;
+        u8 tileYPos = yPos / TILE_HEIGHT;
 
         // get the x and y position of the pixel within the tile
-        u8 pixelXPos = xPos % BG_TILE_WIDTH;
-        u8 pixelYPos = yPos % BG_TILE_HEIGHT;
+        u8 pixelXPos = xPos % TILE_WIDTH;
+        u8 pixelYPos = yPos % TILE_HEIGHT;
 
         // get the tile index number and the tile within the tile map
-        u16 tileIndex = tileXPos + tileYPos * BG_TILES_PER_LINE;
+        u16 tileIndex = tileXPos + tileYPos * TILES_PER_LINE;
         u8  tileID    = m_Gameboy.read(tileMapAddress + tileIndex);
 
         // get the memory offset of the tile in the tile data
@@ -288,48 +255,63 @@ void PPU::drawWindowLine(u8 line)
         // add 2 bytes/line based on the y offset into the tile
         u16 tileAddress = tileDataAddress + tileDataOffset + 2 * pixelYPos;
 
-        u8 low  = m_Gameboy.read(tileAddress    );
-        u8 high = m_Gameboy.read(tileAddress + 1);
+        Colour c;
 
-        // TODO: Colour pallets
-        u8 bit = 7 - pixelXPos;
-        u8 colour = GET_BIT(low, bit) | (GET_BIT(high, bit) << 1);
-        
-        u8 red, green, blue; // NOLINT(cppcoreguidelines-init-variables)
-
-        if(colour == 0)
-        {
-            red     = 0x9B; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-            green   = 0xBC; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-            blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        }
-        else if(colour == 1)
-        {
-            red     = 0x30; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-            green   = 0x62; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-            blue    = 0x30; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        }
-        else if(colour == 2)
-        {
-            red     = 0x8B; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-            green   = 0xAC; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-            blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        }
-        else
-        {
-            red     = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-            green   = 0x38; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-            blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        }
-
-        m_FrameBuffer.at((col + line * GAMEBOY_WIDTH) * 4    ) = red;
-        m_FrameBuffer.at((col + line * GAMEBOY_WIDTH) * 4 + 1) = green;
-        m_FrameBuffer.at((col + line * GAMEBOY_WIDTH) * 4 + 2) = blue;
-        m_FrameBuffer.at((col + line * GAMEBOY_WIDTH) * 4 + 3) = 0xFF;
+        drawPixel(col, line, c);
     }
 }
 
 void PPU::drawSprites()
 {
+    
+}
 
+auto PPU::getColour(u8 pixelXPos, u16 tileAddress) -> Colour
+{
+    // TODO: Colour pallets
+
+    u8 low  = m_Gameboy.read(tileAddress    );
+    u8 high = m_Gameboy.read(tileAddress + 1);
+
+    u8 bit = 7 - pixelXPos;
+    u8 colour = GET_BIT(low, bit) | (GET_BIT(high, bit) << 1);
+
+    Colour c;
+
+    if(colour == 0)
+    {
+        c.red     = 0x9B; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.green   = 0xBC; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+    }
+    else if(colour == 1)
+    {
+        c.red     = 0x30; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.green   = 0x62; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.blue    = 0x30; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+    }
+    else if(colour == 2)
+    {
+        c.red     = 0x8B; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.green   = 0xAC; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+    }
+    else
+    {
+        c.red     = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.green   = 0x38; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+    }
+
+    c.alpha = 0xFF;
+
+    return c;
+}
+
+void PPU::drawPixel(u8 x, u8 y, Colour c)
+{
+    m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4    ) = c.red;
+    m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 1) = c.green;
+    m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 2) = c.blue;
+    m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 3) = c.alpha;
 }

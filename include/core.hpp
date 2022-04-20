@@ -111,10 +111,12 @@ constexpr u16 TILE_MAP_ONE      = 0x9800;
 constexpr u16 BG_WIDTH          = 0x0100;
 constexpr u16 BG_HEIGHT         = 0x0100;
 
-constexpr u8  BG_TILE_WIDTH     = 8;
-constexpr u8  BG_TILE_HEIGHT    = 8;
-constexpr u8  BG_TILES_PER_LINE = 32;
+constexpr u8  TILE_WIDTH        = 8;
+constexpr u8  TILE_HEIGHT       = 8;
+constexpr u8  TILES_PER_LINE    = 32;
 constexpr u8  BYTES_PER_TILE    = 16;
+
+constexpr u8  BYTES_PER_SPRITE  = 4;
 
 constexpr u8 GAMEBOY_WIDTH      = 160;
 constexpr u8 GAMEBOY_HEIGHT     = 144;

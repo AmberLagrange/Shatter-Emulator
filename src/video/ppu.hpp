@@ -28,11 +28,6 @@ class PPU
         void tick(u8 cycles);
         
     private:
-        void drawBackgroundLine(u8 line);
-        void drawWindowLine(u8 line);
-        void drawSprites();
-
-    private:
         enum class Mode
         {
             HBlank,     // Mode 0
@@ -41,6 +36,22 @@ class PPU
             Transfer    // Mode 3
         };
 
+        struct Colour
+        {
+            u8 red;
+            u8 green;
+            u8 blue;
+            u8 alpha;
+        };
+
+    private:
+        void drawBackgroundLine(u8 line);
+        void drawWindowLine(u8 line);
+        void drawSprites();
+
+        auto getColour(u8 pixelXPos, u16 tileAddress) -> Colour;
+        void drawPixel(u8 x, u8 y, Colour c);
+    private:
         Gameboy& m_Gameboy;
 
         std::array<u8, FRAME_BUFFER_SIZE> m_FrameBuffer      {{}};
