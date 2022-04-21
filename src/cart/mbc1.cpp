@@ -3,17 +3,48 @@
 #include "mbc1.hpp"
 
 MBC1::MBC1()
-    : m_BankNumber(0) {}
+    : m_RomBankNumber(1), m_RamBankNumber(0), m_RamEnabled(false) {}
 
 auto MBC1::read(u16 address) const -> u8
 {
-    return (address < BANK_SIZE) ? m_Data.at(address) : m_Data.at(address + BANK_SIZE * m_BankNumber);
+    switch(address & 0xE000)
+    {
+        case 0x4000:
+        case 0x6000:
+            return m_Data.at((address - BANK_SIZE) + BANK_SIZE * m_RomBankNumber);
+        case 0xA000:
+            return m_Ram.at((address - 0xA000) + BANK_SIZE * m_RamBankNumber);
+        default:
+            return m_Data.at(address);
+    }
+    
 }
 
 void MBC1::write(u16 address, u8 val)
 {
-    if(address < BANK_SIZE) // ROM Bank Swapping
+    switch(address & 0xE000)
     {
-        m_BankNumber = (val & 0x1F) - 1; //NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        case 0x0000: //RAM Enable
+            m_RamEnabled = (val == 0x0A);
+            break;
+        case 0x2000: //ROM Bank Switching
+            m_RomBankNumber = (val & 0x1F);
+
+            if(m_RomBankNumber == 0x00 || m_RomBankNumber == 0x20 ||
+               m_RomBankNumber == 0x40 || m_RomBankNumber == 0x60)
+            {
+                m_RomBankNumber++;
+            }
+            break;
+        case 0x4000:
+            if(val <= 0x03) m_RamBankNumber = (val & 0x03);
+            break;
+        case 0x6000:
+            break;
+        case 0xA000:
+            if(m_RamEnabled)
+            {
+                m_Ram.at((address - 0xA000) + BANK_SIZE * m_RamBankNumber) = val;
+            }
     }
 }

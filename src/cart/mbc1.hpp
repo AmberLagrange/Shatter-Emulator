@@ -1,5 +1,9 @@
 #pragma once
 
+#include "core.hpp"
+
+#include <array>
+
 #include "mbc.hpp"
 
 class MBC1 : public MBC
@@ -24,5 +28,10 @@ class MBC1 : public MBC
         virtual void write(u16 address, u8 val) override;
 
     private:
-        u8 m_BankNumber;
+        u8 m_RomBankNumber;
+
+        u8 m_RamBankNumber;
+        bool m_RamEnabled = false;
+
+        std::array<u8, 0x8000 * 4> m_Ram {{}};
 };

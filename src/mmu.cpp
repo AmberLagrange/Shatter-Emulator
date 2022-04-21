@@ -21,6 +21,8 @@ void MMU::load(const char* path)
             m_Rom = std::make_unique<MBC>();
             break;
         case Cart::Type::MBC1:
+        case Cart::Type::MBC1_RAM:
+        case Cart::Type::MBC1_RAM_BATTERY:
             DEBUG("MBC1!");
             m_Rom = std::make_unique<MBC1>();
             break;
