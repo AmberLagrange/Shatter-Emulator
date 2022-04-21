@@ -13,7 +13,7 @@ void CPU::opcodeRLC(u8& reg)
 {
     clearAllFlags();
 
-    u8 carry = GET_BIT(reg, 7);
+    u8 carry = bit_functions::get_bit(reg, 7);
 
     reg = (reg << 1) | carry;
 
@@ -25,7 +25,7 @@ void CPU::opcodeRRC(u8& reg)
 {
     clearAllFlags();
 
-    u8 carry = GET_BIT(reg, 0);
+    u8 carry = bit_functions::get_bit(reg, 0);
 
     reg = (carry << 7) | (reg >> 1);
 
@@ -39,7 +39,7 @@ void CPU::opcodeRL(u8& reg)
 
     clearAllFlags();
 
-    if(GET_BIT(reg, 7)) setFlag(Flags::Register::Carry);
+    if(bit_functions::get_bit(reg, 7)) setFlag(Flags::Register::Carry);
 
     reg = (reg << 1) | carry;
 
@@ -52,7 +52,7 @@ void CPU::opcodeRR(u8& reg)
 
     clearAllFlags();
 
-    if(GET_BIT(reg, 0)) setFlag(Flags::Register::Carry);
+    if(bit_functions::get_bit(reg, 0)) setFlag(Flags::Register::Carry);
 
     reg = (carry << 7) | (reg >> 1);
 
@@ -63,7 +63,7 @@ void CPU::opcodeSLA(u8& reg)
 {
     clearAllFlags();
 
-    if(GET_BIT(reg, 7)) setFlag(Flags::Register::Carry);
+    if(bit_functions::get_bit(reg, 7)) setFlag(Flags::Register::Carry);
 
     reg <<= 1;
 
@@ -74,11 +74,11 @@ void CPU::opcodeSRA(u8& reg)
 {
     clearAllFlags();
 
-    if(GET_BIT(reg, 0)) setFlag(Flags::Register::Carry);
+    if(bit_functions::get_bit(reg, 0)) setFlag(Flags::Register::Carry);
     
     reg >>= 1;
 
-    if(GET_BIT(reg, 6)) reg |= 0x80;
+    if(bit_functions::get_bit(reg, 6)) reg |= 0x80;
 
     setZeroFromVal(reg);
 }
@@ -94,7 +94,7 @@ void CPU::opcodeSWAP(u8& reg)
 
 void CPU::opcodeSRL(u8& reg)
 {
-    u8 carry = GET_BIT(reg, 0);
+    u8 carry = bit_functions::get_bit(reg, 0);
 
     clearAllFlags();
 
@@ -106,7 +106,7 @@ void CPU::opcodeSRL(u8& reg)
 
 void CPU::opcodeBIT(u8 bit, u8& reg)
 {
-    if(GET_BIT(reg, bit)) clearFlag(Flags::Register::Zero);
+    if(bit_functions::get_bit(reg, bit)) clearFlag(Flags::Register::Zero);
     else
         setFlag(Flags::Register::Zero);
 
@@ -116,12 +116,12 @@ void CPU::opcodeBIT(u8 bit, u8& reg)
 
 void CPU::opcodeRES(u8 bit, u8& reg)
 {
-    CLEAR_BIT(reg, bit);
+    bit_functions::clear_bit(reg, bit);
 }
 
 void CPU::opcodeSET(u8 bit, u8& reg)
 {
-    SET_BIT(reg, bit);
+    bit_functions::set_bit(reg, bit);
 }
 
 //HL variants
@@ -130,7 +130,7 @@ void CPU::opcodeBIT_HL(u8 bit)
 {
     u8 val = m_Gameboy.read(m_Registers.HL());
 
-    if(GET_BIT(val, bit)) clearFlag(Flags::Register::Zero);
+    if(bit_functions::get_bit(val, bit)) clearFlag(Flags::Register::Zero);
     else
         setFlag(Flags::Register::Zero);
 
@@ -214,7 +214,7 @@ void CPU::opcodeCB0x06() // RLC (HL)
     
     clearAllFlags();
 
-    u8 carry = GET_BIT(val, 7);
+    u8 carry = bit_functions::get_bit(val, 7);
 
     val = (val << 1) | carry;
 
@@ -289,7 +289,7 @@ void CPU::opcodeCB0x0E() // RRC (HL)
 
     clearAllFlags();
 
-    u8 carry = GET_BIT(val, 0);
+    u8 carry = bit_functions::get_bit(val, 0);
 
     val = (carry << 7) | (val >> 1);
 
@@ -368,7 +368,7 @@ void CPU::opcodeCB0x16() // RL (HL)
 
     clearAllFlags();
 
-    if(GET_BIT(val, 7)) setFlag(Flags::Register::Carry);
+    if(bit_functions::get_bit(val, 7)) setFlag(Flags::Register::Carry);
 
     val = (val << 1) | carry;
 
@@ -444,7 +444,7 @@ void CPU::opcodeCB0x1E() // RR (HL)
 
     clearAllFlags();
 
-    if(GET_BIT(val, 0)) setFlag(Flags::Register::Carry);
+    if(bit_functions::get_bit(val, 0)) setFlag(Flags::Register::Carry);
 
     val = (carry << 7) | (val >> 1);
 
@@ -520,7 +520,7 @@ void CPU::opcodeCB0x26() // SLA (HL)
 
     clearAllFlags();
 
-    if(GET_BIT(val, 7)) setFlag(Flags::Register::Carry);
+    if(bit_functions::get_bit(val, 7)) setFlag(Flags::Register::Carry);
 
     val <<= 1;
 
@@ -594,10 +594,10 @@ void CPU::opcodeCB0x2E() // SRA (HL)
 
     clearAllFlags();
 
-    if(GET_BIT(val, 0)) setFlag(Flags::Register::Carry);
+    if(bit_functions::get_bit(val, 0)) setFlag(Flags::Register::Carry);
     val >>= 1;
 
-    if(GET_BIT(val, 6)) val |= 0x80;
+    if(bit_functions::get_bit(val, 6)) val |= 0x80;
 
     setZeroFromVal(val);
 
@@ -742,7 +742,7 @@ void CPU::opcodeCB0x3E() // SRL (HL)
 {
     u8 val = m_Gameboy.read(m_Registers.HL());
 
-    u8 carry = GET_BIT(val, 0);
+    u8 carry = bit_functions::get_bit(val, 0);
 
     clearAllFlags();
 

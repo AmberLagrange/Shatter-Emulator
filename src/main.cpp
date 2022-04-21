@@ -1,3 +1,5 @@
+#include "SDL_events.h"
+#include "SDL_keycode.h"
 #include "core.hpp"
 
 #include <span>
@@ -67,10 +69,44 @@ auto main(int argc, char** argv) -> int
         SDL_Event e;
         if (SDL_PollEvent(&e))
         {
-            if(e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_CLOSE)
+            switch(e.type)
             {
-                gb.stop();
-                break;
+                case SDL_WINDOWEVENT:
+                    if(e.window.event == SDL_WINDOWEVENT_CLOSE)
+                    {
+                        gb.stop();
+                    }
+                    break;
+                case SDL_KEYDOWN:
+                    if(e.key.repeat) break;
+                    switch(e.key.keysym.sym)
+                    {
+                        case SDLK_RIGHT:     gb.press(Button::Right);  break;
+                        case SDLK_LEFT:      gb.press(Button::Left);   break;
+                        case SDLK_UP:        gb.press(Button::Up);     break;
+                        case SDLK_DOWN:      gb.press(Button::Down);   break;
+
+                        case SDLK_z:         gb.press(Button::A);      break;
+                        case SDLK_x:         gb.press(Button::B);      break;
+                        case SDLK_BACKSPACE: gb.press(Button::Select); break;
+                        case SDLK_RETURN:    gb.press(Button::Start);  break;
+                    }
+                    break;
+                case SDL_KEYUP:
+                    if(e.key.repeat) break;
+                    switch(e.key.keysym.sym)
+                    {
+                        case SDLK_RIGHT:     gb.release(Button::Right);  break;
+                        case SDLK_LEFT:      gb.release(Button::Left);   break;
+                        case SDLK_UP:        gb.release(Button::Up);     break;
+                        case SDLK_DOWN:      gb.release(Button::Down);   break;
+
+                        case SDLK_z:         gb.release(Button::A);      break;
+                        case SDLK_x:         gb.release(Button::B);      break;
+                        case SDLK_BACKSPACE: gb.release(Button::Select); break;
+                        case SDLK_RETURN:    gb.release(Button::Start);  break;
+                    }
+                    break;
             }
         }
 

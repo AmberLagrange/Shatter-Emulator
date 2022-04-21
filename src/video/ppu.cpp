@@ -39,11 +39,11 @@ void PPU::tick(u8 cycles)
 
                     u8 stat = m_Gameboy.read(STAT_REGISTER);
 
-                    SET_BIT(stat, 0);
-                    CLEAR_BIT(stat, 1);
+                    bit_functions::set_bit_to(stat, 0, 1);
+                    bit_functions::set_bit_to(stat, 1, 0);
 
                     // STAT interrupt checks OAM bit as well
-                    if(GET_BIT(stat, STAT_VBLANK_BIT) || GET_BIT(stat, STAT_OAM_BIT))
+                    if(bit_functions::get_bit(stat, STAT_VBLANK_BIT) || bit_functions::get_bit(stat, STAT_OAM_BIT))
                     {
                         m_Gameboy.raiseInterrupt(Flags::Interrupt::LCD_STAT);
                     }
@@ -56,10 +56,10 @@ void PPU::tick(u8 cycles)
 
                     u8 stat = m_Gameboy.read(STAT_REGISTER);
 
-                    CLEAR_BIT(stat, 0);
-                    SET_BIT(stat, 1);
+                    bit_functions::set_bit_to(stat, 0, 0);
+                    bit_functions::set_bit_to(stat, 1, 1);
 
-                    if(GET_BIT(stat, STAT_OAM_BIT))
+                    if(bit_functions::get_bit(stat, STAT_OAM_BIT))
                     {
                         m_Gameboy.raiseInterrupt(Flags::Interrupt::LCD_STAT);
                     }
@@ -84,10 +84,10 @@ void PPU::tick(u8 cycles)
                     
                     u8 stat = m_Gameboy.read(STAT_REGISTER);
                     
-                    CLEAR_BIT(stat, 0);
-                    SET_BIT(stat, 1);
+                    bit_functions::set_bit_to(stat, 0, 0);
+                    bit_functions::set_bit_to(stat, 1, 1);
 
-                    if(GET_BIT(stat, STAT_OAM_BIT))
+                    if(bit_functions::get_bit(stat, STAT_OAM_BIT))
                     {
                         m_Gameboy.raiseInterrupt(Flags::Interrupt::LCD_STAT);
                     }
@@ -105,8 +105,8 @@ void PPU::tick(u8 cycles)
                 
                 u8 stat = m_Gameboy.read(STAT_REGISTER);
                 
-                SET_BIT(stat, 0);
-                SET_BIT(stat, 1);
+                bit_functions::set_bit_to(stat, 0, 1);
+                bit_functions::set_bit_to(stat, 1, 1);
 
                 m_Gameboy.write(STAT_REGISTER, stat);
             }
@@ -120,26 +120,26 @@ void PPU::tick(u8 cycles)
                 
                 u8 stat = m_Gameboy.read(STAT_REGISTER);
                 
-                CLEAR_BIT(stat, 0);
-                CLEAR_BIT(stat, 1);
+                bit_functions::set_bit_to(stat, 0, 0);
+                bit_functions::set_bit_to(stat, 1, 0);
 
-                if(GET_BIT(stat, STAT_HBLANK_BIT))
+                if(bit_functions::get_bit(stat, STAT_HBLANK_BIT))
                 {
                     m_Gameboy.raiseInterrupt(Flags::Interrupt::LCD_STAT);
                 }
 
                 // LYC enabled
-                if(GET_BIT(stat, STAT_LYC_BIT))
+                if(bit_functions::get_bit(stat, STAT_LYC_BIT))
                 {
                     u8 lyc = m_Gameboy.read(LYC_REGISTER);
                     if(m_Line == lyc)
                     {
-                        SET_BIT(stat, STAT_LCY_LY_BIT);
+                        bit_functions::set_bit(stat, STAT_LCY_LY_BIT);
                         m_Gameboy.raiseInterrupt(Flags::Interrupt::LCD_STAT);
                     }
                     else
                     {
-                        CLEAR_BIT(stat, STAT_LCY_LY_BIT);
+                        bit_functions::clear_bit(stat, STAT_LCY_LY_BIT);
                     }
                 }
 
@@ -165,8 +165,8 @@ void PPU::drawBackgroundLine(u8 line)
     u8 scrollX = m_Gameboy.read(SCX_REGISTER);
     u8 scrollY = m_Gameboy.read(SCY_REGISTER);
 
-    u16 tileMapAddress  = GET_BIT(lcdc, 3) ? TILE_MAP_ZERO  : TILE_MAP_ONE;
-    u16 tileDataAddress = GET_BIT(lcdc, 4) ? TILE_DATA_ZERO : TILE_DATA_ONE;
+    u16 tileMapAddress  = bit_functions::get_bit(lcdc, 3) ? TILE_MAP_ZERO  : TILE_MAP_ONE;
+    u16 tileDataAddress = bit_functions::get_bit(lcdc, 4) ? TILE_DATA_ZERO : TILE_DATA_ONE;
 
     bool usingTileDataZero = (tileDataAddress == TILE_DATA_ZERO);
 
@@ -209,7 +209,7 @@ void PPU::drawWindowLine(u8 line)
 {
     u8 lcdc = m_Gameboy.read(LCDC_REGISTER);
 
-    if(!GET_BIT(lcdc, 5)) // Window not rendering
+    if(!bit_functions::get_bit(lcdc, 5)) // Window not rendering
     {
         return;
     }
@@ -228,8 +228,8 @@ void PPU::drawWindowLine(u8 line)
         return;
     }
 
-    u16 tileDataAddress = GET_BIT(lcdc, 4) ? TILE_DATA_ZERO : TILE_DATA_ONE;
-    u16 tileMapAddress  = GET_BIT(lcdc, 6) ? TILE_MAP_ZERO  : TILE_MAP_ONE;
+    u16 tileDataAddress = bit_functions::get_bit(lcdc, 4) ? TILE_DATA_ZERO : TILE_DATA_ONE;
+    u16 tileMapAddress  = bit_functions::get_bit(lcdc, 6) ? TILE_MAP_ZERO  : TILE_MAP_ONE;
 
     bool usingTileDataZero = (tileDataAddress == TILE_DATA_ZERO);
 
@@ -274,12 +274,11 @@ void PPU::drawSprites()
 auto PPU::getColour(u8 pixelXPos, u16 tileAddress) -> Colour
 {
     // TODO: Colour pallets
-
     u8 low  = m_Gameboy.read(tileAddress    );
     u8 high = m_Gameboy.read(tileAddress + 1);
 
     u8 bit = 7 - pixelXPos;
-    u8 colour = GET_BIT(low, bit) | (GET_BIT(high, bit) << 1);
+    u8 colour = bit_functions::get_bit(low, bit) | (bit_functions::get_bit(high, bit) << 1);
 
     Colour c;
 

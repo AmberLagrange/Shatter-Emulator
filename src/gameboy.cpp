@@ -1,5 +1,6 @@
 #include "core.hpp"
 
+#include "flags.hpp"
 #include "gameboy.hpp"
 
 Gameboy::Gameboy()
@@ -81,6 +82,27 @@ void Gameboy::setIME(bool ime)
 void Gameboy::raiseInterrupt(const Flags::Interrupt& flag)
 {
     m_CPU.raiseInterrupt(flag);
+}
+
+void Gameboy::press(Button button)
+{
+    m_Joypad.press(button);
+    raiseInterrupt(Flags::Interrupt::Joypad);
+}
+
+void Gameboy::release(Button button)
+{
+    m_Joypad.release(button);
+}
+
+void Gameboy::writeInput(u8 val)
+{
+    m_Joypad.writeInput(val);
+}
+
+auto Gameboy::getInput() -> u8
+{
+    return m_Joypad.getInput();
 }
 
 void Gameboy::resetDiv()

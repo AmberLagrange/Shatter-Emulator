@@ -81,31 +81,34 @@ void CPU::handleInterrupts(u8& cycles)
     {
         if(m_IME)
         {
-            pushStack(m_Registers.PC());
-
             if(enabledFlags & Flags::Interrupt::VBlank)
             {
                 flags &= ~Flags::Interrupt::VBlank;
+                pushStack(m_Registers.PC());
                 m_Registers.PC() = VBLANK_VECTOR;
             }
             else if(enabledFlags & Flags::Interrupt::LCD_STAT)
             {
                 flags &= ~Flags::Interrupt::LCD_STAT;
+                pushStack(m_Registers.PC());
                 m_Registers.PC() = LCD_STAT_VECTOR;
             }
             else if(enabledFlags & Flags::Interrupt::Timer)
             {
                 flags &= ~Flags::Interrupt::Timer;
+                pushStack(m_Registers.PC());
                 m_Registers.PC() = TIMER_VECTOR;
             }
             else if(enabledFlags & Flags::Interrupt::Serial)
             {
                 flags &= ~Flags::Interrupt::Serial;
+                pushStack(m_Registers.PC());
                 m_Registers.PC() = SERIAL_VECTOR;
             }
             else if(enabledFlags & Flags::Interrupt::Joypad)
             {
                 flags &= ~Flags::Interrupt::Joypad;
+                pushStack(m_Registers.PC());
                 m_Registers.PC() = JOYPAD_VECTOR;
             }
             

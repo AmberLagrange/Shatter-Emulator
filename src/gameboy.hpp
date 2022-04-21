@@ -12,6 +12,8 @@
 #include "video/screen.hpp"
 #include "video/ppu.hpp"
 
+#include "joypad.hpp"
+
 class Gameboy
 {
     public:
@@ -93,6 +95,11 @@ class Gameboy
          */
         void raiseInterrupt(const Flags::Interrupt& flag);
 
+        void press(Button button);
+        void release(Button button);
+        void writeInput(u8 val);
+        auto getInput() -> u8;
+
         /**
          * @brief Resets the DIV counter in the timer
          * 
@@ -110,6 +117,8 @@ class Gameboy
         CPU m_CPU;
         MMU m_MMU;
         PPU m_PPU;
+
+        Joypad m_Joypad;
 
         Timer m_Timer;
 

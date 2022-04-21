@@ -332,7 +332,7 @@ void CPU::opcode0x07() // RLCA
 
     clearAllFlags();
 
-    u8 carry = GET_BIT(m_Registers.A(), 7);
+    u8 carry = bit_functions::get_bit(m_Registers.A(), 7);
     m_Registers.A() = (m_Registers.A() << 1) | carry;
 
     if(carry) setFlag(Flags::Register::Carry);
@@ -398,7 +398,7 @@ void CPU::opcode0x0F() // RRCA
 
     clearAllFlags();
 
-    u8 carry = GET_BIT(m_Registers.A(), 0);
+    u8 carry = bit_functions::get_bit(m_Registers.A(), 0);
     m_Registers.A() = (carry << 7) | (m_Registers.A() >> 1);
 
     if(carry) setFlag(Flags::Register::Carry);
@@ -464,7 +464,7 @@ void CPU::opcode0x17() // RLA
 
     clearAllFlags();
 
-    if(GET_BIT(m_Registers.A(), 7)) setFlag(Flags::Register::Carry);
+    if(bit_functions::get_bit(m_Registers.A(), 7)) setFlag(Flags::Register::Carry);
 
     m_Registers.A() = (m_Registers.A() << 1) | carry;
 
@@ -526,7 +526,7 @@ void CPU::opcode0x1F() // RRA
 
     clearAllFlags();
 
-    if(GET_BIT(m_Registers.A(), 0)) setFlag(Flags::Register::Carry);
+    if(bit_functions::get_bit(m_Registers.A(), 0)) setFlag(Flags::Register::Carry);
 
     m_Registers.A() = (carry << 7) | (m_Registers.A() >> 1);
 }

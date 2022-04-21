@@ -20,7 +20,7 @@ void Timer::update(u8 cycles)
         m_Gameboy.write(DIV_REGISTER, m_Gameboy.read(DIV_REGISTER) + 1);
     }
 
-    if(GET_BIT(m_Gameboy.read(TAC_REGISTER), 2))
+    if(bit_functions::get_bit(m_Gameboy.read(TAC_REGISTER), 2))
     {
         m_TIMA += cycles;
 

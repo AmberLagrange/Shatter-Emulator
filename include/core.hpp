@@ -40,10 +40,15 @@ using i32 = int32_t;
 //TODO: Move constexpr into namespace
 
 //Bit Functions
-constexpr auto GET_BIT(u8 x, u8 n)    -> bool { return (x >> n) & 0x01; }
-constexpr auto SET_BIT(u8& x, u8 n)   -> u8&  { return x |= (0x01 << n); }
-constexpr auto CLEAR_BIT(u8& x, u8 n) -> u8&  { return x &= ~(0x01 << n); }
-constexpr auto FLIP_BIT(u8& x, u8 n)  -> u8&  { return x ^= (0x01 << n); }
+
+namespace bit_functions
+{
+    inline auto get_bit(u8 x, u8 n)              -> bool { return (x >> n) & 0x01; }
+    inline auto set_bit(u8& x, u8 n)             -> u8&  { return x |= (0x01 << n); }
+    inline auto clear_bit(u8& x, u8 n)           -> u8&  { return x &= ~(0x01 << n); }
+    inline auto flip_bit(u8& x, u8 n)            -> u8&  { return x ^= (0x01 << n); }
+    inline auto set_bit_to(u8& x, u8 n, bool v)  -> u8&  { return (v ? set_bit(x, n) : clear_bit(x, n)); }
+}
 
 //Clock and Timers
 constexpr u32 CLOCK_SPEED       = 4194304;
@@ -123,6 +128,20 @@ constexpr u8 GAMEBOY_HEIGHT     = 144;
 constexpr u8 VBLANK_HEIGHT      = 154;
 
 constexpr u32 FRAME_BUFFER_SIZE = GAMEBOY_WIDTH * GAMEBOY_HEIGHT * 4;
+
+//Joypad Info
+/**
+    https://gbdev.io/pandocs/Joypad_Input.html
+**/
+
+constexpr u16 JOYPAD_REGISTER   = 0xFF00;
+
+constexpr u8  P10_INPUT_BIT     = 0; //Right or A        (0=Pressed) (Read Only)
+constexpr u8  P11_INPUT_BIT     = 1; //Left  or B        (0=Pressed) (Read Only)
+constexpr u8  P12_INPUT_BIT     = 2; //Up    or Select   (0=Pressed) (Read Only)
+constexpr u8  P13_INPUT_BIT     = 3; //Down  or Start    (0=Pressed) (Read Only)
+constexpr u8  P14_INPUT_BIT     = 4; //Direction buttons (0=Select)
+constexpr u8  P15_INPUT_BIT     = 5; //Action buttons    (0=Select)
 
 //Cartridge Header
 constexpr u16 CART_TYPE         = 0x0147;

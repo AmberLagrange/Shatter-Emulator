@@ -72,10 +72,11 @@ auto MMU::read(u16 address) const -> u8
     }
     else if(address < IO_ADDR)
     {
-        if(address == 0xFF00)
+        if(address == JOYPAD_REGISTER)
         {
-            return 0xFF;
+            return m_Gameboy.getInput();
         }
+
         return m_Memory.at(address - ROM_SIZE);
     }
     else
@@ -120,6 +121,9 @@ void MMU::write(u16 address, u8 val)
     {
         switch(address)
         {
+            case JOYPAD_REGISTER:
+                m_Gameboy.writeInput(val);
+                break;
             case DIV_REGISTER:
                 m_Gameboy.resetDiv();
                 break;
