@@ -284,27 +284,27 @@ auto PPU::getColour(u8 pixelXPos, u16 tileAddress) -> Colour
 
     if(colour == 0)
     {
-        c.red     = 0xFF; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        c.green   = 0xFF; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        c.blue    = 0xFF; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.red     = 0x9B; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.green   = 0xBC; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
     }
     else if(colour == 1)
     {
-        c.red     = 0xAA; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        c.green   = 0xAA; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        c.blue    = 0xAA; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.red     = 0x8B; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.green   = 0xAC; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
     }
     else if(colour == 2)
     {
-        c.red     = 0x55; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        c.green   = 0x55; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        c.blue    = 0x55; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.red     = 0x30; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.green   = 0x62; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.blue    = 0x30; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
     }
     else
     {
-        c.red     = 0x00; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        c.green   = 0x00; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        c.blue    = 0x00; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.red     = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.green   = 0x38; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+        c.blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
     }
 
     c.alpha = 0xFF;

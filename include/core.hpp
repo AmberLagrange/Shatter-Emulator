@@ -123,9 +123,9 @@ constexpr u8  BYTES_PER_TILE    = 16;
 
 constexpr u8  BYTES_PER_SPRITE  = 4;
 
-constexpr u8 GAMEBOY_WIDTH      = 160;
-constexpr u8 GAMEBOY_HEIGHT     = 144;
-constexpr u8 VBLANK_HEIGHT      = 154;
+constexpr u8  GAMEBOY_WIDTH      = 160;
+constexpr u8  GAMEBOY_HEIGHT     = 144;
+constexpr u8  VBLANK_HEIGHT      = 154;
 
 constexpr u32 FRAME_BUFFER_SIZE = GAMEBOY_WIDTH * GAMEBOY_HEIGHT * 4;
 
