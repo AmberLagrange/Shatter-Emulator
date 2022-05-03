@@ -2,6 +2,8 @@
 
 #include "core.hpp"
 
+#include "SDL_keycode.h"
+
 /**
     The eight Game Boy action/direction buttons are arranged
     as a 2x4 matrix. Select either action or direction buttons
@@ -15,7 +17,8 @@ enum class Button
     Right,  A,      // Bit 0
     Left,   B,      // Bit 1
     Up,     Select, // Bit 2
-    Down,   Start   // Bit 3
+    Down,   Start,  // Bit 3
+    None            // Unused
 };
 
 class Joypad
@@ -47,6 +50,12 @@ class Joypad
          * 
          */
         [[nodiscard]] auto getInput() -> u8;
+
+        /**
+         * @brief Convert an SDL2 keycode to 
+         * 
+         */
+        [[nodiscard]] auto getButton(SDL_Keycode keycode) -> Button;
     private:
 
         /**

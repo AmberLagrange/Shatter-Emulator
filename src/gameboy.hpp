@@ -123,6 +123,12 @@ class Gameboy
         __always_inline auto getInput() -> u8;
 
         /**
+         * @brief Gets the button from an SDL keycode
+         * 
+         */
+        __always_inline auto getButton(SDL_Keycode keycode) -> Button;
+
+        /**
          * @brief Resets the DIV counter in the timer
          * 
          */
@@ -205,4 +211,9 @@ __always_inline void Gameboy::resetDiv()
 __always_inline void Gameboy::setTimerSpeed(u32 speed)
 {
     m_Timer.setSpeed(speed);
+}
+
+__always_inline auto Gameboy::getButton(SDL_Keycode keycode) -> Button
+{
+    return m_Joypad.getButton(keycode);
 }

@@ -15,6 +15,8 @@ void Joypad::press(Button button)
         case Button::B:      b      = 0; TRACE("Pressed b");      break;
         case Button::Select: select = 0; TRACE("Pressed select"); break;
         case Button::Start:  start  = 0; TRACE("Pressed start");  break;
+
+        default:                         WARN("Invalid Key Press");
     }
 }
 
@@ -31,6 +33,8 @@ void Joypad::release(Button button)
         case Button::B:      b      = 1; TRACE("Released b");      break;
         case Button::Select: select = 1; TRACE("Released select"); break;
         case Button::Start:  start  = 1; TRACE("Released start");  break;
+
+        default:                         WARN("Invalid Key Press");
     }
 }
 
@@ -66,4 +70,24 @@ auto Joypad::getInput() -> u8
     bit_functions::set_bit_to(input, P15_INPUT_BIT, action);
 
     return input;
+}
+
+// TODO: Allow for rebinding
+
+auto Joypad::getButton(SDL_Keycode keycode) -> Button
+{
+    switch(keycode)
+    {
+        case SDLK_RIGHT:     return Button::Right;
+        case SDLK_LEFT:      return Button::Left;
+        case SDLK_UP:        return Button::Up;
+        case SDLK_DOWN:      return Button::Down;
+
+        case SDLK_z:         return Button::A;
+        case SDLK_x:         return Button::B;
+        case SDLK_BACKSPACE: return Button::Select;
+        case SDLK_RETURN:    return Button::Start;
+    }
+
+    return Button::None;
 }

@@ -1,5 +1,3 @@
-#include "SDL_events.h"
-#include "SDL_keycode.h"
 #include "core.hpp"
 
 #include <span>
@@ -69,6 +67,7 @@ auto main(int argc, char** argv) -> int
         SDL_Event e;
         if (SDL_PollEvent(&e))
         {
+            Button button;
             switch(e.type)
             {
                 case SDL_WINDOWEVENT:
@@ -77,41 +76,36 @@ auto main(int argc, char** argv) -> int
                         gb.stop();
                     }
                     break;
+
                 case SDL_KEYDOWN:
                     if(e.key.repeat) break;
-                    switch(e.key.keysym.sym)
+                    
+                    button = gb.getButton(e.key.keysym.sym);
+                    if(button != Button::None)
                     {
-                        case SDLK_RIGHT:     gb.press(Button::Right);  break;
-                        case SDLK_LEFT:      gb.press(Button::Left);   break;
-                        case SDLK_UP:        gb.press(Button::Up);     break;
-                        case SDLK_DOWN:      gb.press(Button::Down);   break;
-
-                        case SDLK_z:         gb.press(Button::A);      break;
-                        case SDLK_x:         gb.press(Button::B);      break;
-                        case SDLK_BACKSPACE: gb.press(Button::Select); break;
-                        case SDLK_RETURN:    gb.press(Button::Start);  break;
-
-                        case SDLK_1:         Logger::setLogLevel(LogLevel::Opcode);   break;
-                        case SDLK_2:         Logger::setLogLevel(LogLevel::Trace);    break;
-                        case SDLK_3:         Logger::setLogLevel(LogLevel::Debug);    break;
-                        case SDLK_4:         Logger::setLogLevel(LogLevel::Warn);     break;
-                        case SDLK_5:         Logger::setLogLevel(LogLevel::Error);    break;
-                        case SDLK_6:         Logger::setLogLevel(LogLevel::Critical); break;
+                        gb.press(button);
+                    }
+                    else
+                    {
+                        switch(e.key.keysym.sym)
+                        {
+                            case SDLK_1:         Logger::setLogLevel(LogLevel::Opcode);   break;
+                            case SDLK_2:         Logger::setLogLevel(LogLevel::Trace);    break;
+                            case SDLK_3:         Logger::setLogLevel(LogLevel::Debug);    break;
+                            case SDLK_4:         Logger::setLogLevel(LogLevel::Warn);     break;
+                            case SDLK_5:         Logger::setLogLevel(LogLevel::Error);    break;
+                            case SDLK_6:         Logger::setLogLevel(LogLevel::Critical); break;
+                        }
                     }
                     break;
+                    
                 case SDL_KEYUP:
                     if(e.key.repeat) break;
-                    switch(e.key.keysym.sym)
-                    {
-                        case SDLK_RIGHT:     gb.release(Button::Right);  break;
-                        case SDLK_LEFT:      gb.release(Button::Left);   break;
-                        case SDLK_UP:        gb.release(Button::Up);     break;
-                        case SDLK_DOWN:      gb.release(Button::Down);   break;
 
-                        case SDLK_z:         gb.release(Button::A);      break;
-                        case SDLK_x:         gb.release(Button::B);      break;
-                        case SDLK_BACKSPACE: gb.release(Button::Select); break;
-                        case SDLK_RETURN:    gb.release(Button::Start);  break;
+                    button = gb.getButton(e.key.keysym.sym);
+                    if(button != Button::None)
+                    {
+                        gb.release(button);
                     }
                     break;
             }
