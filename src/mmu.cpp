@@ -50,23 +50,23 @@ auto MMU::read(u16 address) const -> u8
     }
     else if(address < VRAM_ADDR)
     {
-        return m_Memory.at(address - ROM_SIZE);
+        return m_Memory[address - ROM_SIZE];
     }
     else if(address < RAM_BANK_ADDR)
     {
-        return m_Memory.at(address - ROM_SIZE);
+        return m_Memory[address - ROM_SIZE];
     }
     else if(address < INTERNAL_RAM_ADDR)
     {
-        return m_Memory.at(address - ROM_SIZE);
+        return m_Memory[address - ROM_SIZE];
     }
     else if(address < ECHO_RAM_ADDR)
     {
-        return m_Memory.at(address - ROM_SIZE - INTERNAL_RAM_SIZE); // Map back into RAM
+        return m_Memory[address - ROM_SIZE - INTERNAL_RAM_SIZE]; // Map back into RAM
     }
     else if(address < OAM_ADDR)
     {
-        return m_Memory.at(address - ROM_SIZE);
+        return m_Memory[address - ROM_SIZE];
     }
     else if(address < UNUSABLE_ADDR)
     {
@@ -79,11 +79,11 @@ auto MMU::read(u16 address) const -> u8
             return m_Gameboy.getInput();
         }
 
-        return m_Memory.at(address - ROM_SIZE);
+        return m_Memory[address - ROM_SIZE];
     }
     else
     {
-        return m_Memory.at(address - ROM_SIZE);
+        return m_Memory[address - ROM_SIZE];
     }
 
     return UINT8_MAX;
@@ -97,23 +97,23 @@ void MMU::write(u16 address, u8 val)
     }
     else if(address < VRAM_ADDR)
     {
-        m_Memory.at(address - ROM_SIZE) = val;
+        m_Memory[address - ROM_SIZE] = val;
     }
     else if(address < RAM_BANK_ADDR)
     {
-        m_Memory.at(address - ROM_SIZE) = val;
+        m_Memory[address - ROM_SIZE] = val;
     }
     else if(address < INTERNAL_RAM_ADDR)
     {
-        m_Memory.at(address - ROM_SIZE) = val;
+        m_Memory[address - ROM_SIZE] = val;
     }
     else if(address < ECHO_RAM_ADDR)
     {
-        m_Memory.at(address - ROM_SIZE - INTERNAL_RAM_SIZE) = val; // Map back into RAM
+        m_Memory[address - ROM_SIZE - INTERNAL_RAM_SIZE] = val; // Map back into RAM
     }
     else if(address < OAM_ADDR)
     {
-        m_Memory.at(address - ROM_SIZE) = val;
+        m_Memory[address - ROM_SIZE] = val;
     }
     else if(address < UNUSABLE_ADDR)
     {
@@ -124,13 +124,13 @@ void MMU::write(u16 address, u8 val)
         switch(address)
         {
             case JOYPAD_REGISTER:
-                m_Gameboy.writeInput(val);
+                m_Gameboy.setInput(val);
                 break;
             case DIV_REGISTER:
                 m_Gameboy.resetDiv();
                 break;
             case TAC_REGISTER:
-                m_Memory.at(address - ROM_SIZE) = val;
+                m_Memory[address - ROM_SIZE] = val;
                 switch(val & 0x03)
                 {
                     case 0b00:
@@ -150,11 +150,11 @@ void MMU::write(u16 address, u8 val)
                 }
                 break;
             default:
-                m_Memory.at(address - ROM_SIZE) = val;
+                m_Memory[address - ROM_SIZE] = val;
         }
     }
     else
     {
-        m_Memory.at(address - ROM_SIZE) = val;
+        m_Memory[address - ROM_SIZE] = val;
     }
 }

@@ -90,6 +90,13 @@ auto main(int argc, char** argv) -> int
                         case SDLK_x:         gb.press(Button::B);      break;
                         case SDLK_BACKSPACE: gb.press(Button::Select); break;
                         case SDLK_RETURN:    gb.press(Button::Start);  break;
+
+                        case SDLK_1:         Logger::setLogLevel(LogLevel::Opcode);   break;
+                        case SDLK_2:         Logger::setLogLevel(LogLevel::Trace);    break;
+                        case SDLK_3:         Logger::setLogLevel(LogLevel::Debug);    break;
+                        case SDLK_4:         Logger::setLogLevel(LogLevel::Warn);     break;
+                        case SDLK_5:         Logger::setLogLevel(LogLevel::Error);    break;
+                        case SDLK_6:         Logger::setLogLevel(LogLevel::Critical); break;
                     }
                     break;
                 case SDL_KEYUP:

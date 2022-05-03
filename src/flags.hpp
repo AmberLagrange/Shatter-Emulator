@@ -39,7 +39,7 @@ namespace Flags
 
 
 /**
- * @brief Ors two Register Flags together
+ * @brief ORs two Register Flags together
  * 
  * @param flag1 The first flag
  * @param flag2 The second flag
@@ -48,7 +48,7 @@ namespace Flags
 auto operator|(const Flags::Register& flag1, const Flags::Register& flag2) -> Flags::Register;
 
 /**
- * @brief Ands two Register Flags together
+ * @brief ANDs two Register Flags together
  * 
  * @param flag1 The first flag
  * @param flag2 The second flag
@@ -57,7 +57,7 @@ auto operator|(const Flags::Register& flag1, const Flags::Register& flag2) -> Fl
 auto operator&(const Flags::Register& flag1, const Flags::Register& flag2) -> Flags::Register;
 
 /**
- * @brief Xors two Register Flags together
+ * @brief XORs two Register Flags together
  * 
  * @param flag1 The first flag
  * @param flag2 The second flag
@@ -66,7 +66,7 @@ auto operator&(const Flags::Register& flag1, const Flags::Register& flag2) -> Fl
 auto operator^(const Flags::Register& flag1, const Flags::Register& flag2) -> Flags::Register;
 
 /**
- * @brief Ors two Register Flags together and stores the result in the first flag
+ * @brief ORs two Register Flags together and stores the result in the first flag
  * 
  * @param flag1 The first flag
  * @param flag2 The second flag
@@ -75,7 +75,7 @@ auto operator^(const Flags::Register& flag1, const Flags::Register& flag2) -> Fl
 auto operator|=(Flags::Register& flag1, const Flags::Register flag2) -> Flags::Register&;
 
 /**
- * @brief Ands two Register Flags together and stores the result in the first flag
+ * @brief ANDs two Register Flags together and stores the result in the first flag
  * 
  * @param flag1 The first flag
  * @param flag2 The second flag
@@ -84,7 +84,7 @@ auto operator|=(Flags::Register& flag1, const Flags::Register flag2) -> Flags::R
 auto operator&=(Flags::Register& flag1, const Flags::Register flag2) -> Flags::Register&;
 
 /**
- * @brief Xors two Register Flags together and stores the result in the first flag
+ * @brief XORs two Register Flags together and stores the result in the first flag
  * 
  * @param flag1 The first flag
  * @param flag2 The second flag
@@ -95,7 +95,7 @@ auto operator^=(Flags::Register& flag1, const Flags::Register flag2) -> Flags::R
 //--------------------------------------Interrupt Flags--------------------------------------//
 
 /**
- * @brief Ors two Interrupt Flags together
+ * @brief ORs two Interrupt Flags together
  * 
  * @param flag1 The first flag
  * @param flag2 The second flag
@@ -104,7 +104,7 @@ auto operator^=(Flags::Register& flag1, const Flags::Register flag2) -> Flags::R
 auto operator|(const Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt;
 
 /**
- * @brief Ands two Interrupt Flags together
+ * @brief ANDs two Interrupt Flags together
  * 
  * @param flag1 The first flag
  * @param flag2 The second flag
@@ -113,7 +113,7 @@ auto operator|(const Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> 
 auto operator&(const Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt;
 
 /**
- * @brief Xors two Interrupt Flags together
+ * @brief XORs two Interrupt Flags together
  * 
  * @param flag1 The first flag
  * @param flag2 The second flag
@@ -122,7 +122,7 @@ auto operator&(const Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> 
 auto operator^(const Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt;
 
 /**
- * @brief Ors two Interrupt Flags together and stores the result in the first flag
+ * @brief ORs two Interrupt Flags together and stores the result in the first flag
  * 
  * @param flag1 The first flag
  * @param flag2 The second flag
@@ -131,7 +131,7 @@ auto operator^(const Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> 
 auto operator|=(Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt&;
 
 /**
- * @brief Ands two Interrupt Flags together and stores the result in the first flag
+ * @brief ANDs two Interrupt Flags together and stores the result in the first flag
  * 
  * @param flag1 The first flag
  * @param flag2 The second flag
@@ -140,7 +140,7 @@ auto operator|=(Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags
 auto operator&=(Flags::Interrupt& flag1, const Flags::Interrupt& flag2) -> Flags::Interrupt&;
 
 /**
- * @brief Xors two Interrupt Flags together and stores the result in the first flag
+ * @brief XORs two Interrupt Flags together and stores the result in the first flag
  * 
  * @param flag1 The first flag
  * @param flag2 The second flag

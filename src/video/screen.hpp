@@ -11,7 +11,16 @@ class Gameboy;
 class Screen
 {
     public:
+        /**
+         * @brief Initializes SDL2
+         * 
+         */
         static void init();
+
+        /**
+         * @brief Quits SDL2
+         * 
+         */
         static void quit();
     public:
         Screen();

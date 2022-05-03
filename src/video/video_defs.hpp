@@ -2,6 +2,8 @@
 
 #include "core.hpp"
 
+// TODO: Maybe move colour to its own file?
+
 enum class VideoMode
 {
     HBlank,     // Mode 0

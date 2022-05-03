@@ -30,16 +30,52 @@ class PPU
         void tick(u8 cycles);
 
         /**
-         * @brief Returns the state the PPU is in
+         * @brief Returns the mode the PPU is in
         **/
         auto getMode() -> VideoMode;
 
     private:
+        /**
+         * @brief Draw a background line to the screen
+         * 
+         * @param line The background line to draw
+         */
         void drawBackgroundLine(u8 line);
+
+        /**
+         * @brief Draw a window line to the screen
+         * 
+         * @param line The window line to draw
+         */
         void drawWindowLine(u8 line);
+
+        /**
+         * @brief Draw the sprites to the screen
+         * 
+         */
         void drawSprites();
 
+        /**
+         * @brief Get the colour of a pixel within a tile
+         * 
+         * @param pixelXPos The x position of the pixel within
+         * the tile
+         * 
+         * @param tileAddress The address of the tile to get the
+         * colour information from
+         */
         auto getColour(u8 pixelXPos, u16 tileAddress) -> Colour;
+
+        /**
+         * @brief Draw a specified pixel at position (x, y) with
+         * colour c
+         * 
+         * @param x The x coordinate of the pixel
+         * 
+         * @param y The y coordinate of the pixel
+         *
+         * @param c The colour of the pixel
+         */
         void drawPixel(u8 x, u8 y, Colour c);
     private:
         Gameboy& m_Gameboy;

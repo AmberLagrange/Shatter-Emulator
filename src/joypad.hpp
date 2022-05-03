@@ -21,10 +21,31 @@ enum class Button
 class Joypad
 {
     public:
+         /**
+         * @brief Presses a button on the joypad
+         * 
+         * @param button The button to press
+         */
         void press(Button button);
+
+        /**
+         * @brief Releases a button on the joypad
+         * 
+         * @param button The button to release
+         */
         void release(Button button);
 
-        void writeInput(u8 val);
+        /**
+         * @brief Writes an input state to the joypad
+         * 
+         * @param val The input state to write
+         */
+        void setInput(u8 val);
+
+        /**
+         * @brief Gets the current joypad input state
+         * 
+         */
         [[nodiscard]] auto getInput() -> u8;
     private:
 

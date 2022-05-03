@@ -34,7 +34,7 @@ void Joypad::release(Button button)
     }
 }
 
-void Joypad::writeInput(u8 val)
+void Joypad::setInput(u8 val)
 {
     using bit_functions::get_bit;
 

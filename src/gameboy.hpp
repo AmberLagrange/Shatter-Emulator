@@ -64,7 +64,7 @@ class Gameboy
          * @param address The address to read from
          * @return The value stored at that address
          */
-        [[nodiscard]]auto read(u16 address) const -> u8;
+        [[nodiscard]] __always_inline auto read(u16 address) const -> u8;
 
         /**
          * @brief Writes a byte at the specified memory address
@@ -72,33 +72,55 @@ class Gameboy
          * @param address The address to write to
          * @param val The value to write
          */
-        void write(u16 address, u8 val);
+        __always_inline void write(u16 address, u8 val);
 
         /**
          * @brief Gets the status of the IME (interrupt master enable)
          * 
          * @return The current value of the IME
          */
-        [[nodiscard]] auto getIME() const -> bool;
+        [[nodiscard]] __always_inline auto getIME() const -> bool;
 
         /**
          * @brief Sets the IME (interrupt master enable) to the specified state
          * 
          * @param ime The state to set the IME to
          */
-        void setIME(bool ime);
+        __always_inline void setIME(bool ime);
 
         /**
          * @brief Raise an interrupt of a specified type
          * 
          * @param flag The type of interrupt to raise
          */
-        void raiseInterrupt(const Flags::Interrupt& flag);
+        __always_inline void raiseInterrupt(const Flags::Interrupt& flag);
 
-        void press(Button button);
-        void release(Button button);
-        void writeInput(u8 val);
-        auto getInput() -> u8;
+        /**
+         * @brief Presses a button on the joypad
+         * 
+         * @param button The button to press
+         */
+        __always_inline void press(Button button);
+
+        /**
+         * @brief Releases a button on the joypad
+         * 
+         * @param button The button to release
+         */
+        __always_inline void release(Button button);
+
+        /**
+         * @brief Writes an input state to the joypad
+         * 
+         * @param val The input state to write
+         */
+        __always_inline void setInput(u8 val);
+
+        /**
+         * @brief Gets the current joypad input state
+         * 
+         */
+        __always_inline auto getInput() -> u8;
 
         /**
          * @brief Resets the DIV counter in the timer
@@ -126,3 +148,61 @@ class Gameboy
 
         bool m_Running;
 };
+
+//--------------------------  Inline function implementations --------------------------//
+
+__always_inline auto Gameboy::read(u16 address) const -> u8
+{
+    return m_MMU.read(address);
+}
+
+__always_inline void Gameboy::write(u16 address, u8 val)
+{
+    m_MMU.write(address, val);
+}
+
+__always_inline auto Gameboy::getIME() const -> bool
+{
+    return m_CPU.getIME();
+}
+
+__always_inline void Gameboy::setIME(bool ime)
+{
+    m_CPU.setIME(ime);
+}
+
+__always_inline void Gameboy::raiseInterrupt(const Flags::Interrupt& flag)
+{
+    m_CPU.raiseInterrupt(flag);
+}
+
+__always_inline void Gameboy::press(Button button)
+{
+    m_Joypad.press(button);
+    raiseInterrupt(Flags::Interrupt::Joypad);
+}
+
+__always_inline void Gameboy::release(Button button)
+{
+    m_Joypad.release(button);
+}
+
+__always_inline void Gameboy::setInput(u8 val)
+{
+    m_Joypad.setInput(val);
+}
+
+__always_inline auto Gameboy::getInput() -> u8
+{
+    return m_Joypad.getInput();
+}
+
+__always_inline void Gameboy::resetDiv()
+{
+    m_Timer.resetDiv();
+}
+
+__always_inline void Gameboy::setTimerSpeed(u32 speed)
+{
+    m_Timer.setSpeed(speed);
+}
