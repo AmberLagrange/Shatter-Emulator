@@ -3,7 +3,10 @@
 #include "mbc3.hpp"
 
 MBC3::MBC3()
-    : m_RomBankNumber(1), m_RamBankNumber(0), m_RamEnabled(false) {}
+    : m_RomBankNumber(1), m_RamBankNumber(0),
+      m_RamEnabled(false), m_RTCEnabled(false) {}
+
+MBC3::~MBC3() = default;
 
 auto MBC3::read(u16 address) const -> u8
 {

@@ -18,7 +18,7 @@ void MMU::load(const char* path)
     switch(type)
     {
         case Cart::Type::ROM_ONLY:
-            m_Rom = std::make_unique<MBC>();
+            m_Rom = std::make_unique<RomOnly>();
             break;
         case Cart::Type::MBC1:
         case Cart::Type::MBC1_RAM:
@@ -33,7 +33,7 @@ void MMU::load(const char* path)
             m_Rom = std::make_unique<MBC3>();
             break;
         default:
-            m_Rom = std::make_unique<MBC>();
+            m_Rom = std::make_unique<RomOnly>();
     }
 
     m_Rom->load(path);

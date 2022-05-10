@@ -52,6 +52,7 @@ class MBC
         static auto getCartTitle(const char* path) -> const std::string;
     public:
         MBC() = default;
+        virtual ~MBC() = default;
 
         /**
          * @brief Load a rom file into memory
@@ -66,7 +67,7 @@ class MBC
          * @param address The address to read from
          * @return The value stored at that address
          */
-        [[nodiscard]] virtual auto read(u16 address) const -> u8;
+        [[nodiscard]] virtual auto read(u16 address) const -> u8 = 0;
 
         /**
          * @brief Writes a byte at the specified memory address
@@ -74,7 +75,7 @@ class MBC
          * @param address The address to write to
          * @param val The value to write
          */
-        virtual void write(u16 address, u8 val);
+        virtual void write(u16 address, u8 val) = 0;
     protected:
         std::vector<u8> m_Rom;
 };

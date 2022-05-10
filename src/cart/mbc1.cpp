@@ -5,6 +5,8 @@
 MBC1::MBC1()
     : m_RomBankNumber(1), m_RamBankNumber(0), m_RamEnabled(false) {}
 
+MBC1::~MBC1() = default;
+
 auto MBC1::read(u16 address) const -> u8
 {
     switch(address & 0xE000)

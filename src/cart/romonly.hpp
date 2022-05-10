@@ -2,15 +2,13 @@
 
 #include "core.hpp"
 
-#include <array>
-
 #include "mbc.hpp"
 
-class MBC1 final : public MBC
+class RomOnly final : public MBC
 {
     public:
-        MBC1();
-        ~MBC1() final;
+        RomOnly();
+        ~RomOnly() final;
         
         /**
          * @brief Reads a byte from the specified memory address
@@ -27,12 +25,4 @@ class MBC1 final : public MBC
          * @param val The value to write
          */
         virtual void write(u16 address, u8 val) final;
-
-    private:
-        u8 m_RomBankNumber;
-
-        u8 m_RamBankNumber;
-        bool m_RamEnabled = false;
-
-        std::array<u8, 0x8000 * 4> m_Ram {{}};
 };

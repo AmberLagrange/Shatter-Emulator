@@ -54,13 +54,3 @@ void MBC::load(const char* path)
     m_Rom.assign((std::istreambuf_iterator<char>(rom)), {});
     DEBUG("Rom Size: " << std::dec << m_Rom.size() / 1024 << "KB!");
 }
-
-auto MBC::read(u16 address) const -> u8
-{
-    return m_Rom.at(address);
-}
-
-void MBC::write([[maybe_unused]] u16 address, [[maybe_unused]] u8 val)
-{
-    // nop
-}

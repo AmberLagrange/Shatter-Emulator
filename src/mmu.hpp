@@ -5,6 +5,7 @@
 #include <array>
 #include <memory>
 
+#include "cart/romonly.hpp"
 #include "cart/mbc1.hpp"
 #include "cart/mbc3.hpp"
 
