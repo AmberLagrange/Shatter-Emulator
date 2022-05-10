@@ -9,15 +9,18 @@ auto MBC3::read(u16 address) const -> u8
 {
     switch(address & 0xE000)
     {
+        case 0x0000:
+        case 0x2000:
+            return m_Rom[address];
         case 0x4000:
         case 0x6000:
-            return m_Data[(address - BANK_SIZE) + BANK_SIZE * m_RomBankNumber];
+            return m_Rom[(address - ROM_BANK_OFFSET) + ROM_BANK_SIZE * m_RomBankNumber];
         case 0xA000:
-            return  m_Ram[(address - 0xA000)    + BANK_SIZE * m_RamBankNumber];
+            return m_Ram[(address - RAM_BANK_OFFSET) + RAM_BANK_SIZE * m_RamBankNumber];
         default:
-            return m_Data[address];
+            WARN("Trying to read from address 0x" << std::hex << std::setw(4) << std::setfill('0') << address << '!');
+            return 0xFF;
     }
-    
 }
 
 void MBC3::write(u16 address, u8 val)
@@ -25,20 +28,40 @@ void MBC3::write(u16 address, u8 val)
     switch(address & 0xE000)
     {
         case 0x0000: // RAM Enable
-            m_RamEnabled = (val == 0x0A);
+            if(val == 0x0A) { m_RamEnabled = true; }
+            else if(val == 0x00) { m_RamEnabled = false; }
             break;
         case 0x2000: // ROM Bank Switching
-            m_RomBankNumber = (val & 0x1F);
+            if(val == 0x00) {val = 0x01; }
+            m_RomBankNumber = (val & 0x7F);
             break;
         case 0x4000: // RAM Bank Switching
-            m_RamBankNumber = (val & 0x03);
+            if(val <= 0x03)
+            {
+                m_RamBankNumber = val;
+                m_RTCEnabled = false;
+            }
+            else if(0x80 <= val && val <= 0x0C)
+            {
+                m_RTCEnabled = true;
+                // TODO: RTC
+            }
             break;
-        case 0x6000: // TODO:
+        case 0x6000: // TODO: RTC
             break;
         case 0xA000:
-            if(m_RamEnabled)
+            if(!m_RamEnabled) return;
+
+            if(m_RTCEnabled)
             {
-                m_Ram[(address - 0xA000) + BANK_SIZE * m_RamBankNumber] = val;
+                // TODO: RTC
             }
+            else
+            {
+                m_Ram[(address - RAM_BANK_OFFSET) + RAM_BANK_SIZE * m_RamBankNumber] = val;
+            }
+        default:
+            WARN("Trying to write 0x" << std::hex << std::setw(2) << std::setfill('0') << val
+                  << " to address 0x" << std::hex << std::setw(4) << std::setfill('0') << val << '!');
     }
 }

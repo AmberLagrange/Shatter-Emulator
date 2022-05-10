@@ -32,6 +32,7 @@ class MBC3 : public MBC
 
         u8 m_RamBankNumber;
         bool m_RamEnabled = false;
+        bool m_RTCEnabled = false;
 
-        std::array<u8, 0x8000 * 4> m_Ram {{}};
+        std::array<u8, 0x2000 * 4> m_Ram {{}};
 };

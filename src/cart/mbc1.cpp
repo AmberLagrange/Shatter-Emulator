@@ -11,11 +11,11 @@ auto MBC1::read(u16 address) const -> u8
     {
         case 0x4000:
         case 0x6000:
-            return m_Data.at((address - BANK_SIZE) + BANK_SIZE * m_RomBankNumber);
+            return m_Rom.at((address - ROM_BANK_OFFSET) + ROM_BANK_SIZE * m_RomBankNumber);
         case 0xA000:
-            return m_Ram.at((address - 0xA000) + BANK_SIZE * m_RamBankNumber);
+            return m_Ram.at((address - RAM_BANK_OFFSET) + RAM_BANK_SIZE * m_RamBankNumber);
         default:
-            return m_Data.at(address);
+            return m_Rom.at(address);
     }
     
 }
@@ -44,7 +44,7 @@ void MBC1::write(u16 address, u8 val)
         case 0xA000:
             if(m_RamEnabled)
             {
-                m_Ram.at((address - 0xA000) + BANK_SIZE * m_RamBankNumber) = val;
+                m_Ram.at((address - RAM_BANK_OFFSET) + RAM_BANK_SIZE * m_RamBankNumber) = val;
             }
     }
 }

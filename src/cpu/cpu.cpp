@@ -151,7 +151,7 @@ void CPU::reset()
     m_Branched = false;
 
     m_Gameboy.resetDiv();
-    m_Gameboy.write(TIMA_REGISTER, 0);
+    m_Gameboy.write(TIMER_TIMA_REGISTER, 0);
 }
 
 auto CPU::isFlagSet(const Flags::Register& flag) const -> bool

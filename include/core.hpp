@@ -77,32 +77,13 @@ constexpr u8 RST_0x28           = 0x0028;
 constexpr u8 RST_0x30           = 0x0030;
 constexpr u8 RST_0x38           = 0x0038;
 
-//Registers
-constexpr u16 DIV_REGISTER      = 0xFF04;
-constexpr u16 TIMA_REGISTER     = 0xFF05;
-constexpr u16 TMA_REGISTER      = 0xFF06;
-constexpr u16 TAC_REGISTER      = 0xFF07;
 
-constexpr u16 LCDC_REGISTER     = 0xFF40;
-
-constexpr u16 STAT_REGISTER     = 0xFF41;
+//LCD Info
 constexpr u8  STAT_LCY_LY_BIT   = 2;
 constexpr u8  STAT_HBLANK_BIT   = 3;
 constexpr u8  STAT_VBLANK_BIT   = 4;
 constexpr u8  STAT_OAM_BIT      = 5;
 constexpr u8  STAT_LYC_BIT      = 6;
-
-constexpr u16 SCY_REGISTER      = 0xFF42;
-constexpr u16 SCX_REGISTER      = 0xFF43;
-
-constexpr u16 LY_REGISTER       = 0xFF44;
-constexpr u16 LYC_REGISTER      = 0xFF45;
-
-constexpr u16 WY_REGISTER       = 0xFF4A;
-constexpr u16 WX_REGISTER       = 0xFF4B;
-
-constexpr u16 IF_REGISTER       = 0xFF0F;
-constexpr u16 IE_REGISTER       = 0xFFFF;
 
 //Graphics Data
 constexpr u16 TILE_DATA_ZERO    = 0x8000;
@@ -134,8 +115,6 @@ constexpr u32 FRAME_BUFFER_SIZE = GAMEBOY_WIDTH * GAMEBOY_HEIGHT * 4;
     https://gbdev.io/pandocs/Joypad_Input.html
 **/
 
-constexpr u16 JOYPAD_REGISTER   = 0xFF00;
-
 constexpr u8  P10_INPUT_BIT     = 0; //Right or A        (0=Pressed) (Read Only)
 constexpr u8  P11_INPUT_BIT     = 1; //Left  or B        (0=Pressed) (Read Only)
 constexpr u8  P12_INPUT_BIT     = 2; //Up    or Select   (0=Pressed) (Read Only)
@@ -144,12 +123,18 @@ constexpr u8  P14_INPUT_BIT     = 4; //Direction buttons (0=Select)
 constexpr u8  P15_INPUT_BIT     = 5; //Action buttons    (0=Select)
 
 //Cartridge Header
+constexpr u16 CART_TITLE        = 0x134;
+constexpr u16 CART_TITLE_SIZE   = 16;
+
 constexpr u16 CART_TYPE         = 0x0147;
 
 //MMU Addresses
 constexpr u32 ROM_SIZE          = 0x8000;
 constexpr u32 RAM_SIZE          = 0x8000;
-constexpr u32 BANK_SIZE         = 0x4000;
+constexpr u32 ROM_BANK_SIZE     = 0x4000;
+constexpr u32 ROM_BANK_OFFSET   = 0x4000;
+constexpr u32 RAM_BANK_SIZE     = 0x2000;
+constexpr u32 RAM_BANK_OFFSET   = 0xA000;
 constexpr u32 INTERNAL_RAM_SIZE = 0x2000;
 
 constexpr u16 ROM_ADDR          = 0x8000;
@@ -160,6 +145,93 @@ constexpr u16 ECHO_RAM_ADDR     = 0xFE00;
 constexpr u16 OAM_ADDR          = 0xFEA0;
 constexpr u16 UNUSABLE_ADDR     = 0xFF00;
 constexpr u16 IO_ADDR           = 0xFF80;
+constexpr u16 IF_REGISTER       = 0xFF0F;
+constexpr u16 IE_REGISTER       = 0xFFFF;
+
+// IO Registers
+
+constexpr u16 JOYPAD_REGISTER           = 0xFF00;
+
+constexpr u16 SERIAL_DATA_REGISTER      = 0xFF01;
+constexpr u16 SERIAL_CONTROL_REGISTER   = 0xFF02;
+
+// 0xFF03 UNUSED
+
+constexpr u16 TIMER_DIV_REGISTER        = 0xFF04;
+constexpr u16 TIMER_TIMA_REGISTER       = 0xFF05;
+constexpr u16 TIMER_TMA_REGISTER        = 0xFF06;
+constexpr u16 TIMER_TAC_REGISTER        = 0xFF07;
+
+// 0xFF08 UNUSED
+// 0xFF09 UNUSED
+// 0xFF0A UNUSED
+// 0xFF0B UNUSED
+// 0xFF0C UNUSED
+// 0xFF0D UNUSED
+// 0xFF0E UNUSED
+// 0xFF0F UNUSED
+
+constexpr u16 CHANNEL1_SWEEP_REGISTER   = 0xFF10;
+constexpr u16 CHANNEL1_LENGTH_REGISTER  = 0xFF11;
+constexpr u16 CHANNEL1_VOLUME_REGISTER  = 0xFF12;
+constexpr u16 CHANNEL1_FREQ_LO_REGISTER = 0xFF13;
+constexpr u16 CHANNEL1_FREQ_HI_REGISTER = 0xFF14;
+
+// 0xFF15 UNUSED
+
+constexpr u16 CHANNEL2_LENGTH_REGISTER  = 0xFF16;
+constexpr u16 CHANNEL2_VOLUME_REGISTER  = 0xFF17;
+constexpr u16 CHANNEL2_FREQ_LO_REGISTER = 0xFF18;
+constexpr u16 CHANNEL2_FREQ_HI_REGISTER = 0xFF19;
+
+constexpr u16 CHANNEL3_TOGGLE_REGISTER  = 0xFF1A;
+constexpr u16 CHANNEL3_LENGTH_REGISTER  = 0xFF1B;
+constexpr u16 CHANNEL3_VOLUME_REGISTER  = 0xFF1C;
+constexpr u16 CHANNEL3_FREQ_LO_REGISTER = 0xFF1D;
+constexpr u16 CHANNEL3_FREQ_HI_REGISTER = 0xFF1E;
+
+// 0xFF1F UNUSED
+
+constexpr u16 CHANNEL4_LENGTH_REGISTER  = 0xFF20;
+constexpr u16 CHANNEL4_VOLUME_REGISTER  = 0xFF21;
+constexpr u16 CHANNEL4_POLY_REGISTER    = 0xFF22;
+constexpr u16 CHANNEL4_COUNTER_REGISTER = 0xFF23;
+
+constexpr u16 CHANNEL_CONTROL_REGISTER  = 0xFF24;
+constexpr u16 SOUND_OUTPUT_REGISTER     = 0xFF25;
+constexpr u16 SOUND_TOGGLE_REGISTER     = 0xFF26;
+
+// 0xFF27 UNUSED
+// 0xFF28 UNUSED
+// 0xFF29 UNUSED
+// 0xFF2A UNUSED
+// 0xFF2B UNUSED
+// 0xFF2C UNUSED
+// 0xFF2D UNUSED
+// 0xFF2E UNUSED
+// 0xFF2F UNUSED
+
+// 0xFF30 - 0xFF3F WAVE_PATTERN_RAM
+
+constexpr u16 LCD_CONTROL_REGISTER      = 0xFF40;
+constexpr u16 LCD_STAT_REGISTER         = 0xFF41;
+
+constexpr u16 SCY_REGISTER              = 0xFF42;
+constexpr u16 SCX_REGISTER              = 0xFF43;
+
+constexpr u16 LY_REGISTER               = 0xFF44;
+constexpr u16 LYC_REGISTER              = 0xFF45;
+
+constexpr u16 DMA_TRANSFER_REGISTER     = 0xFF46;
+
+constexpr u16 BG_PALLETTE_REGISTER      = 0xFF47;
+constexpr u16 OBJ_0_PALLETTE_REGISTER   = 0xFF48;
+constexpr u16 OBJ_1_PALLETTE_REGISTER   = 0xFF49;
+
+constexpr u16 WY_REGISTER               = 0xFF4A;
+constexpr u16 WX_REGISTER               = 0xFF4B;
+
+// 0xFF4C UNUSED
 
 //Gameboy Reset Values
 constexpr u16 AF_RESET = 0x01B0;

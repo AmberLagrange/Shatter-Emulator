@@ -8,8 +8,6 @@
 #include <iterator>
 #include <vector>
 
-using Data = std::vector<u8>;
-
 namespace Cart
 {
     enum Type
@@ -48,7 +46,10 @@ namespace Cart
 class MBC
 {
     public:
+        // TODO: Either not have to load data multiple times, or return
+        // the full data along with all the metadata
         static auto getCartType(const char* path) -> Cart::Type;
+        static auto getCartTitle(const char* path) -> const std::string;
     public:
         MBC() = default;
 
@@ -75,5 +76,5 @@ class MBC
          */
         virtual void write(u16 address, u8 val);
     protected:
-        Data m_Data;
+        std::vector<u8> m_Rom;
 };

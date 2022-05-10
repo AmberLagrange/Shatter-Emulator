@@ -17,21 +17,21 @@ void Timer::update(u8 cycles)
     while(m_DIV >= 0x0100)
     {
         m_DIV -= 0x0100;
-        m_Gameboy.write(DIV_REGISTER, m_Gameboy.read(DIV_REGISTER) + 1);
+        m_Gameboy.write(TIMER_DIV_REGISTER, m_Gameboy.read(TIMER_DIV_REGISTER) + 1);
     }
 
-    if(bit_functions::get_bit(m_Gameboy.read(TAC_REGISTER), 2))
+    if(bit_functions::get_bit(m_Gameboy.read(TIMER_TAC_REGISTER), 2))
     {
         m_TIMA += cycles;
 
         while(m_TIMA >= m_Speed)
         {
             m_TIMA -= m_Speed;
-            u8 tima = m_Gameboy.read(TIMA_REGISTER);
+            u8 tima = m_Gameboy.read(TIMER_TIMA_REGISTER);
             
             if(tima == 0xFF)
             {
-                tima = m_Gameboy.read(TMA_REGISTER);
+                tima = m_Gameboy.read(TIMER_TMA_REGISTER);
                 m_Gameboy.raiseInterrupt(Flags::Interrupt::Timer);
             }
             else
@@ -39,7 +39,7 @@ void Timer::update(u8 cycles)
                 tima++;
             }
 
-            m_Gameboy.write(TIMA_REGISTER, tima);
+            m_Gameboy.write(TIMER_TIMA_REGISTER, tima);
         }
     }
 }

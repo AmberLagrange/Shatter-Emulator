@@ -13,17 +13,16 @@ MMU::MMU(Gameboy& gb)
 void MMU::load(const char* path)
 {
     Cart::Type type = MBC::getCartType(path);
+    DEBUG("Loaded " << MBC::getCartTitle(path) << "!");
 
     switch(type)
     {
         case Cart::Type::ROM_ONLY:
-            DEBUG("ROM Only!");
             m_Rom = std::make_unique<MBC>();
             break;
         case Cart::Type::MBC1:
         case Cart::Type::MBC1_RAM:
         case Cart::Type::MBC1_RAM_BATTERY:
-            DEBUG("MBC1!");
             m_Rom = std::make_unique<MBC1>();
             break;
         case Cart::Type::MBC3_TIMER_BATTERY:
@@ -31,11 +30,9 @@ void MMU::load(const char* path)
         case Cart::Type::MBC3:
         case Cart::Type::MBC3_RAM_2:
         case Cart::Type::MBC3_RAM_BATTERY_2:
-            DEBUG("MBC3!");
             m_Rom = std::make_unique<MBC3>();
             break;
         default:
-            WARN("Unknown MBC Type: 0x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(type) << ", falling back to ROM Only!");
             m_Rom = std::make_unique<MBC>();
     }
 
@@ -74,12 +71,14 @@ auto MMU::read(u16 address) const -> u8
     }
     else if(address < IO_ADDR)
     {
-        if(address == JOYPAD_REGISTER)
+        switch(address)
         {
-            return m_Gameboy.getInput();
+            case JOYPAD_REGISTER:
+                return m_Gameboy.getInput();
+                
+            default:
+                return m_Memory[address - ROM_SIZE];
         }
-
-        return m_Memory[address - ROM_SIZE];
     }
     else
     {
@@ -126,10 +125,10 @@ void MMU::write(u16 address, u8 val)
             case JOYPAD_REGISTER:
                 m_Gameboy.setInput(val);
                 break;
-            case DIV_REGISTER:
+            case TIMER_DIV_REGISTER:
                 m_Gameboy.resetDiv();
                 break;
-            case TAC_REGISTER:
+            case TIMER_TAC_REGISTER:
                 m_Memory[address - ROM_SIZE] = val;
                 switch(val & 0x03)
                 {

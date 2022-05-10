@@ -37,7 +37,7 @@ void PPU::tick(u8 cycles)
                     m_Mode = VideoMode::VBlank;
                     m_Gameboy.raiseInterrupt(Flags::Interrupt::VBlank);
 
-                    u8 stat = m_Gameboy.read(STAT_REGISTER);
+                    u8 stat = m_Gameboy.read(LCD_STAT_REGISTER);
 
                     bit_functions::set_bit_to(stat, 0, 1);
                     bit_functions::set_bit_to(stat, 1, 0);
@@ -48,13 +48,13 @@ void PPU::tick(u8 cycles)
                         m_Gameboy.raiseInterrupt(Flags::Interrupt::LCD_STAT);
                     }
 
-                    m_Gameboy.write(STAT_REGISTER, stat);
+                    m_Gameboy.write(LCD_STAT_REGISTER, stat);
                 }
                 else
                 {
                     m_Mode = VideoMode::OAM_Scan;
 
-                    u8 stat = m_Gameboy.read(STAT_REGISTER);
+                    u8 stat = m_Gameboy.read(LCD_STAT_REGISTER);
 
                     bit_functions::set_bit_to(stat, 0, 0);
                     bit_functions::set_bit_to(stat, 1, 1);
@@ -64,7 +64,7 @@ void PPU::tick(u8 cycles)
                         m_Gameboy.raiseInterrupt(Flags::Interrupt::LCD_STAT);
                     }
 
-                    m_Gameboy.write(STAT_REGISTER, stat);
+                    m_Gameboy.write(LCD_STAT_REGISTER, stat);
                 }
             }
             break;
@@ -82,7 +82,7 @@ void PPU::tick(u8 cycles)
                     std::invoke(m_DrawCallback, m_FrameBuffer);
                     m_Line = 0;
                     
-                    u8 stat = m_Gameboy.read(STAT_REGISTER);
+                    u8 stat = m_Gameboy.read(LCD_STAT_REGISTER);
                     
                     bit_functions::set_bit_to(stat, 0, 0);
                     bit_functions::set_bit_to(stat, 1, 1);
@@ -92,7 +92,7 @@ void PPU::tick(u8 cycles)
                         m_Gameboy.raiseInterrupt(Flags::Interrupt::LCD_STAT);
                     }
 
-                    m_Gameboy.write(STAT_REGISTER, stat);
+                    m_Gameboy.write(LCD_STAT_REGISTER, stat);
                 };
             }
             break;
@@ -103,12 +103,12 @@ void PPU::tick(u8 cycles)
 
                 m_Mode = VideoMode::Transfer;
                 
-                u8 stat = m_Gameboy.read(STAT_REGISTER);
+                u8 stat = m_Gameboy.read(LCD_STAT_REGISTER);
                 
                 bit_functions::set_bit_to(stat, 0, 1);
                 bit_functions::set_bit_to(stat, 1, 1);
 
-                m_Gameboy.write(STAT_REGISTER, stat);
+                m_Gameboy.write(LCD_STAT_REGISTER, stat);
             }
             break;
         case VideoMode::Transfer:
@@ -118,7 +118,7 @@ void PPU::tick(u8 cycles)
 
                 m_Mode = VideoMode::HBlank;
                 
-                u8 stat = m_Gameboy.read(STAT_REGISTER);
+                u8 stat = m_Gameboy.read(LCD_STAT_REGISTER);
                 
                 bit_functions::set_bit_to(stat, 0, 0);
                 bit_functions::set_bit_to(stat, 1, 0);
@@ -143,7 +143,7 @@ void PPU::tick(u8 cycles)
                     }
                 }
 
-                m_Gameboy.write(STAT_REGISTER, stat);
+                m_Gameboy.write(LCD_STAT_REGISTER, stat);
             }
             break;
         default:
@@ -160,7 +160,7 @@ auto PPU::getMode() -> VideoMode
 
 void PPU::drawBackgroundLine(u8 line)
 {
-    u8 lcdc = m_Gameboy.read(LCDC_REGISTER);
+    u8 lcdc = m_Gameboy.read(LCD_CONTROL_REGISTER);
 
     u8 scrollX = m_Gameboy.read(SCX_REGISTER);
     u8 scrollY = m_Gameboy.read(SCY_REGISTER);
@@ -207,7 +207,7 @@ void PPU::drawBackgroundLine(u8 line)
 
 void PPU::drawWindowLine(u8 line)
 {
-    u8 lcdc = m_Gameboy.read(LCDC_REGISTER);
+    u8 lcdc = m_Gameboy.read(LCD_CONTROL_REGISTER);
 
     if(!bit_functions::get_bit(lcdc, 5)) // Window not rendering
     {
