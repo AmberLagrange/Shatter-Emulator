@@ -3,6 +3,7 @@
 #include "mmu.hpp"
 
 #include "gameboy.hpp"
+#include <memory>
 
 MMU::MMU(Gameboy& gb)
     : m_Gameboy(gb)
@@ -12,64 +13,63 @@ MMU::MMU(Gameboy& gb)
 
 void MMU::load(const char* path)
 {
-    Cart::Type type = MBC::getCartType(path);
-    DEBUG("Loaded " << MBC::getCartTitle(path) << "!");
+    std::vector<u8> rom = MBC::load(path);
+    Cart::Type type = MBC::getCartType(rom);
+    DEBUG("Loaded " << MBC::getCartTitle(rom) << "!");
 
     switch(type)
     {
         case Cart::Type::ROM_ONLY:
-            m_Rom = std::make_unique<RomOnly>();
+            m_Rom = std::make_unique<RomOnly>(std::move(rom));
             break;
         case Cart::Type::MBC1:
         case Cart::Type::MBC1_RAM:
         case Cart::Type::MBC1_RAM_BATTERY:
-            m_Rom = std::make_unique<MBC1>();
+            m_Rom = std::make_unique<MBC1>(std::move(rom));
             break;
         case Cart::Type::MBC3_TIMER_BATTERY:
         case Cart::Type::MBC3_TIMER_RAM_BATTERY_2:
         case Cart::Type::MBC3:
         case Cart::Type::MBC3_RAM_2:
         case Cart::Type::MBC3_RAM_BATTERY_2:
-            m_Rom = std::make_unique<MBC3>();
+            m_Rom = std::make_unique<MBC3>(std::move(rom));
             break;
         default:
-            m_Rom = std::make_unique<RomOnly>();
+            m_Rom = std::make_unique<RomOnly>(std::move(rom));
     }
-
-    m_Rom->load(path);
 }
 
 auto MMU::read(u16 address) const -> u8
 {
-    if(address < ROM_ADDR)
+    if(address < ROM_END_ADDR)
     {
         return m_Rom->read(address);
     }
-    else if(address < VRAM_ADDR)
+    else if(address < VRAM_END_ADDR)
     {
         return m_Memory[address - ROM_SIZE];
     }
-    else if(address < RAM_BANK_ADDR)
+    else if(address < RAM_BANK_END_ADDR)
     {
         return m_Memory[address - ROM_SIZE];
     }
-    else if(address < INTERNAL_RAM_ADDR)
+    else if(address < INTERNAL_RAM_END_ADDR)
     {
         return m_Memory[address - ROM_SIZE];
     }
-    else if(address < ECHO_RAM_ADDR)
+    else if(address < ECHO_RAM_END_ADDR)
     {
         return m_Memory[address - ROM_SIZE - INTERNAL_RAM_SIZE]; // Map back into RAM
     }
-    else if(address < OAM_ADDR)
+    else if(address < OAM_END_ADDR)
     {
         return m_Memory[address - ROM_SIZE];
     }
-    else if(address < UNUSABLE_ADDR)
+    else if(address < UNUSABLE_END_ADDR)
     {
         return UINT8_MAX;
     }
-    else if(address < IO_ADDR)
+    else if(address < IO_END_ADDR)
     {
         switch(address)
         {
@@ -90,35 +90,35 @@ auto MMU::read(u16 address) const -> u8
 
 void MMU::write(u16 address, u8 val)
 {
-    if(address < ROM_ADDR)
+    if(address < ROM_END_ADDR)
     {
         m_Rom->write(address, val);
     }
-    else if(address < VRAM_ADDR)
+    else if(address < VRAM_END_ADDR)
     {
         m_Memory[address - ROM_SIZE] = val;
     }
-    else if(address < RAM_BANK_ADDR)
+    else if(address < RAM_BANK_END_ADDR)
     {
         m_Memory[address - ROM_SIZE] = val;
     }
-    else if(address < INTERNAL_RAM_ADDR)
+    else if(address < INTERNAL_RAM_END_ADDR)
     {
         m_Memory[address - ROM_SIZE] = val;
     }
-    else if(address < ECHO_RAM_ADDR)
+    else if(address < ECHO_RAM_END_ADDR)
     {
         m_Memory[address - ROM_SIZE - INTERNAL_RAM_SIZE] = val; // Map back into RAM
     }
-    else if(address < OAM_ADDR)
+    else if(address < OAM_END_ADDR)
     {
         m_Memory[address - ROM_SIZE] = val;
     }
-    else if(address < UNUSABLE_ADDR)
+    else if(address < UNUSABLE_END_ADDR)
     {
         
     }
-    else if(address < IO_ADDR)
+    else if(address < IO_END_ADDR)
     {
         switch(address)
         {

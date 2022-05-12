@@ -2,7 +2,8 @@
 
 #include "romonly.hpp"
 
-RomOnly::RomOnly()  = default;
+RomOnly::RomOnly(std::vector<u8>&& rom)
+    : MBC(std::move(rom)) {}
 RomOnly::~RomOnly() = default;
 
 [[nodiscard]] auto RomOnly::read(u16 address) const -> u8

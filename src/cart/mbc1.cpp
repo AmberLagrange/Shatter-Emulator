@@ -2,8 +2,9 @@
 
 #include "mbc1.hpp"
 
-MBC1::MBC1()
-    : m_RomBankNumber(1), m_RamBankNumber(0), m_RamEnabled(false) {}
+MBC1::MBC1(std::vector<u8>&& rom)
+    : MBC(std::move(rom)),
+      m_RomBankNumber(1), m_RamBankNumber(0), m_RamEnabled(false) {}
 
 MBC1::~MBC1() = default;
 

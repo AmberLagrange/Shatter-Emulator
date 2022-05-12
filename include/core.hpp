@@ -129,24 +129,37 @@ constexpr u16 CART_TITLE_SIZE   = 16;
 constexpr u16 CART_TYPE         = 0x0147;
 
 //MMU Addresses
-constexpr u32 ROM_SIZE          = 0x8000;
-constexpr u32 RAM_SIZE          = 0x8000;
-constexpr u32 ROM_BANK_SIZE     = 0x4000;
-constexpr u32 ROM_BANK_OFFSET   = 0x4000;
-constexpr u32 RAM_BANK_SIZE     = 0x2000;
-constexpr u32 RAM_BANK_OFFSET   = 0xA000;
-constexpr u32 INTERNAL_RAM_SIZE = 0x2000;
+constexpr u32 ROM_SIZE                  = 0x8000;
+constexpr u32 RAM_SIZE                  = 0x8000;
+constexpr u32 ROM_BANK_SIZE             = 0x4000;
+constexpr u32 ROM_BANK_OFFSET           = 0x4000;
+constexpr u32 RAM_BANK_SIZE             = 0x2000;
+constexpr u32 RAM_BANK_OFFSET           = 0xA000;
+constexpr u32 INTERNAL_RAM_SIZE         = 0x2000;
 
-constexpr u16 ROM_ADDR          = 0x8000;
-constexpr u16 VRAM_ADDR         = 0xA000;
-constexpr u16 RAM_BANK_ADDR     = 0xC000;
-constexpr u16 INTERNAL_RAM_ADDR = 0xE000;
-constexpr u16 ECHO_RAM_ADDR     = 0xFE00;
-constexpr u16 OAM_ADDR          = 0xFEA0;
-constexpr u16 UNUSABLE_ADDR     = 0xFF00;
-constexpr u16 IO_ADDR           = 0xFF80;
-constexpr u16 IF_REGISTER       = 0xFF0F;
-constexpr u16 IE_REGISTER       = 0xFFFF;
+constexpr u16 ROM_START_ADDR            = 0x0000;
+constexpr u16 ROM_END_ADDR              = 0x8000;
+
+constexpr u16 VRAM_START_ADDR           = 0x8000;
+constexpr u16 VRAM_END_ADDR             = 0xA000;
+
+constexpr u16 RAM_BANK_START_ADDR       = 0xA000;
+constexpr u16 RAM_BANK_END_ADDR         = 0xC000;
+
+constexpr u16 INTERNAL_RAM_START_ADDR   = 0xC000;
+constexpr u16 INTERNAL_RAM_END_ADDR     = 0xE000;
+
+constexpr u16 ECHO_RAM_START_ADDR       = 0xE000;
+constexpr u16 ECHO_RAM_END_ADDR         = 0xFE00;
+
+constexpr u16 OAM_START_ADDR            = 0xFE00;
+constexpr u16 OAM_END_ADDR              = 0xFEA0;
+
+constexpr u16 UNUSABLE_START_ADDR       = 0xFEA0;
+constexpr u16 UNUSABLE_END_ADDR         = 0xFF00;
+
+constexpr u16 IO_START_ADDR             = 0xFF00;
+constexpr u16 IO_END_ADDR               = 0xFF80;
 
 // IO Registers
 
@@ -232,6 +245,9 @@ constexpr u16 WY_REGISTER               = 0xFF4A;
 constexpr u16 WX_REGISTER               = 0xFF4B;
 
 // 0xFF4C UNUSED
+
+constexpr u16 IF_REGISTER               = 0xFF0F;
+constexpr u16 IE_REGISTER               = 0xFFFF;
 
 //Gameboy Reset Values
 constexpr u16 AF_RESET = 0x01B0;

@@ -2,13 +2,14 @@
 
 #include "mbc.hpp"
 
-auto MBC::getCartType(const char* path) -> Cart::Type
-{
-    std::ifstream rom(path, std::ios::in | std::ios::binary);
-    rom.seekg(CART_TYPE);
+MBC::MBC(std::vector<u8>&& rom)
+    : m_Rom(rom) {}
 
-    char cartType;
-    rom.read(&cartType, 1);
+MBC::~MBC() = default;
+
+auto MBC::getCartType(const std::vector<u8>& data) -> Cart::Type
+{
+    u8 cartType = data[CART_TYPE];
 
     #ifndef NDEBUG
         switch(static_cast<Cart::Type>(cartType))
@@ -37,20 +38,19 @@ auto MBC::getCartType(const char* path) -> Cart::Type
     return static_cast<Cart::Type>(cartType);
 }
 
-auto MBC::getCartTitle(const char* path) -> const std::string
+auto MBC::getCartTitle(const std::vector<u8>& data) -> const std::string
 {
-    std::ifstream rom(path, std::ios::in | std::ios::binary);
-    rom.seekg(CART_TITLE);
-
-    std::string title(CART_TITLE_SIZE, ' ');
-    rom.read(&title[0], CART_TITLE_SIZE);
-
-    return title;
+    auto it = data.begin() + CART_TITLE;
+    return std::string(it, it + CART_TITLE_SIZE);
 }
 
-void MBC::load(const char* path)
+auto MBC::load(const char* path) -> std::vector<u8>
 {
-    std::ifstream rom(path, std::ios::in | std::ios::binary);
-    m_Rom.assign((std::istreambuf_iterator<char>(rom)), {});
-    DEBUG("Rom Size: " << std::dec << m_Rom.size() / 1024 << "KB!");
+    std::vector<u8> rom;
+    
+    std::ifstream data(path, std::ios::in | std::ios::binary);
+    rom.assign((std::istreambuf_iterator<char>(data)), {});
+    DEBUG("Rom Size: " << std::dec << rom.size() / 1024 << "KB!");
+
+    return rom;
 }

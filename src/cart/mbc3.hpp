@@ -9,7 +9,7 @@
 class MBC3 final : public MBC
 {
     public:
-        MBC3();
+        MBC3(std::vector<u8>&& rom);
         ~MBC3() final;
         
         /**

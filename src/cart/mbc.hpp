@@ -46,20 +46,29 @@ namespace Cart
 class MBC
 {
     public:
-        // TODO: Either not have to load data multiple times, or return
-        // the full data along with all the metadata
-        static auto getCartType(const char* path) -> Cart::Type;
-        static auto getCartTitle(const char* path) -> const std::string;
-    public:
-        MBC() = default;
-        virtual ~MBC() = default;
+        /**
+         * @brief Get the MBC of the cart
+         * 
+         * @param data The rom's data
+         */
+        [[nodiscard]] static auto getCartType(const std::vector<u8>& data) -> Cart::Type;
 
         /**
-         * @brief Load a rom file into memory
+         * @brief Get the title of the cart
          * 
-         * @param path The filepath to the rom 
+         * @param data The rom's data
          */
-        virtual void load(const char* path);
+        [[nodiscard]] static auto getCartTitle(const std::vector<u8>& data) -> const std::string;
+
+        /**
+         * @brief Load a rom into memory
+         * 
+         * @param path The path to the rom
+         */
+        [[nodiscard]] static auto load(const char* path) -> std::vector<u8>;
+    public:
+        MBC(std::vector<u8>&& rom);
+        virtual ~MBC();
 
         /**
          * @brief Reads a byte from the specified memory address

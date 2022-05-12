@@ -7,7 +7,7 @@
 class RomOnly final : public MBC
 {
     public:
-        RomOnly();
+        RomOnly(std::vector<u8>&& rom);
         ~RomOnly() final;
         
         /**

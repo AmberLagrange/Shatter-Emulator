@@ -2,8 +2,9 @@
 
 #include "mbc3.hpp"
 
-MBC3::MBC3()
-    : m_RomBankNumber(1), m_RamBankNumber(0),
+MBC3::MBC3(std::vector<u8>&& rom)
+    : MBC(std::move(rom)),
+      m_RomBankNumber(1), m_RamBankNumber(0),
       m_RamEnabled(false), m_RTCEnabled(false) {}
 
 MBC3::~MBC3() = default;
