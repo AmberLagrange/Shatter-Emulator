@@ -86,13 +86,13 @@ constexpr u8  STAT_OAM_BIT      = 5;
 constexpr u8  STAT_LYC_BIT      = 6;
 
 //Graphics Data
-constexpr u16 TILE_DATA_ZERO    = 0x8000;
-constexpr u16 TILE_DATA_ONE     = 0x8800;
+constexpr u16 TILE_DATA_LOW     = 0x8800;
+constexpr u16 TILE_DATA_HIGH    = 0x8000;
 
 constexpr u8  TILE_ONE_OFFSET   = 128;
 
-constexpr u16 TILE_MAP_ZERO     = 0x9C00;
-constexpr u16 TILE_MAP_ONE      = 0x9800;
+constexpr u16 TILE_MAP_LOW      = 0x9800;
+constexpr u16 TILE_MAP_HIGH     = 0x9C00;
 
 constexpr u16 BG_WIDTH          = 0x0100;
 constexpr u16 BG_HEIGHT         = 0x0100;

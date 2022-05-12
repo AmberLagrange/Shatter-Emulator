@@ -8,9 +8,6 @@
 #include <filesystem>
 #include <fstream>
 
-#include <chrono>
-#include <thread>
-
 #include "gameboy.hpp"
 #include "video/screen.hpp"
 
@@ -115,6 +112,8 @@ auto main(int argc, char** argv) -> int
     }
 
     Screen::quit();
+    gb.~Gameboy(); // main's scope never ends, so Gameboy's destructor is never called
+                   // Gross hack until SDL no longer segfaults.
 
     _Exit(0); // SDL segfaults unless I call _Exit
 }

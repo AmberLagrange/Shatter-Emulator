@@ -165,10 +165,8 @@ void PPU::drawBackgroundLine(u8 line)
     u8 scrollX = m_Gameboy.read(SCX_REGISTER);
     u8 scrollY = m_Gameboy.read(SCY_REGISTER);
 
-    u16 tileMapAddress  = bit_functions::get_bit(lcdc, 3) ? TILE_MAP_ZERO  : TILE_MAP_ONE;
-    u16 tileDataAddress = bit_functions::get_bit(lcdc, 4) ? TILE_DATA_ZERO : TILE_DATA_ONE;
-
-    bool usingTileDataZero = (tileDataAddress == TILE_DATA_ZERO);
+    u16 tileMapAddress  = bit_functions::get_bit(lcdc, 3) ? TILE_MAP_HIGH  : TILE_MAP_LOW;
+    u16 tileDataAddress = bit_functions::get_bit(lcdc, 4) ? TILE_DATA_HIGH : TILE_DATA_LOW;
 
     for(u8 col = 0; col < GAMEBOY_WIDTH; ++col)
     {
@@ -190,7 +188,7 @@ void PPU::drawBackgroundLine(u8 line)
 
         // get the memory offset of the tile in the tile data
         // if we're using tile data one we need treat the offset as signed from 128
-        u16 tileDataOffset = usingTileDataZero
+        u16 tileDataOffset = (tileDataAddress == TILE_DATA_HIGH)
                            ? (tileID                                   ) * BYTES_PER_TILE
                            : (static_cast<i8>(tileID) + TILE_ONE_OFFSET) * BYTES_PER_TILE;
 
@@ -228,10 +226,8 @@ void PPU::drawWindowLine(u8 line)
         return;
     }
 
-    u16 tileDataAddress = bit_functions::get_bit(lcdc, 4) ? TILE_DATA_ZERO : TILE_DATA_ONE;
-    u16 tileMapAddress  = bit_functions::get_bit(lcdc, 6) ? TILE_MAP_ZERO  : TILE_MAP_ONE;
-
-    bool usingTileDataZero = (tileDataAddress == TILE_DATA_ZERO);
+    u16 tileDataAddress = bit_functions::get_bit(lcdc, 4) ? TILE_DATA_HIGH : TILE_DATA_LOW;
+    u16 tileMapAddress  = bit_functions::get_bit(lcdc, 6) ? TILE_MAP_HIGH  : TILE_MAP_LOW;
 
     for(u8 col = 0; col < GAMEBOY_WIDTH; ++col)
     {
@@ -253,15 +249,14 @@ void PPU::drawWindowLine(u8 line)
 
         // get the memory offset of the tile in the tile data
         // if we're using tile data one we need treat the offset as signed from 128
-        u16 tileDataOffset = usingTileDataZero
+        u16 tileDataOffset = (tileDataAddress == TILE_DATA_HIGH)
                            ? (tileID                                   ) * BYTES_PER_TILE
                            : (static_cast<i8>(tileID) + TILE_ONE_OFFSET) * BYTES_PER_TILE;
 
         // add 2 bytes/line based on the y offset into the tile
         u16 tileAddress = tileDataAddress + tileDataOffset + 2 * pixelYPos;
 
-        Colour c;
-
+        Colour c = getColour(pixelXPos, tileAddress);
         drawPixel(col, line, c);
     }
 }
