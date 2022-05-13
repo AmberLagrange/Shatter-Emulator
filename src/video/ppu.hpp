@@ -56,7 +56,7 @@ class PPU
         void drawSprites();
 
         /**
-         * @brief Get the colour of a pixel within a tile
+         * @brief Get the gameboy colour of a pixel within a tile
          * 
          * @param pixelXPos The x position of the pixel within
          * the tile
@@ -64,7 +64,14 @@ class PPU
          * @param tileAddress The address of the tile to get the
          * colour information from
          */
-        auto getColour(u8 pixelXPos, u16 tileAddress) -> Colour;
+        auto getGBColour(u8 pixelXPos, u16 tileAddress) -> Colour::GBColour;
+
+        /**
+         * @brief Convert a GB Colour into a screen colour
+         * 
+         * @param colour The colour of the gb colour to convert into a screen colour
+         */
+        auto getScreenColour(Colour::GBColour colour) -> Colour::ScreenColour;
 
         /**
          * @brief Draw a specified pixel at position (x, y) with
@@ -76,7 +83,7 @@ class PPU
          *
          * @param c The colour of the pixel
          */
-        void drawPixel(u8 x, u8 y, Colour c);
+        void drawPixel(u8 x, u8 y, Colour::ScreenColour c);
     private:
         Gameboy& m_Gameboy;
 

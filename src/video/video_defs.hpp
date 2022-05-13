@@ -12,10 +12,23 @@ enum class VideoMode
     Transfer    // Mode 3
 };
 
-struct Colour
+namespace Colour
 {
-    u8 red;
-    u8 green;
-    u8 blue;
-    u8 alpha;
-};
+    enum GBColour
+    {
+        WHITE       = 0b00,
+        LIGHT_GRAY  = 0b01,
+        DARK_GRAY   = 0b10,
+        BLACK       = 0b11
+    };
+
+    struct ScreenColour
+    {
+        u8 red;
+        u8 green;
+        u8 blue;
+        u8 alpha;
+    };
+}
+
+

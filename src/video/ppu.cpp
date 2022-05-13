@@ -4,6 +4,7 @@
 
 #include "flags.hpp"
 #include "gameboy.hpp"
+#include "video/video_defs.hpp"
 
 PPU::PPU(Gameboy& gb)
     : m_Gameboy(gb), m_Mode(VideoMode::OAM_Scan), m_Cycles(0)
@@ -198,8 +199,9 @@ void PPU::drawBackgroundLine(u8 line)
         u8 low  = m_Gameboy.read(tileAddress    );
         u8 high = m_Gameboy.read(tileAddress + 1);
 
-        Colour c = getColour(pixelXPos, tileAddress);
-        drawPixel(col, line, c);
+        Colour::GBColour    gbc = getGBColour(pixelXPos, tileAddress);
+        Colour::ScreenColour sc = getScreenColour(gbc);
+        drawPixel(col, line, sc);
     }
 }
 
@@ -256,58 +258,70 @@ void PPU::drawWindowLine(u8 line)
         // add 2 bytes/line based on the y offset into the tile
         u16 tileAddress = tileDataAddress + tileDataOffset + 2 * pixelYPos;
 
-        Colour c = getColour(pixelXPos, tileAddress);
-        drawPixel(col, line, c);
+        Colour::GBColour gbc    = getGBColour(pixelXPos, tileAddress);
+        Colour::ScreenColour sc = getScreenColour(gbc);
+        drawPixel(col, line, sc);
     }
 }
 
 void PPU::drawSprites()
 {
-    
+    for(u8 spriteNo = 0; spriteNo < 40; ++spriteNo)
+    {
+
+    }
 }
 
-auto PPU::getColour(u8 pixelXPos, u16 tileAddress) -> Colour
+auto PPU::getGBColour(u8 pixelXPos, u16 tileAddress) -> Colour::GBColour
 {
-    // TODO: Colour pallets
     u8 low  = m_Gameboy.read(tileAddress    );
     u8 high = m_Gameboy.read(tileAddress + 1);
 
     u8 bit = 7 - pixelXPos;
     u8 colour = bit_functions::get_bit(low, bit) | (bit_functions::get_bit(high, bit) << 1);
 
-    Colour c;
+    return static_cast<Colour::GBColour>(colour);
+}
 
-    if(colour == 0)
-    {
-        c.red     = 0x9B; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        c.green   = 0xBC; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        c.blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-    }
-    else if(colour == 1)
-    {
-        c.red     = 0x8B; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        c.green   = 0xAC; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        c.blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-    }
-    else if(colour == 2)
-    {
-        c.red     = 0x30; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        c.green   = 0x62; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        c.blue    = 0x30; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-    }
-    else
-    {
-        c.red     = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        c.green   = 0x38; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-        c.blue    = 0x0F; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
-    }
+auto PPU::getScreenColour(Colour::GBColour colour) -> Colour::ScreenColour
+{
+    // TODO: Colour pallets
 
-    c.alpha = 0xFF;
+    Colour::ScreenColour c;
+    switch(colour)
+    {
+        case Colour::GBColour::WHITE:
+            c.red     = 0x9B;
+            c.green   = 0xBC;
+            c.blue    = 0x0F;
+            c.alpha   = 0xFF;
+            break;
+        case Colour::GBColour::LIGHT_GRAY:
+            c.red     = 0x8B;
+            c.green   = 0xAC;
+            c.blue    = 0x0F;
+            c.alpha   = 0xFF;
+            break;
+        case Colour::GBColour::DARK_GRAY:
+            c.red     = 0x30;
+            c.green   = 0x62;
+            c.blue    = 0x30;
+            c.alpha   = 0xFF;
+            break;
+        case Colour::GBColour::BLACK:
+            c.red     = 0x0F;
+            c.green   = 0x38;
+            c.blue    = 0x0F;
+            c.alpha   = 0xFF;
+            break;
+        default:
+            ASSERT(false, "Invalid colour!");
+    }
 
     return c;
 }
 
-void PPU::drawPixel(u8 x, u8 y, Colour c)
+void PPU::drawPixel(u8 x, u8 y, Colour::ScreenColour c)
 {
     m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4    ) = c.red;
     m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 1) = c.green;
