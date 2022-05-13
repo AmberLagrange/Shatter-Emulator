@@ -2,6 +2,8 @@
 
 #include "mbc.hpp"
 
+#include <sstream>
+
 MBC::MBC(std::vector<u8>&& rom)
     : m_Rom(rom) {}
 
@@ -47,6 +49,16 @@ auto MBC::getCartTitle(const std::vector<u8>& data) -> const std::string
     auto it = data.begin() + CART_TITLE;
     std::string title(it, it + CART_TITLE_SIZE);
     title.erase(std::find(title.begin(), title.end(), '\0'), title.end());
+
+    // If the version is not version 0, add "(Version n)" to the title
+
+    u8 version = data[CART_VERSION_NUMBER];
+    if(version)
+    {
+        std::stringstream ss;
+        ss << title << " (Version " << static_cast<int>(version) << ")";
+        title = ss.str();
+    }
 
     return title;
 }

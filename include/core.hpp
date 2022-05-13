@@ -123,10 +123,10 @@ constexpr u8  P14_INPUT_BIT     = 4; //Direction buttons (0=Select)
 constexpr u8  P15_INPUT_BIT     = 5; //Action buttons    (0=Select)
 
 //Cartridge Header
-constexpr u16 CART_TITLE        = 0x134;
-constexpr u16 CART_TITLE_SIZE   = 16;
-
-constexpr u16 CART_TYPE         = 0x0147;
+constexpr u16 CART_TITLE                = 0x134;
+constexpr u16 CART_TITLE_SIZE           = 16;
+constexpr u16 CART_TYPE                 = 0x0147;
+constexpr u16 CART_VERSION_NUMBER       = 0x014C;
 
 //MMU Addresses
 constexpr u32 ROM_SIZE                  = 0x8000;
