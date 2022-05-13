@@ -16,7 +16,7 @@ void Screen::quit()
 
 Screen::Screen()
 {
-    DEBUG("Initializing Screen!");
+    DEBUG("Initializing Screen.");
     
     m_Window = SDL_CreateWindow("Shatter Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                 GAMEBOY_WIDTH * m_Scale, GAMEBOY_HEIGHT * m_Scale, SDL_WINDOW_SHOWN);

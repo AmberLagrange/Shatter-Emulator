@@ -34,7 +34,7 @@ void Gameboy::save()
 
 void Gameboy::start()
 {
-    DEBUG("Starting Gameboy!");
+    DEBUG("Starting Gameboy.");
     m_Running = true;
 }
 
@@ -61,7 +61,7 @@ void Gameboy::renderFrame()
 
 void Gameboy::stop()
 {
-    DEBUG("Stopping Gameboy!");
+    DEBUG("Stopping Gameboy.");
     m_Running = false;
 }
 

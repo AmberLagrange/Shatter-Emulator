@@ -10,7 +10,7 @@
 MMU::MMU(Gameboy& gb)
     : m_Gameboy(gb)
 {
-    DEBUG("Initializing MMU!");
+    DEBUG("Initializing MMU.");
 }
 
 void MMU::load(const std::string& path)
@@ -24,7 +24,7 @@ void MMU::load(const std::string& path)
     std::string title = MBC::getCartTitle(rom);
 
     m_Gameboy.setTitle("Shatter Emulator: " + title);
-    DEBUG("Loaded " << title << "!");
+    DEBUG("Loaded " << title << ".");
 
     switch(type)
     {
@@ -54,13 +54,13 @@ void MMU::save(const std::string& path)
 
     if(ram.empty())
     {
-        DEBUG("No ram to save!");
+        DEBUG("No ram to save.");
         return;
     }
 
     std::ofstream file(path + ".sav", std::ios::out | std::ios::binary);
     file.write(reinterpret_cast<const char*>(&ram[0]), ram.size());
-    DEBUG("Saved data to: " << path << ".sav!");
+    DEBUG("Saved data to: " << path << ".sav.");
 }
 
 auto MMU::read(u16 address) const -> u8

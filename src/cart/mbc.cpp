@@ -13,19 +13,19 @@ auto MBC::getCartType(const std::vector<u8>& data) -> Cart::Type
         switch(static_cast<Cart::Type>(cartType))
         {
             case Cart::Type::ROM_ONLY:
-            DEBUG("Loaded ROM Only!");
+            DEBUG("Loaded ROM Only.");
             break;
         case Cart::Type::MBC1:
         case Cart::Type::MBC1_RAM:
         case Cart::Type::MBC1_RAM_BATTERY:
-            DEBUG("Loaded MBC1!");
+            DEBUG("Loaded MBC1.");
             break;
         case Cart::Type::MBC3_TIMER_BATTERY:
         case Cart::Type::MBC3_TIMER_RAM_BATTERY_2:
         case Cart::Type::MBC3:
         case Cart::Type::MBC3_RAM_2:
         case Cart::Type::MBC3_RAM_BATTERY_2:
-            DEBUG("Loaded MBC3!");
+            DEBUG("Loaded MBC3.");
             break;
         default:
             WARN("Unknown MBC Type: 0x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(cartType) << ", falling back to ROM Only!");
@@ -88,7 +88,7 @@ auto MBC::loadRom(const std::string& path) -> std::vector<u8>
     
     std::ifstream data(path, std::ios::in | std::ios::binary);
     rom.assign((std::istreambuf_iterator<char>(data)), {});
-    DEBUG("Rom Size: " << std::dec << rom.size() / 1024 << "KB!");
+    DEBUG("Rom Size: " << std::dec << rom.size() / 1024 << "KB.");
 
     return rom;
 }
@@ -101,7 +101,7 @@ auto MBC::loadRam(const std::string& path) -> std::vector<u8>
     {
         std::ifstream data(path, std::ios::in | std::ios::binary);
         ram.assign((std::istreambuf_iterator<char>(data)), {});
-        DEBUG("Ram Size: " << std::dec << ram.size() / 1024 << "KB!");
+        DEBUG("Ram Size: " << std::dec << ram.size() / 1024 << "KB.");
     }
 
     return ram;
@@ -122,7 +122,7 @@ MBC::MBC(std::vector<u8>&& rom, std::vector<u8>&& ram)
     }
     else
     {
-        DEBUG("Read RAM from disk!");
+        DEBUG("Read RAM from disk.");
         m_Ram = std::move(ram);
     }
 }

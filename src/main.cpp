@@ -1,9 +1,5 @@
+#include "CLI11.hpp"
 #include "core.hpp"
-
-#include <span>
-
-#include <algorithm>
-#include <string>
 
 #include <filesystem>
 #include <fstream>
@@ -11,43 +7,66 @@
 #include "gameboy.hpp"
 #include "video/screen.hpp"
 
-auto optionExists(const std::span<char*>& args, const std::string& option) -> bool
-{
-    return std::find(args.begin(), args.end(), option) != args.end();
-}
-
 [[noreturn]]
 auto main(int argc, char** argv) -> int
 {
     Logger::setDefaultStream(std::cout);
-    if(argc < 2)
+
+    CLI::App shatter{"Shatter Emulator"};
+
+    std::string path;
+    shatter.add_option("-r,--rom,-f,--file,rom", path, "Path to the rom.");
+    
+    std::string bootPath;
+    shatter.add_option("-b,--br,--boot,--bootrom,bootrom", bootPath, "Path to a boot rom.");
+
+    std::string logPath;
+    shatter.add_option("-l,--log", logPath, "Path to the log file.");
+
+    #ifndef NDEBUG
+        bool verbose = false;
+        shatter.add_flag("-v,--verbose", verbose, "Enable opcode logging.");
+        if(verbose)
+        {
+            Logger::enableOpcodeLogging();
+        }
+    #endif
+
+    try
+    {
+        shatter.parse(argc, argv);
+    }
+    catch (const CLI::ParseError &e)
+    {
+        _Exit(shatter.exit(e));
+    }
+
+    if(path.empty())
     {
         ERROR("No file provided!");
         _Exit(-1);
     }
 
-    auto args = std::span(argv, size_t(argc));
-
-    if(!std::filesystem::exists(args[1]))
+    if(!std::filesystem::exists(path))
     {
-        ERROR("File '" << args[1] << "' not found!");
+        ERROR("File '" << path << "' not found!");
         _Exit(-2);
     }
 
-    if(std::filesystem::is_directory(args[1]))
+    if(std::filesystem::is_directory(path))
     {
-        ERROR("'" << args[1] << "' is a directory!");
+        ERROR("'" << path << "' is a directory!");
         _Exit(-3);
     }
 
-    if(optionExists(args, "-l"))
+    if(!logPath.empty())
     {
-        std::ofstream file("./logs/log.log");
+        std::ofstream file(logPath);
         Logger::setDefaultStream(file);
     }
 
     #ifndef NDEBUG
-        if(optionExists(args, "-v") || optionExists(args, "--verbose"))
+        if(verbose)
         {
             Logger::enableOpcodeLogging();
         }
@@ -56,7 +75,7 @@ auto main(int argc, char** argv) -> int
     Screen::init();
 
     Gameboy gb;
-    gb.load(args[1]);
+    gb.load(path);
     gb.start();
 
     while(gb.isRunning())
@@ -114,6 +133,7 @@ auto main(int argc, char** argv) -> int
     Screen::quit();
     gb.~Gameboy(); // main's scope never ends, so Gameboy's destructor is never called
                    // Gross hack until SDL no longer segfaults.
+    shatter.~App();
 
     _Exit(0); // SDL segfaults unless I call _Exit
 }

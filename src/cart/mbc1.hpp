@@ -2,8 +2,6 @@
 
 #include "core.hpp"
 
-#include <array>
-
 #include "mbc.hpp"
 
 class MBC1 final : public MBC

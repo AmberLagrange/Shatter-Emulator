@@ -13,7 +13,7 @@
 CPU::CPU(Gameboy& gb)
     : m_Registers({}), m_Gameboy(gb), m_Halted(false), m_IME(false), m_Branched(false)
 {
-    DEBUG("Initializing CPU!");
+    DEBUG("Initializing CPU.");
     reset();
 }
 

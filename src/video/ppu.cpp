@@ -9,7 +9,7 @@
 PPU::PPU(Gameboy& gb)
     : m_Gameboy(gb), m_Mode(VideoMode::OAM_Scan), m_Cycles(0)
 {
-    DEBUG("Initializing GPU!");
+    DEBUG("Initializing GPU.");
 }
 
 void PPU::setDrawCallback(std::function<void(std::array<u8, FRAME_BUFFER_SIZE> buffer)> callback)
@@ -306,13 +306,23 @@ void PPU::drawSprites(u8 line)
                 pixelXPos = SPRITE_WIDTH - 1 - pixelXPos;
             }
 
+            u8 screenXPos = spriteXPos + x;
+
+            // Only render pixels visible on the screen.
+
+            // Less than 0 might continue with the sprite
+            if(screenXPos < 0) continue;
+
+            // Greater than the screen's width would not, so go to the next sprite
+            if(screenXPos > GAMEBOY_WIDTH) break;
+
             Colour::GBColour gbc = getGBColour(pixelXPos, tileAddress);
 
             // Don't render white pixels, as they're transparent
             if (gbc == Colour::GBColour::WHITE) continue;
 
             // Don't draw if the background has priority, unless the colour is white
-            if(!bgPriority || getPixel(spriteXPos + x, line) == Colour::GBColour::WHITE)
+            if(!bgPriority || getPixel(screenXPos, line) == Colour::GBColour::WHITE)
             {
                 Colour::ScreenColour sc = getScreenColour(gbc);
                 drawPixel(spriteXPos + x, line, sc);
@@ -372,6 +382,8 @@ auto PPU::getScreenColour(Colour::GBColour colour) -> Colour::ScreenColour
 
 void PPU::drawPixel(u8 x, u8 y, Colour::ScreenColour c)
 {
+    ASSERT(((x + y * GAMEBOY_WIDTH) * 4 < 0x16800), "INVALID PIXEL POSITION! X: " << (int)x << ", Y: " << (int)y << ", Pos: " << (int)((x + y * GAMEBOY_WIDTH) * 4));
+    
     m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4    ) = c.red;
     m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 1) = c.green;
     m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 2) = c.blue;
