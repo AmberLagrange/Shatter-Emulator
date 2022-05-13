@@ -9,7 +9,7 @@
 class MBC3 final : public MBC
 {
     public:
-        MBC3(std::vector<u8>&& rom);
+        MBC3(std::vector<u8>&& rom, std::vector<u8>&& ram);
         ~MBC3() final;
         
         /**
@@ -27,13 +27,10 @@ class MBC3 final : public MBC
          * @param val The value to write
          */
         virtual void write(u16 address, u8 val) final;
-
     private:
         u8 m_RomBankNumber;
         u8 m_RamBankNumber;
 
         bool m_RamEnabled;
         bool m_RTCEnabled;
-
-        std::array<u8, 0x2000 * 4> m_Ram {{}};
 };

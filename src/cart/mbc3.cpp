@@ -2,8 +2,8 @@
 
 #include "mbc3.hpp"
 
-MBC3::MBC3(std::vector<u8>&& rom)
-    : MBC(std::move(rom)),
+MBC3::MBC3(std::vector<u8>&& rom, std::vector<u8>&& ram)
+    : MBC(std::move(rom), std::move(ram)),
       m_RomBankNumber(1), m_RamBankNumber(0),
       m_RamEnabled(false), m_RTCEnabled(false) {}
 
@@ -64,8 +64,9 @@ void MBC3::write(u16 address, u8 val)
             {
                 m_Ram[(address - RAM_BANK_OFFSET) + RAM_BANK_SIZE * m_RamBankNumber] = val;
             }
+            break;
         default:
-            WARN("Trying to write 0x" << std::hex << std::setw(2) << std::setfill('0') << val
-                  << " to address 0x" << std::hex << std::setw(4) << std::setfill('0') << val << '!');
+            WARN("Trying to write 0x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(val)
+                  << " to address 0x" << std::hex << std::setw(4) << std::setfill('0') << static_cast<int>(val) << '!');
     }
 }

@@ -3,6 +3,8 @@
 #include "mmu.hpp"
 
 #include "gameboy.hpp"
+
+#include <fstream>
 #include <memory>
 
 MMU::MMU(Gameboy& gb)
@@ -11,44 +13,61 @@ MMU::MMU(Gameboy& gb)
     DEBUG("Initializing MMU!");
 }
 
-void MMU::load(const char* path)
+void MMU::load(const std::string& path)
 {
-    if(m_Rom) return;
+    if(m_Cart) return;
 
-    std::vector<u8> rom = MBC::load(path);
-    Cart::Type type = MBC::getCartType(rom);
+    std::vector<u8> rom = MBC::loadRom(path);
+    std::vector<u8> ram = MBC::loadRam(path + ".sav");
 
+    Cart::Type type   = MBC::getCartType(rom);
     std::string title = MBC::getCartTitle(rom);
+
     m_Gameboy.setTitle("Shatter Emulator: " + title);
     DEBUG("Loaded " << title << "!");
 
     switch(type)
     {
         case Cart::Type::ROM_ONLY:
-            m_Rom = std::make_unique<RomOnly>(std::move(rom));
+            m_Cart = std::make_unique<RomOnly>(std::move(rom));
             break;
         case Cart::Type::MBC1:
         case Cart::Type::MBC1_RAM:
         case Cart::Type::MBC1_RAM_BATTERY:
-            m_Rom = std::make_unique<MBC1>(std::move(rom));
+            m_Cart = std::make_unique<MBC1>(std::move(rom), std::move(ram));
             break;
         case Cart::Type::MBC3_TIMER_BATTERY:
         case Cart::Type::MBC3_TIMER_RAM_BATTERY_2:
         case Cart::Type::MBC3:
         case Cart::Type::MBC3_RAM_2:
         case Cart::Type::MBC3_RAM_BATTERY_2:
-            m_Rom = std::make_unique<MBC3>(std::move(rom));
+            m_Cart = std::make_unique<MBC3>(std::move(rom), std::move(ram));
             break;
         default:
-            m_Rom = std::make_unique<RomOnly>(std::move(rom));
+            m_Cart = std::make_unique<RomOnly>(std::move(rom));
     }
+}
+
+void MMU::save(const std::string& path)
+{
+    auto& ram = m_Cart->getRam();
+
+    if(ram.empty())
+    {
+        DEBUG("No ram to save!");
+        return;
+    }
+
+    std::ofstream file(path + ".sav", std::ios::out | std::ios::binary);
+    file.write(reinterpret_cast<const char*>(&ram[0]), ram.size());
+    DEBUG("Saved data to: " << path << ".sav!");
 }
 
 auto MMU::read(u16 address) const -> u8
 {
     if(address < ROM_END_ADDR)
     {
-        return m_Rom->read(address);
+        return m_Cart->read(address);
     }
     else if(address < VRAM_END_ADDR)
     {
@@ -56,7 +75,7 @@ auto MMU::read(u16 address) const -> u8
     }
     else if(address < RAM_BANK_END_ADDR)
     {
-        return m_Memory[address - ROM_SIZE];
+        return m_Cart->read(address);
     }
     else if(address < INTERNAL_RAM_END_ADDR)
     {
@@ -90,15 +109,13 @@ auto MMU::read(u16 address) const -> u8
     {
         return m_Memory[address - ROM_SIZE];
     }
-
-    return UINT8_MAX;
 }
 
 void MMU::write(u16 address, u8 val)
 {
     if(address < ROM_END_ADDR)
     {
-        m_Rom->write(address, val);
+        m_Cart->write(address, val);
     }
     else if(address < VRAM_END_ADDR)
     {
@@ -106,7 +123,7 @@ void MMU::write(u16 address, u8 val)
     }
     else if(address < RAM_BANK_END_ADDR)
     {
-        m_Memory[address - ROM_SIZE] = val;
+        m_Cart->write(address, val);
     }
     else if(address < INTERNAL_RAM_END_ADDR)
     {

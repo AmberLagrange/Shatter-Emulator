@@ -17,11 +17,18 @@ class MMU
         MMU(Gameboy& gb);
 
         /**
-         * @brief Loads a rom into memory
+         * @brief Loads a rom (and potentially ram) into memory
          * 
          * @param path The filepath to the rom
          */
-        void load(const char* path);
+        void load(const std::string& path);
+
+        /**
+         * @brief Saves the ram to disk
+         * 
+         * @param path The filepath to the rom
+         */
+        void save(const std::string& path);
 
         /**
          * @brief Reads a byte from the specified memory address
@@ -42,7 +49,7 @@ class MMU
         void dmaTransfer(u8 val);
     private:
         Gameboy& m_Gameboy;
-        std::unique_ptr<MBC> m_Rom;
-
+        
+        std::unique_ptr<MBC> m_Cart;
         std::array<u8, RAM_SIZE> m_Memory {{}};
 };

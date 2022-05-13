@@ -5,20 +5,31 @@
 
 Gameboy::Gameboy()
     :   m_APU(*this), m_CPU(*this), m_MMU(*this), m_PPU(*this),
-        m_Timer(*this), m_Running(false)
+        m_Timer(*this), m_Path(""), m_Running(false)
 {
     m_PPU.setDrawCallback([screen = &m_Screen](std::array<u8, FRAME_BUFFER_SIZE> buffer) { screen->draw(buffer); });
 }
 
-Gameboy::Gameboy(const char* path)
+Gameboy::Gameboy(const std::string& path)
     : Gameboy()
 {
     load(path);
 }
 
-void Gameboy::load(const char* path)
+Gameboy::~Gameboy()
 {
-    m_MMU.load(path);
+    save();
+}
+
+void Gameboy::load(const std::string& path)
+{
+    m_Path = path;
+    m_MMU.load(m_Path);
+}
+
+void Gameboy::save()
+{
+    m_MMU.save(m_Path);
 }
 
 void Gameboy::start()

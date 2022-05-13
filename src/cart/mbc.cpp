@@ -2,12 +2,8 @@
 
 #include "mbc.hpp"
 
+#include <filesystem>
 #include <sstream>
-
-MBC::MBC(std::vector<u8>&& rom)
-    : m_Rom(rom) {}
-
-MBC::~MBC() = default;
 
 auto MBC::getCartType(const std::vector<u8>& data) -> Cart::Type
 {
@@ -63,7 +59,30 @@ auto MBC::getCartTitle(const std::vector<u8>& data) -> const std::string
     return title;
 }
 
-auto MBC::load(const char* path) -> std::vector<u8>
+auto MBC::getCartRamSize(const std::vector<u8>& data) -> u32
+{
+    switch(data[CART_RAM_SIZE])
+    {
+        case 0x00:
+            return 0;
+        case 0x01:
+            WARN("Unused RAM Size!");
+            return 0;
+        case 0x02:
+            return 1  * RAM_BANK_SIZE;
+        case 0x03:
+            return 4  * RAM_BANK_SIZE;
+        case 0x04:
+            return 16 * RAM_BANK_SIZE;
+        case 0x05:
+            return 8  * RAM_BANK_SIZE;
+        default:
+            WARN("Unknown RAM Size!");
+            return 0;
+    }
+}
+
+auto MBC::loadRom(const std::string& path) -> std::vector<u8>
 {
     std::vector<u8> rom;
     
@@ -72,4 +91,45 @@ auto MBC::load(const char* path) -> std::vector<u8>
     DEBUG("Rom Size: " << std::dec << rom.size() / 1024 << "KB!");
 
     return rom;
+}
+
+auto MBC::loadRam(const std::string& path) -> std::vector<u8>
+{
+    std::vector<u8> ram{};
+
+    if(std::filesystem::exists(path))
+    {
+        std::ifstream data(path, std::ios::in | std::ios::binary);
+        ram.assign((std::istreambuf_iterator<char>(data)), {});
+        DEBUG("Ram Size: " << std::dec << ram.size() / 1024 << "KB!");
+    }
+
+    return ram;
+}
+
+MBC::MBC(std::vector<u8>&& rom, std::vector<u8>&& ram)
+    : m_Rom(rom)
+{
+    u32 ramSize = getCartRamSize(m_Rom);
+
+    if(ram.empty())
+    {
+        m_Ram = std::vector<u8>(ramSize, 0);
+    }
+    else if(ram.size() != ramSize)
+    {
+        ERROR("Invalid RAM size. Data may be corrupted!");
+    }
+    else
+    {
+        DEBUG("Read RAM from disk!");
+        m_Ram = std::move(ram);
+    }
+}
+
+MBC::~MBC() = default;
+
+auto MBC::getRam() -> const std::vector<u8>&
+{
+    return m_Ram;
 }

@@ -62,13 +62,27 @@ class MBC
         [[nodiscard]] static auto getCartTitle(const std::vector<u8>& data) -> const std::string;
 
         /**
+         * @brief Get the amount of ram a cart supports
+         * 
+         * @param data The rom's data
+         */
+        [[nodiscard]] static auto getCartRamSize(const std::vector<u8>& data) -> u32;
+
+        /**
          * @brief Load a rom into memory
          * 
          * @param path The path to the rom
          */
-        [[nodiscard]] static auto load(const char* path) -> std::vector<u8>;
+        [[nodiscard]] static auto loadRom(const std::string& path) -> std::vector<u8>;
+
+        /**
+         * @brief Load ram data into memory
+         * 
+         * @param path The path to the rom
+         */
+        [[nodiscard]] static auto loadRam(const std::string& path) -> std::vector<u8>;
     public:
-        MBC(std::vector<u8>&& rom);
+        MBC(std::vector<u8>&& rom, std::vector<u8>&& ram);
         virtual ~MBC();
 
         /**
@@ -86,6 +100,13 @@ class MBC
          * @param val The value to write
          */
         virtual void write(u16 address, u8 val) = 0;
+
+        /**
+         * @brief Gets the ram of the cartridge (mainly for saving)
+         * 
+         */
+        [[nodiscard]] auto getRam() -> const std::vector<u8>&;
     protected:
         std::vector<u8> m_Rom;
+        std::vector<u8> m_Ram;
 };

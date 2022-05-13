@@ -18,14 +18,27 @@ class Gameboy
 {
     public:
         Gameboy();
-        Gameboy(const char* path);
+        Gameboy(const std::string& path);
+        ~Gameboy();
 
         /**
          * @brief Loads a rom into memory
          * 
          * @param path The filepath to the rom
          */
-        void load(const char* path);
+        void load(const std::string& path);
+
+        /**
+         * @brief Loads the current 
+         * 
+         */
+        void load();
+
+        /**
+         * @brief Saves a ram to disk
+         * 
+         */
+        void save();
 
         /**
          * @brief Starts the Gameboy
@@ -165,6 +178,7 @@ class Gameboy
 
         Screen m_Screen;
 
+        std::string m_Path;
         bool m_Running;
 };
 

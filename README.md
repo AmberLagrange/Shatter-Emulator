@@ -31,8 +31,8 @@ Additional arguments can be passed as well.
 
 # Future Plans
 
-- [ ] Memory Bank Controllers
-- [ ] Complete Graphics
+- [x] Memory Bank Controllers
+- [x] Complete Graphics
 - [ ] Audio
 - [ ] Save States
 - [ ] GameShark Codes

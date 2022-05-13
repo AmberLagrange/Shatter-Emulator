@@ -9,7 +9,7 @@
 class MBC1 final : public MBC
 {
     public:
-        MBC1(std::vector<u8>&& rom);
+        MBC1(std::vector<u8>&& rom, std::vector<u8>&& ram);
         ~MBC1() final;
         
         /**
@@ -33,6 +33,4 @@ class MBC1 final : public MBC
 
         u8 m_RamBankNumber;
         bool m_RamEnabled = false;
-
-        std::array<u8, 0x8000 * 4> m_Ram {{}};
 };
