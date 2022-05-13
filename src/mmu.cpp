@@ -80,7 +80,8 @@ auto MMU::read(u16 address) const -> u8
         {
             case JOYPAD_REGISTER:
                 return m_Gameboy.getInput();
-                
+            case TIMER_DIV_REGISTER:
+                return m_Gameboy.getDIV();
             default:
                 return m_Memory[address - ROM_SIZE];
         }
@@ -135,7 +136,7 @@ void MMU::write(u16 address, u8 val)
                 break;
             case TIMER_TAC_REGISTER:
                 m_Memory[address - ROM_SIZE] = val;
-                switch(val & 0x03)
+                switch(val & 0b11)
                 {
                     case 0b00:
                         m_Gameboy.setTimerSpeed(TIMER_SPEED_00);

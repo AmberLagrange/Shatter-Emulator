@@ -1,4 +1,3 @@
-#include "SDL_video.h"
 #include "core.hpp"
 
 #include "screen.hpp"

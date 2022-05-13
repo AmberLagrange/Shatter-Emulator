@@ -401,5 +401,6 @@ auto PPU::getPixel(u8 x, u8 y) -> Colour::GBColour
             return Colour::GBColour::BLACK;
         default:
             ASSERT(false, "Invalid colour at pixel!");
+            return Colour::GBColour::WHITE;
     }
 }
