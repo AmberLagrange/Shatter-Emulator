@@ -287,7 +287,7 @@ void PPU::drawSprites(u8 line)
         u8 pixelYPos = line - spriteYPos;
         if(yFlip)
         {
-            pixelYPos = spriteSize - pixelYPos;
+            pixelYPos = spriteSize - 1 - pixelYPos;
         }
 
         // skip sprites that don't need to be rendered
@@ -303,7 +303,7 @@ void PPU::drawSprites(u8 line)
             u8 pixelXPos = x;
             if(xFlip)
             {
-                pixelXPos = 7 - pixelXPos;
+                pixelXPos = SPRITE_WIDTH - 1 - pixelXPos;
             }
 
             Colour::GBColour gbc = getGBColour(pixelXPos, tileAddress);
