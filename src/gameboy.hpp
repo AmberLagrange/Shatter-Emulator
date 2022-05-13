@@ -132,14 +132,21 @@ class Gameboy
          * @brief Resets the DIV counter in the timer
          * 
          */
-        void resetDiv();
+        __always_inline void resetDiv();
 
         /**
          * @brief Sets the speed of the timer
          * 
          * @param speed The speed to be set
          */
-        void setTimerSpeed(u32 speed);
+        __always_inline void setTimerSpeed(u32 speed);
+
+        /**
+         * @brief Set the title of the window
+         * 
+         * @param title The title to set
+         */
+        __always_inline void setTitle(std::string title);
     private:
         APU m_APU;
         CPU m_CPU;
@@ -203,6 +210,11 @@ __always_inline auto Gameboy::getInput() -> u8
     return m_Joypad.getInput();
 }
 
+__always_inline auto Gameboy::getButton(SDL_Keycode keycode) -> Button
+{
+    return m_Joypad.getButton(keycode);
+}
+
 __always_inline void Gameboy::resetDiv()
 {
     m_Timer.resetDiv();
@@ -213,7 +225,7 @@ __always_inline void Gameboy::setTimerSpeed(u32 speed)
     m_Timer.setSpeed(speed);
 }
 
-__always_inline auto Gameboy::getButton(SDL_Keycode keycode) -> Button
+__always_inline void Gameboy::setTitle(std::string title)
 {
-    return m_Joypad.getButton(keycode);
+    m_Screen.setTitle(title);
 }

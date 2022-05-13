@@ -13,9 +13,14 @@ MMU::MMU(Gameboy& gb)
 
 void MMU::load(const char* path)
 {
+    if(m_Rom) return;
+
     std::vector<u8> rom = MBC::load(path);
     Cart::Type type = MBC::getCartType(rom);
-    DEBUG("Loaded " << MBC::getCartTitle(rom) << "!");
+
+    std::string title = MBC::getCartTitle(rom);
+    m_Gameboy.setTitle("Shatter Emulator: " + title);
+    DEBUG("Loaded " << title << "!");
 
     switch(type)
     {

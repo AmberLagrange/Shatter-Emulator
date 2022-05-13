@@ -40,8 +40,15 @@ auto MBC::getCartType(const std::vector<u8>& data) -> Cart::Type
 
 auto MBC::getCartTitle(const std::vector<u8>& data) -> const std::string
 {
+    // Since the title might or might not contain null bytes,
+    // copy all the possible data over, then remove anything after
+    // the first null byte
+    
     auto it = data.begin() + CART_TITLE;
-    return std::string(it, it + CART_TITLE_SIZE);
+    std::string title(it, it + CART_TITLE_SIZE);
+    title.erase(std::find(title.begin(), title.end(), '\0'), title.end());
+
+    return title;
 }
 
 auto MBC::load(const char* path) -> std::vector<u8>
