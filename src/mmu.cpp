@@ -153,6 +153,9 @@ void MMU::write(u16 address, u8 val)
                         ASSERT(false, "Timer Speed Switch branched to invalid case!");
                 }
                 break;
+            case DMA_TRANSFER_REGISTER:
+                dmaTransfer(val);
+                break;
             default:
                 m_Memory[address - ROM_SIZE] = val;
         }
@@ -160,5 +163,14 @@ void MMU::write(u16 address, u8 val)
     else
     {
         m_Memory[address - ROM_SIZE] = val;
+    }
+}
+
+void MMU::dmaTransfer(u8 val)
+{
+    u16 address = val * 0x100;
+    for (u8 i = 0; i < DMA_TRANSFER_SIZE; ++i)
+    {
+        write(OAM_START_ADDR + i, read(address + i));
     }
 }

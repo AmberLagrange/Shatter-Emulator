@@ -39,6 +39,8 @@ class MMU
          */
         void write(u16 address, u8 val);
     private:
+        void dmaTransfer(u8 val);
+    private:
         Gameboy& m_Gameboy;
         std::unique_ptr<MBC> m_Rom;
 

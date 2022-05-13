@@ -53,7 +53,7 @@ class PPU
          * @brief Draw the sprites to the screen
          * 
          */
-        void drawSprites();
+        void drawSprites(u8 line);
 
         /**
          * @brief Get the gameboy colour of a pixel within a tile
@@ -84,6 +84,15 @@ class PPU
          * @param c The colour of the pixel
          */
         void drawPixel(u8 x, u8 y, Colour::ScreenColour c);
+
+        /**
+         * @brief Get the colour of a pixel on the screen
+         * 
+         * @param x The x coordinate of the pixel to get
+         * 
+         * @param y The y coordinate of the pixel to get
+         */
+        auto getPixel(u8 x, u8 y) -> Colour::GBColour;
     private:
         Gameboy& m_Gameboy;
 

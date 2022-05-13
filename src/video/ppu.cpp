@@ -30,6 +30,7 @@ void PPU::tick(u8 cycles)
 
                 drawBackgroundLine(m_Line);
                 drawWindowLine(m_Line);
+                drawSprites(m_Line);
                 
                 m_Line++;
 
@@ -79,7 +80,6 @@ void PPU::tick(u8 cycles)
                 {
                     m_Mode = VideoMode::OAM_Scan;
 
-                    drawSprites();
                     std::invoke(m_DrawCallback, m_FrameBuffer);
                     m_Line = 0;
                     
@@ -264,11 +264,60 @@ void PPU::drawWindowLine(u8 line)
     }
 }
 
-void PPU::drawSprites()
+void PPU::drawSprites(u8 line)
 {
-    for(u8 spriteNo = 0; spriteNo < 40; ++spriteNo)
+    u8 lcdc = m_Gameboy.read(LCD_CONTROL_REGISTER);
+    u8 spriteSize = bit_functions::get_bit(lcdc, 2) ? 2 * SPRITE_HEIGHT : SPRITE_HEIGHT;
+    
+    for (int sprite = 0; sprite < 40; sprite++)
     {
+        u8 spriteIndex = sprite * BYTES_PER_SPRITE;
 
+        // Get the sprite's y position, x position, data address and its attributes
+        u8 spriteYPos      = m_Gameboy.read(OAM_START_ADDR + spriteIndex    ) - SPRITE_Y_OFFSET;
+        u8 spriteXPos      = m_Gameboy.read(OAM_START_ADDR + spriteIndex + 1) - SPRITE_X_OFFSET;
+        u8 tileDataAddress = m_Gameboy.read(OAM_START_ADDR + spriteIndex + 2);
+        u8 attributes      = m_Gameboy.read(OAM_START_ADDR + spriteIndex + 3);
+
+        bool xFlip      = bit_functions::get_bit(attributes, 5);
+        bool yFlip      = bit_functions::get_bit(attributes, 6);
+        bool bgPriority = bit_functions::get_bit(attributes, 7);
+
+        // Get the pixel in the sprite (and flip it if needed)
+        u8 pixelYPos = line - spriteYPos;
+        if(yFlip)
+        {
+            pixelYPos = spriteSize - pixelYPos;
+        }
+
+        // skip sprites that don't need to be rendered
+        if(line < spriteYPos || line >= spriteYPos + spriteSize) continue;
+
+        // add 2 bytes/line based on the y offset into the tile
+        u16 tileAddress = TILE_DATA_HIGH + tileDataAddress * BYTES_PER_TILE + 2 * pixelYPos;
+
+        // Loop over all the pixels in the sprite
+        for(u8 x = 0; x < SPRITE_WIDTH; ++x)
+        {
+            // And flip the x position if needed
+            u8 pixelXPos = x;
+            if(xFlip)
+            {
+                pixelXPos = 7 - pixelXPos;
+            }
+
+            Colour::GBColour gbc = getGBColour(pixelXPos, tileAddress);
+
+            // Don't render white pixels, as they're transparent
+            if (gbc == Colour::GBColour::WHITE) continue;
+
+            // Don't draw if the background has priority, unless the colour is white
+            if(!bgPriority || getPixel(spriteXPos + x, line) == Colour::GBColour::WHITE)
+            {
+                Colour::ScreenColour sc = getScreenColour(gbc);
+                drawPixel(spriteXPos + x, line, sc);
+            }
+       }
     }
 }
 
@@ -327,4 +376,30 @@ void PPU::drawPixel(u8 x, u8 y, Colour::ScreenColour c)
     m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 1) = c.green;
     m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 2) = c.blue;
     m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 3) = c.alpha;
+}
+
+auto PPU::getPixel(u8 x, u8 y) -> Colour::GBColour
+{
+    Colour::ScreenColour c;
+    c.red   = m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4    );
+    c.green = m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 1);
+    c.blue  = m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 2); 
+    c.alpha = m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 3);
+
+    // TODO: Better conversion between screen colour and internal colour
+    // Also handle pallets better
+
+    switch(c.red)
+    {
+        case 0x9B:
+            return Colour::GBColour::WHITE;
+        case 0x8B:
+            return Colour::GBColour::LIGHT_GRAY;
+        case 0x30:
+            return Colour::GBColour::DARK_GRAY;
+        case 0x0F:
+            return Colour::GBColour::BLACK;
+        default:
+            ASSERT(false, "Invalid colour at pixel!");
+    }
 }
