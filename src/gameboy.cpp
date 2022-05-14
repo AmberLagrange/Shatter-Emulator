@@ -10,6 +10,11 @@ Gameboy::Gameboy()
     m_PPU.setDrawCallback([screen = &m_Screen](std::array<u8, FRAME_BUFFER_SIZE> buffer) { screen->draw(buffer); });
 }
 
+void Gameboy::reset()
+{
+    m_CPU.reset();
+}
+
 Gameboy::Gameboy(const std::string& path)
     : Gameboy()
 {

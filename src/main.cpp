@@ -1,3 +1,5 @@
+#include "SDL_keyboard.h"
+#include "SDL_keycode.h"
 #include "core.hpp"
 
 #include "CLI11.hpp"
@@ -96,6 +98,8 @@ auto run(int argc, char** argv) -> int
 
     while(gb.isRunning())
     {
+        gb.renderFrame();
+
         SDL_Event e;
         if (SDL_PollEvent(&e))
         {
@@ -121,12 +125,20 @@ auto run(int argc, char** argv) -> int
                     {
                         switch(e.key.keysym.sym)
                         {
-                            case SDLK_1:         Logger::setLogLevel(LogLevel::Opcode);   break;
-                            case SDLK_2:         Logger::setLogLevel(LogLevel::Trace);    break;
-                            case SDLK_3:         Logger::setLogLevel(LogLevel::Debug);    break;
-                            case SDLK_4:         Logger::setLogLevel(LogLevel::Warn);     break;
-                            case SDLK_5:         Logger::setLogLevel(LogLevel::Error);    break;
-                            case SDLK_6:         Logger::setLogLevel(LogLevel::Critical); break;
+                            case SDLK_1: Logger::setLogLevel(LogLevel::Opcode);   break;
+                            case SDLK_2: Logger::setLogLevel(LogLevel::Trace);    break;
+                            case SDLK_3: Logger::setLogLevel(LogLevel::Debug);    break;
+                            case SDLK_4: Logger::setLogLevel(LogLevel::Warn);     break;
+                            case SDLK_5: Logger::setLogLevel(LogLevel::Error);    break;
+                            case SDLK_6: Logger::setLogLevel(LogLevel::Critical); break;
+
+                            case SDLK_r:
+                                const Uint8* state = SDL_GetKeyboardState(nullptr);
+                                if(state[SDL_SCANCODE_LCTRL])
+                                {
+                                    gb.reset();
+                                }
+                                break;
                         }
                     }
                     break;
@@ -142,8 +154,6 @@ auto run(int argc, char** argv) -> int
                     break;
             }
         }
-
-        gb.renderFrame();
     }
 
     Screen::quit();

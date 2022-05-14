@@ -17,6 +17,12 @@ class CPU
         CPU(Gameboy& gb);
 
         /**
+         * @brief Reset the CPU to its startup state
+         * 
+         */
+        void reset();
+
+        /**
          * @brief Interrupt Master Enable (IME) Getter
          * 
          * @return m_IME
@@ -52,12 +58,6 @@ class CPU
         void handleInterrupts(u8& cycles);
 
     private:
-        /**
-         * @brief Reset the CPU to its startup state
-         * 
-         */
-        void reset();
-
         /**
          * @brief Check if a given register flag is set
          * 

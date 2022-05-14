@@ -21,6 +21,8 @@ class Gameboy
         Gameboy(const std::string& path);
         ~Gameboy();
 
+        void reset();
+
         /**
          * @brief Loads a rom into memory
          * 
