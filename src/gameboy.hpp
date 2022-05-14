@@ -29,10 +29,17 @@ class Gameboy
         void load(const std::string& path);
 
         /**
-         * @brief Loads the current 
+         * @brief Loads the rom from the current path into memory
          * 
          */
         void load();
+
+        /**
+         * @brief Loads a bootrom into memory
+         * 
+         * @param path The filepath to the bootrom
+         */
+        void loadBoot(const std::string& path);
 
         /**
          * @brief Saves a ram to disk
@@ -88,6 +95,13 @@ class Gameboy
         __always_inline void write(u16 address, u8 val);
 
         /**
+         * @brief Returns if the bootrom is enabled
+         * 
+         * @return The status of if the bootrom is enabled
+         */
+        [[nodiscard]] __always_inline auto isBootEnabled() const -> u8;
+
+        /**
          * @brief Gets the status of the IME (interrupt master enable)
          * 
          * @return The current value of the IME
@@ -133,13 +147,13 @@ class Gameboy
          * @brief Gets the current joypad input state
          * 
          */
-        __always_inline auto getInput() -> u8;
+        [[nodiscard]]  __always_inline auto getInput() -> u8;
 
         /**
          * @brief Gets the button from an SDL keycode
          * 
          */
-        __always_inline auto getButton(SDL_Keycode keycode) -> Button;
+        [[nodiscard]] __always_inline auto getButton(SDL_Keycode keycode) -> Button;
 
         /**
          * @brief Gets the value of the DIV register
@@ -167,9 +181,9 @@ class Gameboy
          */
         __always_inline void setTitle(std::string title);
     private:
+        MMU m_MMU;
         APU m_APU;
         CPU m_CPU;
-        MMU m_MMU;
         PPU m_PPU;
 
         Joypad m_Joypad;
@@ -192,6 +206,11 @@ __always_inline auto Gameboy::read(u16 address) const -> u8
 __always_inline void Gameboy::write(u16 address, u8 val)
 {
     m_MMU.write(address, val);
+}
+
+__always_inline auto Gameboy::isBootEnabled() const -> u8
+{
+    return m_MMU.isBootEnabled();
 }
 
 __always_inline auto Gameboy::getIME() const -> bool
@@ -229,6 +248,7 @@ __always_inline auto Gameboy::getInput() -> u8
 {
     return m_Joypad.getInput();
 }
+
 
 __always_inline auto Gameboy::getButton(SDL_Keycode keycode) -> Button
 {

@@ -8,7 +8,7 @@
 #include <memory>
 
 MMU::MMU(Gameboy& gb)
-    : m_Gameboy(gb)
+    : m_Gameboy(gb), m_Memory({}), m_BootRom({}), m_BootRomEnabled(false)
 {
     DEBUG("Initializing MMU.");
 }
@@ -48,6 +48,14 @@ void MMU::load(const std::string& path)
     }
 }
 
+void MMU::loadBoot(const std::string& path)
+{
+    DEBUG("Loaded bootrom from " << path << ".");
+    std::ifstream data(path, std::ios::in | std::ios::binary);
+    data.read(reinterpret_cast<char*>(&m_BootRom[0]), BOOT_ROM_SIZE);
+    m_BootRomEnabled = true;
+}
+
 void MMU::save(const std::string& path)
 {
     auto& ram = m_Cart->getRam();
@@ -67,6 +75,11 @@ auto MMU::read(u16 address) const -> u8
 {
     if(address < ROM_END_ADDR)
     {
+        if(address < BOOT_ROM_SIZE && m_BootRomEnabled)
+        {
+            return m_BootRom[address];
+        }
+
         return m_Cart->read(address);
     }
     else if(address < VRAM_END_ADDR)
@@ -101,6 +114,8 @@ auto MMU::read(u16 address) const -> u8
                 return m_Gameboy.getInput();
             case TIMER_DIV_REGISTER:
                 return m_Gameboy.getDIV();
+            case BOOT_REGISTER:
+                return m_BootRomEnabled ? 0 : 1;
             default:
                 return m_Memory[address - ROM_SIZE];
         }
@@ -174,6 +189,8 @@ void MMU::write(u16 address, u8 val)
             case DMA_TRANSFER_REGISTER:
                 dmaTransfer(val);
                 break;
+            case BOOT_REGISTER:
+                m_BootRomEnabled = (val == 0);
             default:
                 m_Memory[address - ROM_SIZE] = val;
         }
@@ -182,6 +199,11 @@ void MMU::write(u16 address, u8 val)
     {
         m_Memory[address - ROM_SIZE] = val;
     }
+}
+
+auto MMU::isBootEnabled() const -> bool
+{
+    return m_BootRomEnabled;
 }
 
 void MMU::dmaTransfer(u8 val)

@@ -128,26 +128,34 @@ void CPU::reset()
 {
     DEBUG("CPU Reset sequence:");
 
-    m_Registers.AF() = AF_RESET;
+    if(m_Gameboy.isBootEnabled())
+    {
+        m_Registers.AF() = 0x0000;
+        m_Registers.BC() = 0x0000;
+        m_Registers.DE() = 0x0000;
+        m_Registers.HL() = 0x0000;
+        m_Registers.SP() = 0x0000;
+        m_Registers.PC() = 0x0000;
+    }
+    else
+    {
+        m_Registers.AF() = AF_RESET;
+        m_Registers.BC() = BC_RESET;
+        m_Registers.DE() = DE_RESET;
+        m_Registers.HL() = HL_RESET;
+        m_Registers.SP() = SP_RESET;
+        m_Registers.PC() = PC_RESET;
+    }
+
     DEBUG("\tAF Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.AF());
-
-    m_Registers.BC() = BC_RESET;
     DEBUG("\tBC Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.BC());
-
-    m_Registers.DE() = DE_RESET;
     DEBUG("\tDE Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.DE());
-
-    m_Registers.HL() = HL_RESET;
     DEBUG("\tHL Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.HL());
-
-    m_Registers.SP() = SP_RESET;
     DEBUG("\tSP Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.SP());
-
-    m_Registers.PC() = PC_RESET;
     DEBUG("\tPC Register: 0x" << std::setw(4) << std::setfill('0') << std::hex << m_Registers.PC());
 
-    m_Halted = false;
-    m_IME = false;
+    m_Halted   = false;
+    m_IME      = false;
     m_Branched = false;
 
     m_Gameboy.resetDiv();

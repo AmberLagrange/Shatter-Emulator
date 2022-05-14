@@ -10,6 +10,8 @@
 class Registers
 {
     public:
+        Registers();
+        ~Registers();
 
         //-------------------------Non-Const Versions-------------------------//
 

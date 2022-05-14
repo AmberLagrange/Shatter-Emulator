@@ -24,6 +24,13 @@ class MMU
         void load(const std::string& path);
 
         /**
+         * @brief Loads a bootrom into memory
+         * 
+         * @param path The filepath to the bootrom
+         */
+        void loadBoot(const std::string& path);
+
+        /**
          * @brief Saves the ram to disk
          * 
          * @param path The filepath to the rom
@@ -45,11 +52,26 @@ class MMU
          * @param val The value to write
          */
         void write(u16 address, u8 val);
+
+        /**
+         * @brief Returns if the bootrom is enabled
+         * 
+         * @return The status of if the bootrom is enabled
+         */
+        [[nodiscard]] auto isBootEnabled() const -> bool;
     private:
+        /**
+         * @brief Initiates the DMA transfer
+         * 
+         * @param val The value given to the dma transfer
+         */
         void dmaTransfer(u8 val);
     private:
         Gameboy& m_Gameboy;
         
         std::unique_ptr<MBC> m_Cart;
-        std::array<u8, RAM_SIZE> m_Memory {{}};
+        std::array<u8, RAM_SIZE> m_Memory;
+
+        std::array<u8, BOOT_ROM_SIZE> m_BootRom;
+        bool m_BootRomEnabled;
 };

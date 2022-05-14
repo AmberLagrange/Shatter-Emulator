@@ -85,7 +85,6 @@ auto MBC::getCartRamSize(const std::vector<u8>& data) -> u32
 auto MBC::loadRom(const std::string& path) -> std::vector<u8>
 {
     std::vector<u8> rom;
-    
     std::ifstream data(path, std::ios::in | std::ios::binary);
     rom.assign((std::istreambuf_iterator<char>(data)), {});
     DEBUG("Rom Size: " << std::dec << rom.size() / 1024 << "KB.");

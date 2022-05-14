@@ -4,7 +4,7 @@
 #include "gameboy.hpp"
 
 Gameboy::Gameboy()
-    :   m_APU(*this), m_CPU(*this), m_MMU(*this), m_PPU(*this),
+    :   m_MMU(*this), m_APU(*this), m_CPU(*this), m_PPU(*this),
         m_Timer(*this), m_Path(""), m_Running(false)
 {
     m_PPU.setDrawCallback([screen = &m_Screen](std::array<u8, FRAME_BUFFER_SIZE> buffer) { screen->draw(buffer); });
@@ -25,6 +25,11 @@ void Gameboy::load(const std::string& path)
 {
     m_Path = path;
     m_MMU.load(m_Path);
+}
+
+void Gameboy::loadBoot(const std::string& path)
+{
+    m_MMU.loadBoot(path);
 }
 
 void Gameboy::save()

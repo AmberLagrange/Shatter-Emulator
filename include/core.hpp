@@ -136,6 +136,7 @@ constexpr u16 CART_RAM_SIZE             = 0x0149;
 constexpr u16 CART_VERSION_NUMBER       = 0x014C;
 
 //MMU Addresses
+constexpr u32 BOOT_ROM_SIZE             = 0x0100;
 constexpr u32 ROM_SIZE                  = 0x8000;
 constexpr u32 RAM_SIZE                  = 0x8000;
 constexpr u32 ROM_BANK_SIZE             = 0x4000;
@@ -252,6 +253,8 @@ constexpr u16 WY_REGISTER               = 0xFF4A;
 constexpr u16 WX_REGISTER               = 0xFF4B;
 
 // 0xFF4C UNUSED
+
+constexpr u16 BOOT_REGISTER             = 0xFF50;
 
 constexpr u16 IF_REGISTER               = 0xFF0F;
 constexpr u16 IE_REGISTER               = 0xFFFF;

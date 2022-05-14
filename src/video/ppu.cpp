@@ -7,7 +7,7 @@
 #include "video/video_defs.hpp"
 
 PPU::PPU(Gameboy& gb)
-    : m_Gameboy(gb), m_Mode(VideoMode::OAM_Scan), m_Cycles(0)
+    : m_Gameboy(gb), m_Mode(VideoMode::OAM_Scan), m_Cycles(0), m_Line(0)
 {
     DEBUG("Initializing GPU.");
 }

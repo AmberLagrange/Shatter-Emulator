@@ -1,5 +1,6 @@
-#include "CLI11.hpp"
 #include "core.hpp"
+
+#include "CLI11.hpp"
 
 #include <filesystem>
 #include <fstream>
@@ -7,8 +8,17 @@
 #include "gameboy.hpp"
 #include "video/screen.hpp"
 
-[[noreturn]]
+auto run(int argc, char** argv) -> int;
+
 auto main(int argc, char** argv) -> int
+{
+    // SDL Segfaults if I don't calll _Exit, so this is 
+    // just a hack to get around that, while preserving
+    // a stack for objects to get destroyed
+    _Exit(run(argc, argv));
+}
+
+auto run(int argc, char** argv) -> int
 {
     Logger::setDefaultStream(std::cout);
 
@@ -38,25 +48,25 @@ auto main(int argc, char** argv) -> int
     }
     catch (const CLI::ParseError &e)
     {
-        _Exit(shatter.exit(e));
+        return shatter.exit(e);
     }
 
     if(path.empty())
     {
         ERROR("No file provided!");
-        _Exit(-1);
+        return -1;
     }
 
     if(!std::filesystem::exists(path))
     {
         ERROR("File '" << path << "' not found!");
-        _Exit(-2);
+        return -2;
     }
 
     if(std::filesystem::is_directory(path))
     {
         ERROR("'" << path << "' is a directory!");
-        _Exit(-3);
+        return -3;
     }
 
     if(!logPath.empty())
@@ -76,6 +86,12 @@ auto main(int argc, char** argv) -> int
 
     Gameboy gb;
     gb.load(path);
+
+    if(!bootPath.empty())
+    {
+        gb.loadBoot(bootPath);
+    }
+
     gb.start();
 
     while(gb.isRunning())
@@ -131,9 +147,6 @@ auto main(int argc, char** argv) -> int
     }
 
     Screen::quit();
-    gb.~Gameboy(); // main's scope never ends, so Gameboy's destructor is never called
-                   // Gross hack until SDL no longer segfaults.
-    shatter.~App();
 
-    _Exit(0); // SDL segfaults unless I call _Exit
+    return 0;
 }

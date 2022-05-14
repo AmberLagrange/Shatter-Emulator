@@ -2,6 +2,27 @@
 
 #include "registers.hpp"
 
+Registers::Registers()
+    #ifndef UNSAFE
+        : af({}), bc({}), de({}), hl({}), sp(0), pc(0)
+    #else
+        : af(0), bc(0), de(0), hl(0), sp(0), pc(0)
+    #endif
+{
+    #ifndef UNSAFE
+        
+    #else
+        a = 0;
+        f = 0;
+        b = 0;
+        c = 0;
+        d = 0;
+        e = 0;
+    #endif
+}
+
+Registers::~Registers() = default;
+
 //-------------------------Helper Functions-------------------------//
 
 #ifndef UNSAFE
