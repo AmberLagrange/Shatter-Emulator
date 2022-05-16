@@ -32,7 +32,7 @@ class PPU
         /**
          * @brief Returns the mode the PPU is in
         **/
-        [[nodiscard]] auto getMode() -> VideoMode;
+        [[nodiscard]] auto getMode() const -> VideoMode;
 
     private:
         /**
@@ -65,7 +65,7 @@ class PPU
          * colour information from
          * @return The Gameboy colour at the x position of the tile
          */
-        auto getGBColour(u8 pixelXPos, u16 tileAddress) -> Colour::GBColour;
+        auto getGBColour(u8 pixelXPos, u16 tileAddress) const -> Colour::GBColour;
 
         /**
          * @brief Convert a GB Colour into a screen colour
@@ -73,7 +73,7 @@ class PPU
          * @param colour The colour of the gb colour to convert into a screen colour
          * @return The screen colour at the pixel
          */
-        auto getScreenColour(Colour::GBColour colour) -> Colour::ScreenColour;
+        auto getScreenColour(Colour::GBColour colour) const -> Colour::ScreenColour;
 
         /**
          * @brief Draw a specified pixel at position (x, y) with
@@ -95,7 +95,7 @@ class PPU
          * @param y The y coordinate of the pixel to get
          * @return The Gameboy colour at the pixel
          */
-        [[nodiscard]] auto getPixel(u8 x, u8 y) -> Colour::GBColour;
+        [[nodiscard]] auto getPixel(u8 x, u8 y) const -> Colour::GBColour;
     private:
         Gameboy& m_Gameboy;
 

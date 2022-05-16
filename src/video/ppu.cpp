@@ -154,7 +154,7 @@ void PPU::tick(u8 cycles)
     m_Gameboy.write(LY_REGISTER, m_Line);
 }
 
-auto PPU::getMode() -> VideoMode
+auto PPU::getMode() const -> VideoMode
 {
     return m_Mode;
 }
@@ -314,7 +314,7 @@ void PPU::drawSprites(u8 line)
             if(screenXPos < 0) continue;
 
             // Greater than the screen's width would not, so go to the next sprite
-            if(screenXPos > GAMEBOY_WIDTH) break;
+            if(screenXPos >= GAMEBOY_WIDTH) break;
 
             Colour::GBColour gbc = getGBColour(pixelXPos, tileAddress);
 
@@ -331,7 +331,7 @@ void PPU::drawSprites(u8 line)
     }
 }
 
-auto PPU::getGBColour(u8 pixelXPos, u16 tileAddress) -> Colour::GBColour
+auto PPU::getGBColour(u8 pixelXPos, u16 tileAddress) const -> Colour::GBColour
 {
     u8 low  = m_Gameboy.read(tileAddress    );
     u8 high = m_Gameboy.read(tileAddress + 1);
@@ -342,7 +342,7 @@ auto PPU::getGBColour(u8 pixelXPos, u16 tileAddress) -> Colour::GBColour
     return static_cast<Colour::GBColour>(colour);
 }
 
-auto PPU::getScreenColour(Colour::GBColour colour) -> Colour::ScreenColour
+auto PPU::getScreenColour(Colour::GBColour colour) const -> Colour::ScreenColour
 {
     // TODO: Colour pallets
 
@@ -390,7 +390,7 @@ void PPU::drawPixel(u8 x, u8 y, Colour::ScreenColour c)
     m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 3) = c.alpha;
 }
 
-auto PPU::getPixel(u8 x, u8 y) -> Colour::GBColour
+auto PPU::getPixel(u8 x, u8 y) const -> Colour::GBColour
 {
     Colour::ScreenColour c;
     c.red   = m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4    );

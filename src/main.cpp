@@ -11,6 +11,7 @@
 #include "video/screen.hpp"
 
 auto run(int argc, char** argv) -> int;
+void pollEvents(Gameboy& gb);
 
 auto main(int argc, char** argv) -> int
 {
@@ -44,14 +45,7 @@ auto run(int argc, char** argv) -> int
         }
     #endif
 
-    try
-    {
-        shatter.parse(argc, argv);
-    }
-    catch (const CLI::ParseError &e)
-    {
-        return shatter.exit(e);
-    }
+    CLI11_PARSE(shatter, argc, argv);
 
     if(path.empty())
     {
@@ -96,67 +90,82 @@ auto run(int argc, char** argv) -> int
 
     gb.start();
 
+    u32 startTime, endTime, delta;
+    u32 target = 1000 / 60;
+
     while(gb.isRunning())
     {
+        startTime = SDL_GetTicks();
         gb.renderFrame();
-
-        SDL_Event e;
-        if (SDL_PollEvent(&e))
+        pollEvents(gb);
+        endTime = SDL_GetTicks();
+        delta = endTime - startTime;
+        if(delta < target)
         {
-            Button button;
-            switch(e.type)
-            {
-                case SDL_WINDOWEVENT:
-                    if(e.window.event == SDL_WINDOWEVENT_CLOSE)
-                    {
-                        gb.stop();
-                    }
-                    break;
-
-                case SDL_KEYDOWN:
-                    if(e.key.repeat) break;
-                    
-                    button = gb.getButton(e.key.keysym.sym);
-                    if(button != Button::None)
-                    {
-                        gb.press(button);
-                    }
-                    else
-                    {
-                        switch(e.key.keysym.sym)
-                        {
-                            case SDLK_1: Logger::setLogLevel(LogLevel::Opcode);   break;
-                            case SDLK_2: Logger::setLogLevel(LogLevel::Trace);    break;
-                            case SDLK_3: Logger::setLogLevel(LogLevel::Debug);    break;
-                            case SDLK_4: Logger::setLogLevel(LogLevel::Warn);     break;
-                            case SDLK_5: Logger::setLogLevel(LogLevel::Error);    break;
-                            case SDLK_6: Logger::setLogLevel(LogLevel::Critical); break;
-
-                            case SDLK_r:
-                                const Uint8* state = SDL_GetKeyboardState(nullptr);
-                                if(state[SDL_SCANCODE_LCTRL])
-                                {
-                                    gb.reset();
-                                }
-                                break;
-                        }
-                    }
-                    break;
-                    
-                case SDL_KEYUP:
-                    if(e.key.repeat) break;
-
-                    button = gb.getButton(e.key.keysym.sym);
-                    if(button != Button::None)
-                    {
-                        gb.release(button);
-                    }
-                    break;
-            }
+            SDL_Delay(target - delta);
         }
     }
 
     Screen::quit();
 
     return 0;
+}
+
+void pollEvents(Gameboy& gb)
+{
+    SDL_Event e;
+    if (SDL_PollEvent(&e))
+    {
+        Button button;
+        switch(e.type)
+        {
+            case SDL_WINDOWEVENT:
+                if(e.window.event == SDL_WINDOWEVENT_CLOSE)
+                {
+                    gb.stop();
+                }
+                break;
+
+            case SDL_KEYDOWN:
+                if(e.key.repeat) break;
+                
+                button = gb.getButton(e.key.keysym.sym);
+                if(button != Button::None)
+                {
+                    gb.press(button);
+                }
+                else
+                {
+                    switch(e.key.keysym.sym)
+                    {
+                        case SDLK_1: Logger::setLogLevel(LogLevel::Opcode);   break;
+                        case SDLK_2: Logger::setLogLevel(LogLevel::Trace);    break;
+                        case SDLK_3: Logger::setLogLevel(LogLevel::Debug);    break;
+                        case SDLK_4: Logger::setLogLevel(LogLevel::Warn);     break;
+                        case SDLK_5: Logger::setLogLevel(LogLevel::Error);    break;
+                        case SDLK_6: Logger::setLogLevel(LogLevel::Critical); break;
+
+                        case SDLK_r:
+                            const Uint8* state = SDL_GetKeyboardState(nullptr);
+                            if(state[SDL_SCANCODE_LCTRL])
+                            {
+                                gb.save();
+                                gb.reset();
+                            }
+                            break;
+                    }
+                }
+                break;
+                
+            case SDL_KEYUP:
+                if(e.key.repeat) break;
+
+                button = gb.getButton(e.key.keysym.sym);
+                if(button != Button::None)
+                {
+                    gb.release(button);
+                }
+                break;
+        }
+    }
 }
