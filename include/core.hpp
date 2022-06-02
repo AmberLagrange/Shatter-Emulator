@@ -52,6 +52,9 @@ namespace bit_functions
     inline auto set_bit_to(u8& x, u8 n, bool v)  -> u8&  { return (v ? set_bit(x, n) : clear_bit(x, n)); }
 }
 
+//Rendering Target Speed
+constexpr float TARGET_SPEED_MULTIPLIER = 100.0f / 60.0f;
+
 //Clock and Timers
 constexpr u32 CLOCK_SPEED       = 4194304;
 

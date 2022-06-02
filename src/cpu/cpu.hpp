@@ -15,6 +15,7 @@ class CPU
 {
     public:
         CPU(Gameboy& gb);
+        ~CPU();
 
         /**
          * @brief Reset the CPU to its startup state

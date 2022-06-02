@@ -1,5 +1,8 @@
 #include "core.hpp"
 
+#include <iomanip>
+#include <sstream>
+
 #include "screen.hpp"
 
 #include "gameboy.hpp"
@@ -52,7 +55,22 @@ void Screen::draw(const std::array<u8, FRAME_BUFFER_SIZE>& buffer)
     SDL_RenderPresent(m_Renderer);
 }
 
-void Screen::setTitle(std::string title)
+void Screen::setTitle(const std::string& title)
 {
-    SDL_SetWindowTitle(m_Window, title.c_str());
+    m_Title = title;
+    SDL_SetWindowTitle(m_Window, m_Title.c_str());
+}
+
+auto Screen::getTitle() -> const std::string&
+{
+    return m_Title;
+}
+
+void Screen::setTitleFPS(u32 fps)
+{
+    std::stringstream ss;
+    ss << m_Title
+       << ", " << std::setprecision(4) << (static_cast<float>(fps) * TARGET_SPEED_MULTIPLIER)
+       << "% (" << fps << " FPS)";
+    SDL_SetWindowTitle(m_Window, ss.str().c_str());
 }

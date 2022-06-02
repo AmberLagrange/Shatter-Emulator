@@ -11,7 +11,7 @@
 #include "video/screen.hpp"
 
 auto run(int argc, char** argv) -> int;
-void pollEvents(Gameboy& gb);
+void pollEvents(Gameboy* gb);
 
 auto main(int argc, char** argv) -> int
 {
@@ -80,29 +80,50 @@ auto run(int argc, char** argv) -> int
 
     Screen::init();
 
-    Gameboy gb;
-    gb.load(path);
+    Gameboy* gb = new Gameboy;
+    gb->load(path);
 
     if(!bootPath.empty())
     {
-        gb.loadBoot(bootPath);
+        gb->loadBoot(bootPath);
     }
 
-    gb.start();
+    gb->setTitleFPS(0);
+    gb->start();
 
     u32 startTime, endTime, delta;
     u32 target = 1000 / 60;
 
-    while(gb.isRunning())
+    u32 fpsStart, fpsEnd;
+    u32 fps = 0;
+
+    fpsStart = SDL_GetTicks();
+
+    while(gb->isRunning())
     {
         startTime = SDL_GetTicks();
-        gb.renderFrame();
+        gb->renderFrame();
         pollEvents(gb);
-        endTime = SDL_GetTicks();
+        fpsEnd = endTime = SDL_GetTicks();
         delta = endTime - startTime;
+
+        //TODO: Proper fps cap
+        /**
         if(delta < target)
         {
             SDL_Delay(target - delta);
+        }
+        **/
+
+        if(fpsEnd - fpsStart >= 1000)
+        {
+            gb->setTitleFPS(fps);
+            fpsStart = fpsEnd;
+            fps = 0;
+        }
+        else
+        {
+            ++fps;
         }
     }
 
@@ -111,7 +132,7 @@ auto run(int argc, char** argv) -> int
     return 0;
 }
 
-void pollEvents(Gameboy& gb)
+void pollEvents(Gameboy* gb)
 {
     SDL_Event e;
     if (SDL_PollEvent(&e))
@@ -122,17 +143,17 @@ void pollEvents(Gameboy& gb)
             case SDL_WINDOWEVENT:
                 if(e.window.event == SDL_WINDOWEVENT_CLOSE)
                 {
-                    gb.stop();
+                    gb->stop();
                 }
                 break;
 
             case SDL_KEYDOWN:
                 if(e.key.repeat) break;
                 
-                button = gb.getButton(e.key.keysym.sym);
+                button = gb->getButton(e.key.keysym.sym);
                 if(button != Button::None)
                 {
-                    gb.press(button);
+                    gb->press(button);
                 }
                 else
                 {
@@ -149,8 +170,8 @@ void pollEvents(Gameboy& gb)
                             const Uint8* state = SDL_GetKeyboardState(nullptr);
                             if(state[SDL_SCANCODE_LCTRL])
                             {
-                                gb.save();
-                                gb.reset();
+                                gb->save();
+                                gb->reset();
                             }
                             break;
                     }
@@ -160,10 +181,10 @@ void pollEvents(Gameboy& gb)
             case SDL_KEYUP:
                 if(e.key.repeat) break;
 
-                button = gb.getButton(e.key.keysym.sym);
+                button = gb->getButton(e.key.keysym.sym);
                 if(button != Button::None)
                 {
-                    gb.release(button);
+                    gb->release(button);
                 }
                 break;
         }

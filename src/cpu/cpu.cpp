@@ -17,6 +17,8 @@ CPU::CPU(Gameboy& gb)
     reset();
 }
 
+CPU::~CPU() = default;
+
 void CPU::reset()
 {
     DEBUG("CPU Reset sequence:");

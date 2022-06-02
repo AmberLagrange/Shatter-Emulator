@@ -182,6 +182,19 @@ class Gameboy
          * @param title The title to set
          */
         __always_inline void setTitle(std::string title);
+
+        /**
+         * @brief Get the title of the window
+         * 
+         */
+        __always_inline auto getTitle(std::string title) -> const std::string&;
+
+        /**
+         * @brief Set the fps in the title of the window
+         * 
+         * @param fps The fps to set
+         */
+        __always_inline void setTitleFPS(u32 fps);
     private:
         MMU m_MMU;
         APU m_APU;
@@ -276,3 +289,13 @@ __always_inline void Gameboy::setTitle(std::string title)
 {
     m_Screen.setTitle(title);
 }
+
+__always_inline auto Gameboy::getTitle(std::string title) -> const std::string&
+{
+    return m_Screen.getTitle();
+}
+
+ __always_inline void Gameboy::setTitleFPS(u32 fps)
+ {
+     m_Screen.setTitleFPS(fps);
+ }
