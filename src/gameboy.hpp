@@ -195,6 +195,19 @@ class Gameboy
          * @param fps The fps to set
          */
         __always_inline void setTitleFPS(u32 fps);
+
+        /**
+         * @brief Set the rendering scale of the window
+         * 
+         * @param scale The rendering scale to set
+         */
+        __always_inline void setRenderingScale(u32 renderingScale);
+
+        /**
+         * @brief Get the rendering scale of the window
+         * 
+         */
+        __always_inline auto getRenderingScale() -> u32;
     private:
         MMU m_MMU;
         APU m_APU;
@@ -295,7 +308,17 @@ __always_inline auto Gameboy::getTitle(std::string title) -> const std::string&
     return m_Screen.getTitle();
 }
 
- __always_inline void Gameboy::setTitleFPS(u32 fps)
- {
-     m_Screen.setTitleFPS(fps);
- }
+__always_inline void Gameboy::setTitleFPS(u32 fps)
+{
+    m_Screen.setTitleFPS(fps);
+}
+
+__always_inline void Gameboy::setRenderingScale(u32 renderingScale)
+{
+    m_Screen.setRenderingScale(renderingScale);
+}
+
+__always_inline auto Gameboy::getRenderingScale() -> u32
+{
+    return m_Screen.getRenderingScale();
+}

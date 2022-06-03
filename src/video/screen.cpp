@@ -1,3 +1,4 @@
+#include "SDL_video.h"
 #include "core.hpp"
 
 #include <iomanip>
@@ -7,22 +8,23 @@
 
 #include "gameboy.hpp"
 
-void Screen::init()
+void Screen::initSDL()
 {
     SDL_Init(SDL_INIT_VIDEO);
 }
 
-void Screen::quit()
+void Screen::quitSDL()
 {
     SDL_Quit();
 }
 
 Screen::Screen()
+    : m_RenderingScale(DEFAULT_RENDERING_SCALE)
 {
     DEBUG("Initializing Screen.");
     
     m_Window = SDL_CreateWindow("Shatter Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                GAMEBOY_WIDTH * m_Scale, GAMEBOY_HEIGHT * m_Scale, SDL_WINDOW_SHOWN);
+                                GAMEBOY_WIDTH * m_RenderingScale, GAMEBOY_HEIGHT * m_RenderingScale, SDL_WINDOW_SHOWN);
     if(!m_Window)
     {
         CRITICAL("\tCould not create window: " << SDL_GetError());
@@ -73,4 +75,17 @@ void Screen::setTitleFPS(u32 fps)
        << ", " << std::setprecision(4) << (static_cast<float>(fps) * TARGET_SPEED_MULTIPLIER)
        << "% (" << fps << " FPS)";
     SDL_SetWindowTitle(m_Window, ss.str().c_str());
+}
+
+void Screen::setRenderingScale(u32 renderingScale)
+{
+    m_RenderingScale = renderingScale;
+
+    SDL_SetWindowSize(m_Window, GAMEBOY_WIDTH * m_RenderingScale, GAMEBOY_HEIGHT * m_RenderingScale);
+    DEBUG("Resized the window to " << (GAMEBOY_WIDTH * m_RenderingScale) << "x" << (GAMEBOY_HEIGHT * m_RenderingScale) << ".");
+}
+
+auto Screen::getRenderingScale() -> u32
+{
+    return m_RenderingScale;
 }

@@ -36,6 +36,9 @@ auto run(int argc, char** argv) -> int
     std::string logPath;
     shatter.add_option("-l,--log", logPath, "Path to the log file.");
 
+    int renderingScale = 0;
+    shatter.add_option("-s, --scale, --rendering-scale", renderingScale, "Change the rendering scale of the window.");
+
     #ifndef NDEBUG
         bool verbose = false;
         shatter.add_flag("-v,--verbose", verbose, "Enable opcode logging.");
@@ -78,7 +81,7 @@ auto run(int argc, char** argv) -> int
         }
     #endif
 
-    Screen::init();
+    Screen::initSDL();
 
     Gameboy* gb = new Gameboy;
     gb->load(path);
@@ -88,7 +91,11 @@ auto run(int argc, char** argv) -> int
         gb->loadBoot(bootPath);
     }
 
-    gb->setTitleFPS(0);
+    if(renderingScale > 0)
+    {
+        gb->setRenderingScale(renderingScale);
+    }
+
     gb->start();
 
     u32 startTime, endTime, delta;
@@ -108,12 +115,12 @@ auto run(int argc, char** argv) -> int
         delta = endTime - startTime;
 
         //TODO: Proper fps cap
-        /**
+        /*
         if(delta < target)
         {
             SDL_Delay(target - delta);
         }
-        **/
+        */
 
         if(fpsEnd - fpsStart >= 1000)
         {
@@ -127,7 +134,7 @@ auto run(int argc, char** argv) -> int
         }
     }
 
-    Screen::quit();
+    Screen::quitSDL();
 
     return 0;
 }

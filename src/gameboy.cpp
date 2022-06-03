@@ -46,6 +46,7 @@ void Gameboy::start()
 {
     DEBUG("Starting Gameboy.");
     m_Running = true;
+    m_Screen.setTitleFPS(0);
 }
 
 void Gameboy::tick()

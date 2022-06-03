@@ -15,13 +15,13 @@ class Screen
          * @brief Initializes SDL2
          * 
          */
-        static void init();
+        static void initSDL();
 
         /**
          * @brief Quits SDL2
          * 
          */
-        static void quit();
+        static void quitSDL();
     public:
         Screen();
         ~Screen();
@@ -52,11 +52,24 @@ class Screen
          * @param fps The fps to set
          */
         void setTitleFPS(u32 fps);
+
+        /**
+         * @brief Set the rendering scale of the window
+         * 
+         * @param scale The rendering scale to set
+         */
+        void setRenderingScale(u32 scale);
+
+        /**
+         * @brief Get the rendering scale of the window
+         * 
+         */
+        auto getRenderingScale() -> u32;
     private:
         SDL_Window*     m_Window;
         SDL_Renderer*   m_Renderer;
         SDL_Texture*    m_Texture;
 
-        std::string m_Title = "";
-        int m_Scale = 3;
+        std::string m_Title;
+        u32 m_RenderingScale;
 };
