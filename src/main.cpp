@@ -13,6 +13,8 @@
 auto run(int argc, char** argv) -> int;
 void pollEvents(Gameboy& gb);
 
+void foo_callback(u8* buf, int len);
+
 auto main(int argc, char** argv) -> int
 {
     // SDL Segfaults if I don't calll _Exit, so this is 
@@ -93,6 +95,26 @@ auto run(int argc, char** argv) -> int
     u32 startTime, endTime, delta;
     u32 target = 1000 / 60;
 
+    DEBUG("Initializing SDL Audio.");
+    if(SDL_Init(SDL_INIT_AUDIO))
+    {
+        CRITICAL("Could not initialize SDL Audio: " << SDL_GetError());
+    }
+    u8            len;
+    u8*           buffer = new u8[1024];
+    SDL_AudioSpec spec;
+    spec.freq = 22050;
+    spec.format = AUDIO_U8;
+    spec.channels = 2;
+    spec.samples = 512;
+    spec.callback = SDL_AudioCallback(foo_callback);
+
+    SDL_PauseAudio(0);
+    SDL_Delay(5000);
+    SDL_CloseAudio();
+    delete[] buffer;
+    return 0;
+
     while(gb.isRunning())
     {
         startTime = SDL_GetTicks();
@@ -166,6 +188,35 @@ void pollEvents(Gameboy& gb)
                     gb.release(button);
                 }
                 break;
+        }
+    }
+}
+
+static bool high = false;
+u32 duty = 0;
+u32 sampleFrames = 0;
+
+void foo_callback(u8* buf, int len)
+{
+    for(int i = 0; i < len; i += 2)
+    {
+        if(high)
+        {
+            buf[i] = 127;
+            buf[i + 1] = 127;
+        }
+        else
+        {
+            buf[i] = 0;
+            buf[i + 1] = 0;
+        }
+
+        duty++;
+
+        if(duty >= 22050 / (440 * 2))
+        {
+            high = !high;
+            duty = 0;
         }
     }
 }

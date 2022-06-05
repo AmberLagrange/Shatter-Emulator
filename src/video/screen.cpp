@@ -6,7 +6,11 @@
 
 void Screen::init()
 {
-    SDL_Init(SDL_INIT_VIDEO);
+    DEBUG("Initializing SDL Video.");
+    if(SDL_Init(SDL_INIT_VIDEO))
+    {
+        CRITICAL("Could not initialize SDL Video: " << SDL_GetError());
+    }
 }
 
 void Screen::quit()
