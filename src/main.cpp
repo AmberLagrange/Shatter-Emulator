@@ -99,7 +99,9 @@ auto run(int argc, char** argv) -> int
     if(SDL_Init(SDL_INIT_AUDIO))
     {
         CRITICAL("Could not initialize SDL Audio: " << SDL_GetError());
+        return -4;
     }
+
     SDL_AudioSpec spec;
     spec.freq = 22050;
     spec.format = AUDIO_U8;
@@ -107,12 +109,16 @@ auto run(int argc, char** argv) -> int
     spec.samples = 512;
     spec.callback = SDL_AudioCallback(foo_callback);
 
-    SDL_OpenAudio(&spec, nullptr);
-    SDL_PauseAudio(0);
-    SDL_Delay(5000);
-    SDL_CloseAudio();
-    delete[] (int*)spec.userdata;
-    return 0;
+    int isAudioOpen = SDL_OpenAudio(&spec, nullptr);
+
+    if(isAudioOpen)
+    {
+        ERROR("Could not open audio: " << SDL_GetError());
+    }
+    else
+    {
+        SDL_PauseAudio(0);
+    }
 
     while(gb.isRunning())
     {
@@ -128,6 +134,7 @@ auto run(int argc, char** argv) -> int
     }
 
     Screen::quit();
+    SDL_CloseAudio();
 
     return 0;
 }
