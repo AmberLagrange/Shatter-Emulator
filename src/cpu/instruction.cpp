@@ -1201,7 +1201,11 @@ void CPU::opcode0x75() // LD (HL),L
 
 void CPU::opcode0x76() // HALT
 {
-    m_Halted = true;
+    u8 flags = m_Gameboy.read(IF_REGISTER);
+    u8 enabledFlags = (flags & m_Gameboy.read(IE_REGISTER));
+
+    m_Halted = m_IME || (flags & enabledFlags & 0x1F) == 0;
+    m_HaltBug = !m_Halted;
     
     OPCODE("Halt!");
 }

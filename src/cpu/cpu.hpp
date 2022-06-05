@@ -107,6 +107,8 @@ class CPU
         Gameboy& m_Gameboy;
 
         bool m_Halted;
+        bool m_HaltBug;
+
         bool m_IME;
         bool m_Branched;
 

@@ -384,19 +384,19 @@ void PPU::drawPixel(u8 x, u8 y, Colour::ScreenColour c)
 {
     ASSERT(((x + y * SCREEN_WIDTH) * 4 < 0x16800), "INVALID PIXEL POSITION! X: " << (int)x << ", Y: " << (int)y << ", Pos: " << (int)((x + y * SCREEN_WIDTH) * 4));
     
-    m_FrameBuffer.at((x + y * SCREEN_WIDTH) * 4    ) = c.red;
-    m_FrameBuffer.at((x + y * SCREEN_WIDTH) * 4 + 1) = c.green;
-    m_FrameBuffer.at((x + y * SCREEN_WIDTH) * 4 + 2) = c.blue;
-    m_FrameBuffer.at((x + y * SCREEN_WIDTH) * 4 + 3) = c.alpha;
+    m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4    ] = c.red;
+    m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4 + 1] = c.green;
+    m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4 + 2] = c.blue;
+    m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4 + 3] = c.alpha;
 }
 
 auto PPU::getPixel(u8 x, u8 y) const -> Colour::GBColour
 {
     Colour::ScreenColour c;
-    c.red   = m_FrameBuffer.at((x + y * SCREEN_WIDTH) * 4    );
-    c.green = m_FrameBuffer.at((x + y * SCREEN_WIDTH) * 4 + 1);
-    c.blue  = m_FrameBuffer.at((x + y * SCREEN_WIDTH) * 4 + 2); 
-    c.alpha = m_FrameBuffer.at((x + y * SCREEN_WIDTH) * 4 + 3);
+    c.red   = m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4    ];
+    c.green = m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4 + 1];
+    c.blue  = m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4 + 2]; 
+    c.alpha = m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4 + 3];
 
     // TODO: Better conversion between screen colour and internal colour
     // Also handle pallets better

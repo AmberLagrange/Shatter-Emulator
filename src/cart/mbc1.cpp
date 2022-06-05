@@ -1,6 +1,7 @@
 #include "core.hpp"
 
 #include "mbc1.hpp"
+#include <stdexcept>
 
 MBC1::MBC1(std::vector<u8>&& rom, std::vector<u8>&& ram)
     : MBC(std::move(rom), std::move(ram)),
@@ -14,13 +15,31 @@ auto MBC1::read(u16 address) const -> u8
     {
         case 0x4000:
         case 0x6000:
-            return m_Rom.at((address - ROM_BANK_OFFSET) + ROM_BANK_SIZE * m_RomBankNumber);
+            try
+            {
+                return m_Rom.at((address - ROM_BANK_OFFSET) + ROM_BANK_SIZE * m_RomBankNumber);
+            }
+            catch(std::out_of_range&)
+            {
+                ERROR("Tried to read out of bounds from ROM at address 0x" << std::setw(4) << std::hex << address << "!");
+            }
+            return 0xFF;
+
         case 0xA000:
-            return m_Ram.at((address - RAM_BANK_OFFSET) + RAM_BANK_SIZE * m_RamBankNumber);
+            try
+            {
+                return m_Ram.at((address - RAM_BANK_OFFSET) + RAM_BANK_SIZE * m_RamBankNumber);
+            }
+            catch(std::out_of_range&)
+            {
+                ERROR("Tried to read out of bounds from RAM at address 0x"
+                      << std::setw(4) << std::hex << address << "!");
+            }
+            return 0xFF;
+            
         default:
-            return m_Rom.at(address);
+            return m_Rom[address];
     }
-    
 }
 
 void MBC1::write(u16 address, u8 val)
@@ -47,7 +66,17 @@ void MBC1::write(u16 address, u8 val)
         case 0xA000:
             if(m_RamEnabled)
             {
-                m_Ram.at((address - RAM_BANK_OFFSET) + RAM_BANK_SIZE * m_RamBankNumber) = val;
+                try
+                {
+                    m_Ram.at((address - RAM_BANK_OFFSET) + RAM_BANK_SIZE * m_RamBankNumber) = val;
+                }
+                catch(std::out_of_range&)
+                {
+                    ERROR("Tried to write 0x" << std::setw(2) << std::setfill('0')
+                          << std::hex << static_cast<u32>(val)
+                          << " out of bounds from RAM at address 0x"
+                          << std::setw(4) << std::setfill('0') << std::hex << address << "!");
+                }
             }
     }
 }
