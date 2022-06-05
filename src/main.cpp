@@ -14,8 +14,6 @@
 auto run(int argc, char** argv) -> int;
 void pollEvents(Gameboy* gb);
 
-void foo_callback(void*, u8* buf, u32 len);
-
 auto main(int argc, char** argv) -> int
 {
     // SDL Segfaults if I don't calll _Exit, so this is 
@@ -88,6 +86,7 @@ auto run(int argc, char** argv) -> int
     #endif
 
     Screen::initSDL();
+    APU::initSDL();
 
     Gameboy* gb = new Gameboy;
     gb->load(path);
@@ -102,38 +101,12 @@ auto run(int argc, char** argv) -> int
         gb->setRenderingScale(renderingScale);
     }
 
-    gb->start();
-
-    DEBUG("Initializing SDL Audio.");
-    if(SDL_Init(SDL_INIT_AUDIO))
-    {
-        CRITICAL("Could not initialize SDL Audio: " << SDL_GetError());
-        return -4;
-    }
-
-    SDL_AudioSpec spec;
-    spec.freq = 22050;
-    spec.format = AUDIO_U8;
-    spec.channels = 2;
-    spec.samples = 512;
-    spec.callback = SDL_AudioCallback(foo_callback);
-
-    int isAudioOpen = SDL_OpenAudio(&spec, nullptr);
-
-    if(isAudioOpen)
-    {
-        ERROR("Could not open audio: " << SDL_GetError());
-    }
-    else
-    {
-        SDL_PauseAudio(0);
-    }
-
     u64 frameStart, frameEnd, fpsStart, fpsEnd;
     float frameDelta, fpsDelta;
     float target;
     bool unlimited = false;
     u32 fps = 0;
+    fpsStart = SDL_GetPerformanceCounter();
     
     if(targetFPS != 0)
     {
@@ -144,7 +117,7 @@ auto run(int argc, char** argv) -> int
         unlimited = true;
     }
 
-    fpsStart = SDL_GetPerformanceCounter();
+    gb->start();
     while(gb->isRunning())
     {
         frameStart = SDL_GetPerformanceCounter();
@@ -176,7 +149,6 @@ auto run(int argc, char** argv) -> int
     }
 
     Screen::quitSDL();
-    SDL_CloseAudio();
 
     return 0;
 }
@@ -236,35 +208,6 @@ void pollEvents(Gameboy* gb)
                     gb->release(button);
                 }
                 break;
-        }
-    }
-}
-
-static bool high = false;
-u32 duty = 0;
-u32 sampleFrames = 0;
-
-void foo_callback(void*, u8* buf, u32 len)
-{
-    for(int i = 0; i < len; i += 2)
-    {
-        if(high)
-        {
-            buf[i] = 15;
-            buf[i + 1] = 15;
-        }
-        else
-        {
-            buf[i] = 0;
-            buf[i + 1] = 0;
-        }
-
-        duty++;
-
-        if(duty >= 22050 / (440 * 2))
-        {
-            high = !high;
-            duty = 0;
         }
     }
 }

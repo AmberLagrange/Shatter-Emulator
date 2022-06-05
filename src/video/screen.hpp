@@ -12,13 +12,13 @@ class Screen
 {
     public:
         /**
-         * @brief Initializes SDL2
+         * @brief Initializes SDL2 Video
          * 
          */
         static void initSDL();
 
         /**
-         * @brief Quits SDL2
+         * @brief Quits SDL2 Video
          * 
          */
         static void quitSDL();

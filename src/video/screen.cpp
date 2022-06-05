@@ -1,5 +1,3 @@
-#include "SDL_error.h"
-#include "SDL_video.h"
 #include "core.hpp"
 
 #include <iomanip>
