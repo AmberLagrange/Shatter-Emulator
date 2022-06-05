@@ -13,7 +13,7 @@
 auto run(int argc, char** argv) -> int;
 void pollEvents(Gameboy& gb);
 
-void foo_callback(u8* buf, int len);
+void foo_callback(void*, u8* buf, u32 len);
 
 auto main(int argc, char** argv) -> int
 {
@@ -100,8 +100,6 @@ auto run(int argc, char** argv) -> int
     {
         CRITICAL("Could not initialize SDL Audio: " << SDL_GetError());
     }
-    u8            len;
-    u8*           buffer = new u8[1024];
     SDL_AudioSpec spec;
     spec.freq = 22050;
     spec.format = AUDIO_U8;
@@ -109,10 +107,11 @@ auto run(int argc, char** argv) -> int
     spec.samples = 512;
     spec.callback = SDL_AudioCallback(foo_callback);
 
+    SDL_OpenAudio(&spec, nullptr);
     SDL_PauseAudio(0);
     SDL_Delay(5000);
     SDL_CloseAudio();
-    delete[] buffer;
+    delete[] (int*)spec.userdata;
     return 0;
 
     while(gb.isRunning())
@@ -196,7 +195,7 @@ static bool high = false;
 u32 duty = 0;
 u32 sampleFrames = 0;
 
-void foo_callback(u8* buf, int len)
+void foo_callback(void*, u8* buf, u32 len)
 {
     for(int i = 0; i < len; i += 2)
     {
