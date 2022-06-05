@@ -5,7 +5,7 @@
 
 Gameboy::Gameboy()
     :   m_MMU(*this), m_APU(*this), m_CPU(*this), m_PPU(*this),
-        m_Timer(*this), m_Path(""), m_Running(false)
+        m_Cycles(0), m_Timer(*this), m_Path(""), m_Running(false)
 {
     m_PPU.setDrawCallback([screen = &m_Screen](std::array<u8, FRAME_BUFFER_SIZE> buffer) { screen->draw(buffer); });
 }
@@ -46,6 +46,7 @@ void Gameboy::start()
 {
     DEBUG("Starting Gameboy.");
     m_Running = true;
+    m_Screen.setTitleFPS(0);
 }
 
 void Gameboy::tick()
@@ -54,19 +55,18 @@ void Gameboy::tick()
     m_CPU.handleInterrupts(cycles);
     m_Timer.update(cycles);
     m_PPU.tick(cycles);
+    
+    m_Cycles += cycles;
 }
 
 void Gameboy::renderFrame()
 {
-    while(m_PPU.getMode() != VideoMode::VBlank)
+    while(m_Cycles <= CYCLES_PER_FRAME)
     {
         tick();
     }
 
-    while(m_PPU.getMode() == VideoMode::VBlank)
-    {
-        tick();
-    }
+    m_Cycles -= CYCLES_PER_FRAME;
 }
 
 void Gameboy::stop()

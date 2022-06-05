@@ -52,14 +52,6 @@ namespace bit_functions
     inline auto set_bit_to(u8& x, u8 n, bool v)  -> u8&  { return (v ? set_bit(x, n) : clear_bit(x, n)); }
 }
 
-//Clock and Timers
-constexpr u32 CLOCK_SPEED       = 4194304;
-
-constexpr u32 TIMER_SPEED_00    = 1024;
-constexpr u32 TIMER_SPEED_01    = 16;
-constexpr u32 TIMER_SPEED_10    = 64;
-constexpr u32 TIMER_SPEED_11    = 256;
-
 //Opcode
 constexpr u8 CB_OPCODE          = 0xCB;
 
@@ -112,11 +104,37 @@ constexpr u8  SPRITE_HEIGHT     = 8;
 constexpr u8  SPRITE_X_OFFSET   = 8;
 constexpr u8  SPRITE_Y_OFFSET   = 16;
 
-constexpr u8  GAMEBOY_WIDTH      = 160;
-constexpr u8  GAMEBOY_HEIGHT     = 144;
+constexpr u8  SCREEN_WIDTH       = 160;
+constexpr u8  SCREEN_HEIGHT      = 144;
 constexpr u8  VBLANK_HEIGHT      = 154;
 
-constexpr u32 FRAME_BUFFER_SIZE = GAMEBOY_WIDTH * GAMEBOY_HEIGHT * 4;
+constexpr u32 FRAME_BUFFER_SIZE = SCREEN_WIDTH * SCREEN_HEIGHT * 4;
+
+//Rendering Defaults
+constexpr float TARGET_SPEED_MULTIPLIER     = 100.0f / 60.0f; // 60fps in percentage, same as '/ 60.0f * 100.0f'
+constexpr float DEFAULT_TITLE_UPDATE_RATE   = 0.5;
+constexpr u32   DEFAULT_RENDERING_SCALE     = 4;
+
+//Clock and Timers
+constexpr u32 CLOCK_SPEED       = 4194304;
+
+constexpr u32 TIMER_SPEED_00    = 1024;
+constexpr u32 TIMER_SPEED_01    = 16;
+constexpr u32 TIMER_SPEED_10    = 64;
+constexpr u32 TIMER_SPEED_11    = 256;
+
+// Temp drawing before implementing pixel FIFO
+// HBLANK and DRAWING clocks might be different with FIFO
+constexpr u16 CYCLES_PER_HBLANK   = 204;
+constexpr u16 CYCLES_PER_VBLANK   = 4560;
+constexpr u16 CYCLES_PER_OAM_SCAN = 80;
+constexpr u16 CYCLES_PER_TRANSFER = 172;
+
+constexpr u16 CYCLES_PER_LINE   = CYCLES_PER_HBLANK
+                                + CYCLES_PER_OAM_SCAN
+                                + CYCLES_PER_TRANSFER;
+
+constexpr u32 CYCLES_PER_FRAME  = CYCLES_PER_LINE * VBLANK_HEIGHT;
 
 //Joypad Info
 /**

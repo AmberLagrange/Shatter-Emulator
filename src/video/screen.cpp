@@ -1,10 +1,15 @@
+#include "SDL_error.h"
+#include "SDL_video.h"
 #include "core.hpp"
+
+#include <iomanip>
+#include <sstream>
 
 #include "screen.hpp"
 
 #include "gameboy.hpp"
 
-void Screen::init()
+void Screen::initSDL()
 {
     DEBUG("Initializing SDL Video.");
     if(SDL_Init(SDL_INIT_VIDEO))
@@ -13,17 +18,18 @@ void Screen::init()
     }
 }
 
-void Screen::quit()
+void Screen::quitSDL()
 {
     SDL_Quit();
 }
 
 Screen::Screen()
+    : m_RenderingScale(DEFAULT_RENDERING_SCALE)
 {
     DEBUG("Initializing Screen.");
     
     m_Window = SDL_CreateWindow("Shatter Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                GAMEBOY_WIDTH * m_Scale, GAMEBOY_HEIGHT * m_Scale, SDL_WINDOW_SHOWN);
+                                SCREEN_WIDTH * m_RenderingScale, SCREEN_HEIGHT * m_RenderingScale, SDL_WINDOW_SHOWN);
     if(!m_Window)
     {
         CRITICAL("\tCould not create window: " << SDL_GetError());
@@ -39,7 +45,7 @@ Screen::Screen()
     }
     DEBUG("\tRenderer Created.");
 
-    m_Texture = SDL_CreateTexture(m_Renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, GAMEBOY_WIDTH, GAMEBOY_HEIGHT);
+    m_Texture = SDL_CreateTexture(m_Renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 Screen::~Screen()
@@ -51,12 +57,40 @@ Screen::~Screen()
 
 void Screen::draw(const std::array<u8, FRAME_BUFFER_SIZE>& buffer)
 {
-    SDL_UpdateTexture(m_Texture, nullptr, buffer.data(), GAMEBOY_WIDTH * 4);
+    SDL_UpdateTexture(m_Texture, nullptr, buffer.data(), SCREEN_WIDTH * 4);
     SDL_RenderCopy(m_Renderer, m_Texture, nullptr, nullptr);
     SDL_RenderPresent(m_Renderer);
 }
 
-void Screen::setTitle(std::string title)
+void Screen::setTitle(const std::string& title)
 {
-    SDL_SetWindowTitle(m_Window, title.c_str());
+    m_Title = title;
+    SDL_SetWindowTitle(m_Window, m_Title.c_str());
+}
+
+auto Screen::getTitle() const -> const std::string&
+{
+    return m_Title;
+}
+
+void Screen::setTitleFPS(u32 fps)
+{
+    std::stringstream ss;
+    ss << m_Title
+       << ", " << std::setprecision(4) << (static_cast<float>(fps) * TARGET_SPEED_MULTIPLIER)
+       << "% (" << fps << " FPS)";
+    SDL_SetWindowTitle(m_Window, ss.str().c_str());
+}
+
+void Screen::setRenderingScale(u8 renderingScale)
+{
+    m_RenderingScale = renderingScale;
+
+    SDL_SetWindowSize(m_Window, SCREEN_WIDTH * m_RenderingScale, SCREEN_HEIGHT * m_RenderingScale);
+    DEBUG("Resized the window to " << (SCREEN_WIDTH * m_RenderingScale) << "x" << (SCREEN_HEIGHT * m_RenderingScale) << ".");
+}
+
+auto Screen::getRenderingScale() const -> u32
+{
+    return m_RenderingScale;
 }

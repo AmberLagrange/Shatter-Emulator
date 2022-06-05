@@ -13,6 +13,7 @@
 #include "video/ppu.hpp"
 
 #include "joypad.hpp"
+#include "video/video_defs.hpp"
 
 class Gameboy
 {
@@ -176,22 +177,55 @@ class Gameboy
          */
         __always_inline void setTimerSpeed(u32 speed);
 
+
+        /**
+         * @brief Get the video mode of the PPU
+         * 
+         */
+        __always_inline auto getVideoMode() const -> VideoMode;
+
         /**
          * @brief Set the title of the window
          * 
          * @param title The title to set
          */
         __always_inline void setTitle(std::string title);
+
+        /**
+         * @brief Get the title of the window
+         * 
+         */
+        __always_inline auto getTitle(std::string title) const -> const std::string&;
+
+        /**
+         * @brief Set the fps in the title of the window
+         * 
+         * @param fps The fps to set
+         */
+        __always_inline void setTitleFPS(u32 fps);
+
+        /**
+         * @brief Set the rendering scale of the window
+         * 
+         * @param scale The rendering scale to set
+         */
+        __always_inline void setRenderingScale(u8 renderingScale);
+
+        /**
+         * @brief Get the rendering scale of the window
+         * 
+         */
+        __always_inline auto getRenderingScale() const -> u32;
     private:
         MMU m_MMU;
         APU m_APU;
         CPU m_CPU;
         PPU m_PPU;
 
+        u32 m_Cycles;
+
         Joypad m_Joypad;
-
-        Timer m_Timer;
-
+        Timer  m_Timer;
         Screen m_Screen;
 
         std::string m_Path;
@@ -272,7 +306,32 @@ __always_inline void Gameboy::setTimerSpeed(u32 speed)
     m_Timer.setSpeed(speed);
 }
 
+__always_inline auto Gameboy::getVideoMode() const -> VideoMode
+{
+    return m_PPU.getMode();
+}
+
 __always_inline void Gameboy::setTitle(std::string title)
 {
     m_Screen.setTitle(title);
+}
+
+__always_inline auto Gameboy::getTitle(std::string title) const -> const std::string&
+{
+    return m_Screen.getTitle();
+}
+
+__always_inline void Gameboy::setTitleFPS(u32 fps)
+{
+    m_Screen.setTitleFPS(fps);
+}
+
+__always_inline void Gameboy::setRenderingScale(u8 renderingScale)
+{
+    m_Screen.setRenderingScale(renderingScale);
+}
+
+__always_inline auto Gameboy::getRenderingScale() const -> u32
+{
+    return m_Screen.getRenderingScale();
 }

@@ -11,11 +11,15 @@
 #endif
 
 CPU::CPU(Gameboy& gb)
-    : m_Registers({}), m_Gameboy(gb), m_Halted(false), m_IME(false), m_Branched(false)
+    : m_Registers({}), m_Gameboy(gb),
+      m_Halted(false), m_HaltBug(false),
+      m_IME(false), m_Branched(false)
 {
     DEBUG("Initializing CPU.");
     reset();
 }
+
+CPU::~CPU() = default;
 
 void CPU::reset()
 {
@@ -67,23 +71,32 @@ void CPU::setIME(bool ime)
 
 auto CPU::tick() -> u8
 {
-    u8 cycles = 0;
     if(m_Halted) return 4; // Halted CPU takes 4 cycles
 
     Instruction instruction;
-    u8 opcode = m_Gameboy.read(m_Registers.PC()++);
+    u8 cycles = 0;
+    u8 opcode = m_Gameboy.read(m_Registers.PC());
+
+    if(!m_HaltBug)
+    {
+        m_Registers.PC()++;
+    }
+    else
+    {
+        m_HaltBug = false;
+    }
 
     if(opcode == CB_OPCODE)
     {
         opcode = m_Gameboy.read(m_Registers.PC()++);
-        instruction = instructionsCB.at(opcode);
+        instruction = instructionsCB[opcode];
         cycles += 4; // Add 4 cycles due to the CB prefix
 
         ASSERT(instruction.op, "Opcode CB 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(opcode) << ": " << instruction.mnemonic);
     }
     else
     {
-        instruction = instructions.at(opcode);
+        instruction = instructions[opcode];
         ASSERT(instruction.op, "Opcode 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(opcode) << ": " << instruction.mnemonic);
     }
     
@@ -113,7 +126,7 @@ void CPU::raiseInterrupt(const Flags::Interrupt& flag)
 void CPU::handleInterrupts(u8& cycles)
 {
     u8 flags = m_Gameboy.read(IF_REGISTER);
-    u8 enabledFlags = (flags & m_Gameboy.read(IE_REGISTER));
+    u8 enabledFlags = flags & m_Gameboy.read(IE_REGISTER) & 0x1F;
 
     if(enabledFlags)
     {
@@ -152,12 +165,15 @@ void CPU::handleInterrupts(u8& cycles)
             
             m_IME = false;
             m_Gameboy.write(IF_REGISTER, flags);
+            
             // TODO: Have more accurate cycle updating
             cycles += 20; //NOLINT(cppcoreguidelines-avoid-magic-numbers)
         }
-        else if(m_Halted)
+
+        if(m_Halted)
         {
             m_Halted = false;
+            cycles += 4;
         }
     }
 }

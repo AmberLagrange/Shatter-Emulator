@@ -64,17 +64,22 @@ auto MBC::getCartRamSize(const std::vector<u8>& data) -> u32
     switch(data[CART_RAM_SIZE])
     {
         case 0x00:
-            return 0;
+            DEBUG("No RAM.");
+            return 4  * RAM_BANK_SIZE;
         case 0x01:
             WARN("Unused RAM Size!");
             return 0;
         case 0x02:
+            DEBUG("Ram Size: " << std::dec << 1  * RAM_BANK_SIZE / 1024 << "KB.");
             return 1  * RAM_BANK_SIZE;
         case 0x03:
+            DEBUG("Ram Size: " << std::dec << 4  * RAM_BANK_SIZE / 1024 << "KB.");
             return 4  * RAM_BANK_SIZE;
         case 0x04:
+            DEBUG("Ram Size: " << std::dec << 16 * RAM_BANK_SIZE / 1024 << "KB.");
             return 16 * RAM_BANK_SIZE;
         case 0x05:
+            DEBUG("Ram Size: " << std::dec << 8  * RAM_BANK_SIZE / 1024 << "KB.");
             return 8  * RAM_BANK_SIZE;
         default:
             WARN("Unknown RAM Size!");
