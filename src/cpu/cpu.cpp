@@ -154,6 +154,7 @@ void CPU::handleInterrupts(u8& cycles)
             
             m_IME = false;
             m_Gameboy.write(IF_REGISTER, flags);
+            
             // TODO: Have more accurate cycle updating
             cycles += 20; //NOLINT(cppcoreguidelines-avoid-magic-numbers)
         }

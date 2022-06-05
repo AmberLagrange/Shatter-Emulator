@@ -23,7 +23,7 @@ void PPU::tick(u8 cycles)
 
     switch(m_Mode)
     {
-        case VideoMode::HBlank:
+        case VideoMode::HBlank: // Mode 0
             if(m_Cycles >= CYCLES_PER_HBLANK)
             {
                 m_Cycles -= CYCLES_PER_HBLANK;
@@ -34,7 +34,7 @@ void PPU::tick(u8 cycles)
                 
                 m_Line++;
 
-                if(m_Line == GAMEBOY_HEIGHT)
+                if(m_Line == SCREEN_HEIGHT)
                 {
                     m_Mode = VideoMode::VBlank;
                     m_Gameboy.raiseInterrupt(Flags::Interrupt::VBlank);
@@ -70,7 +70,7 @@ void PPU::tick(u8 cycles)
                 }
             }
             break;
-        case VideoMode::VBlank:
+        case VideoMode::VBlank: // Mode 1
             if(m_Cycles >= CYCLES_PER_LINE)
             {
                 m_Cycles -= CYCLES_PER_LINE;
@@ -97,7 +97,7 @@ void PPU::tick(u8 cycles)
                 };
             }
             break;
-        case VideoMode::OAM_Scan:
+        case VideoMode::OAM_Scan: // Mode 2
             if (m_Cycles >= CYCLES_PER_OAM_SCAN)
             {
                 m_Cycles -= CYCLES_PER_OAM_SCAN;
@@ -112,7 +112,7 @@ void PPU::tick(u8 cycles)
                 m_Gameboy.write(LCD_STAT_REGISTER, stat);
             }
             break;
-        case VideoMode::Transfer:
+        case VideoMode::Transfer: // Mode 3
             if(m_Cycles >= CYCLES_PER_TRANSFER)
             {
                 m_Cycles -= CYCLES_PER_TRANSFER;
@@ -169,7 +169,7 @@ void PPU::drawBackgroundLine(u8 line)
     u16 tileMapAddress  = bit_functions::get_bit(lcdc, 3) ? TILE_MAP_HIGH  : TILE_MAP_LOW;
     u16 tileDataAddress = bit_functions::get_bit(lcdc, 4) ? TILE_DATA_HIGH : TILE_DATA_LOW;
 
-    for(u8 col = 0; col < GAMEBOY_WIDTH; ++col)
+    for(u8 col = 0; col < SCREEN_WIDTH; ++col)
     {
         // get the x and y position in the background
         u8 xPos = col  + scrollX;
@@ -216,14 +216,14 @@ void PPU::drawWindowLine(u8 line)
 
     u8 windowX = m_Gameboy.read(WX_REGISTER) - 7; // window x scroll has an offset of 7
 
-    if(windowX >= GAMEBOY_WIDTH) // Don't render the window if it's to the right of the screen
+    if(windowX >= SCREEN_WIDTH) // Don't render the window if it's to the right of the screen
     {
         return;
     }
 
     u8 windowY = m_Gameboy.read(WY_REGISTER);
 
-    if(windowY >= GAMEBOY_HEIGHT || windowY > line) // Don't render the window if it's below the screen (or we're not at the scanline yet)
+    if(windowY >= SCREEN_HEIGHT || windowY > line) // Don't render the window if it's below the screen (or we're not at the scanline yet)
     {
         return;
     }
@@ -231,7 +231,7 @@ void PPU::drawWindowLine(u8 line)
     u16 tileDataAddress = bit_functions::get_bit(lcdc, 4) ? TILE_DATA_HIGH : TILE_DATA_LOW;
     u16 tileMapAddress  = bit_functions::get_bit(lcdc, 6) ? TILE_MAP_HIGH  : TILE_MAP_LOW;
 
-    for(u8 col = 0; col < GAMEBOY_WIDTH; ++col)
+    for(u8 col = 0; col < SCREEN_WIDTH; ++col)
     {
         // get the x and y position in the background
         u8 xPos = col  + windowX;
@@ -314,7 +314,7 @@ void PPU::drawSprites(u8 line)
             if(screenXPos < 0) continue;
 
             // Greater than the screen's width would not, so go to the next sprite
-            if(screenXPos >= GAMEBOY_WIDTH) break;
+            if(screenXPos >= SCREEN_WIDTH) break;
 
             Colour::GBColour gbc = getGBColour(pixelXPos, tileAddress);
 
@@ -382,21 +382,21 @@ auto PPU::getScreenColour(Colour::GBColour colour) const -> Colour::ScreenColour
 
 void PPU::drawPixel(u8 x, u8 y, Colour::ScreenColour c)
 {
-    ASSERT(((x + y * GAMEBOY_WIDTH) * 4 < 0x16800), "INVALID PIXEL POSITION! X: " << (int)x << ", Y: " << (int)y << ", Pos: " << (int)((x + y * GAMEBOY_WIDTH) * 4));
+    ASSERT(((x + y * SCREEN_WIDTH) * 4 < 0x16800), "INVALID PIXEL POSITION! X: " << (int)x << ", Y: " << (int)y << ", Pos: " << (int)((x + y * SCREEN_WIDTH) * 4));
     
-    m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4    ) = c.red;
-    m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 1) = c.green;
-    m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 2) = c.blue;
-    m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 3) = c.alpha;
+    m_FrameBuffer.at((x + y * SCREEN_WIDTH) * 4    ) = c.red;
+    m_FrameBuffer.at((x + y * SCREEN_WIDTH) * 4 + 1) = c.green;
+    m_FrameBuffer.at((x + y * SCREEN_WIDTH) * 4 + 2) = c.blue;
+    m_FrameBuffer.at((x + y * SCREEN_WIDTH) * 4 + 3) = c.alpha;
 }
 
 auto PPU::getPixel(u8 x, u8 y) const -> Colour::GBColour
 {
     Colour::ScreenColour c;
-    c.red   = m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4    );
-    c.green = m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 1);
-    c.blue  = m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 2); 
-    c.alpha = m_FrameBuffer.at((x + y * GAMEBOY_WIDTH) * 4 + 3);
+    c.red   = m_FrameBuffer.at((x + y * SCREEN_WIDTH) * 4    );
+    c.green = m_FrameBuffer.at((x + y * SCREEN_WIDTH) * 4 + 1);
+    c.blue  = m_FrameBuffer.at((x + y * SCREEN_WIDTH) * 4 + 2); 
+    c.alpha = m_FrameBuffer.at((x + y * SCREEN_WIDTH) * 4 + 3);
 
     // TODO: Better conversion between screen colour and internal colour
     // Also handle pallets better

@@ -44,7 +44,7 @@ class Screen
          * @brief Get the title of the window
          * 
          */
-         auto getTitle() -> const std::string&;
+         auto getTitle() const -> const std::string&;
 
          /**
          * @brief Set the fps in the title of the window
@@ -58,13 +58,13 @@ class Screen
          * 
          * @param scale The rendering scale to set
          */
-        void setRenderingScale(u32 scale);
+        void setRenderingScale(u8 scale);
 
         /**
          * @brief Get the rendering scale of the window
          * 
          */
-        auto getRenderingScale() -> u32;
+        auto getRenderingScale() const -> u32;
     private:
         SDL_Window*     m_Window;
         SDL_Renderer*   m_Renderer;

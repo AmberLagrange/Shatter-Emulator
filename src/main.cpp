@@ -1,5 +1,6 @@
 #include "SDL_keyboard.h"
 #include "SDL_keycode.h"
+#include "SDL_timer.h"
 #include "core.hpp"
 
 #include "CLI11.hpp"
@@ -36,8 +37,11 @@ auto run(int argc, char** argv) -> int
     std::string logPath;
     shatter.add_option("-l,--log", logPath, "Path to the log file.");
 
-    int renderingScale = 0;
+    u8 renderingScale = 0;
     shatter.add_option("-s, --scale, --rendering-scale", renderingScale, "Change the rendering scale of the window.");
+
+    u32 targetFPS = 60;
+    shatter.add_option("--fps,--frame-rate", targetFPS, "Set the desired fps of the emulation. Set to 0 for unlimited.");
 
     #ifndef NDEBUG
         bool verbose = false;
@@ -98,33 +102,43 @@ auto run(int argc, char** argv) -> int
 
     gb->start();
 
-    u32 startTime, endTime, delta;
-    u32 target = 1000 / 60;
-
-    u32 fpsStart, fpsEnd;
+    u64 frameStart, frameEnd, fpsStart, fpsEnd;
+    float frameDelta, fpsDelta;
+    float target;
+    bool unlimited = false;
     u32 fps = 0;
+    
+    if(targetFPS != 0)
+    {
+        target = 1.0f / targetFPS;
+    }
+    else
+    {
+        unlimited = true;
+    }
 
-    fpsStart = SDL_GetTicks();
-
+    fpsStart = SDL_GetPerformanceCounter();
     while(gb->isRunning())
     {
-        startTime = SDL_GetTicks();
-        gb->renderFrame();
+        frameStart = SDL_GetPerformanceCounter();
         pollEvents(gb);
-        fpsEnd = endTime = SDL_GetTicks();
-        delta = endTime - startTime;
+        gb->renderFrame();
+        frameEnd = SDL_GetPerformanceCounter();
 
-        //TODO: Proper fps cap
-        /*
-        if(delta < target)
+        if(!unlimited)
         {
-            SDL_Delay(target - delta);
+            frameDelta = (frameEnd - frameStart) / static_cast<float>(SDL_GetPerformanceFrequency());
+            if(frameDelta < target)
+            {
+                SDL_Delay((target - frameDelta) * 1000.0f);
+            }
         }
-        */
-
-        if(fpsEnd - fpsStart >= 1000)
+        
+        fpsEnd = SDL_GetPerformanceCounter();
+        fpsDelta = (fpsEnd - fpsStart) / static_cast<float>(SDL_GetPerformanceFrequency());
+        if(fpsDelta >= DEFAULT_TITLE_UPDATE_RATE)
         {
-            gb->setTitleFPS(fps);
+            gb->setTitleFPS(static_cast<float>(fps) / fpsDelta);
             fpsStart = fpsEnd;
             fps = 0;
         }

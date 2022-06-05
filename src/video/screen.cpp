@@ -1,3 +1,4 @@
+#include "SDL_error.h"
 #include "SDL_video.h"
 #include "core.hpp"
 
@@ -24,7 +25,7 @@ Screen::Screen()
     DEBUG("Initializing Screen.");
     
     m_Window = SDL_CreateWindow("Shatter Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                GAMEBOY_WIDTH * m_RenderingScale, GAMEBOY_HEIGHT * m_RenderingScale, SDL_WINDOW_SHOWN);
+                                SCREEN_WIDTH * m_RenderingScale, SCREEN_HEIGHT * m_RenderingScale, SDL_WINDOW_SHOWN);
     if(!m_Window)
     {
         CRITICAL("\tCould not create window: " << SDL_GetError());
@@ -40,7 +41,7 @@ Screen::Screen()
     }
     DEBUG("\tRenderer Created.");
 
-    m_Texture = SDL_CreateTexture(m_Renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, GAMEBOY_WIDTH, GAMEBOY_HEIGHT);
+    m_Texture = SDL_CreateTexture(m_Renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 Screen::~Screen()
@@ -52,7 +53,7 @@ Screen::~Screen()
 
 void Screen::draw(const std::array<u8, FRAME_BUFFER_SIZE>& buffer)
 {
-    SDL_UpdateTexture(m_Texture, nullptr, buffer.data(), GAMEBOY_WIDTH * 4);
+    SDL_UpdateTexture(m_Texture, nullptr, buffer.data(), SCREEN_WIDTH * 4);
     SDL_RenderCopy(m_Renderer, m_Texture, nullptr, nullptr);
     SDL_RenderPresent(m_Renderer);
 }
@@ -63,7 +64,7 @@ void Screen::setTitle(const std::string& title)
     SDL_SetWindowTitle(m_Window, m_Title.c_str());
 }
 
-auto Screen::getTitle() -> const std::string&
+auto Screen::getTitle() const -> const std::string&
 {
     return m_Title;
 }
@@ -77,15 +78,15 @@ void Screen::setTitleFPS(u32 fps)
     SDL_SetWindowTitle(m_Window, ss.str().c_str());
 }
 
-void Screen::setRenderingScale(u32 renderingScale)
+void Screen::setRenderingScale(u8 renderingScale)
 {
     m_RenderingScale = renderingScale;
 
-    SDL_SetWindowSize(m_Window, GAMEBOY_WIDTH * m_RenderingScale, GAMEBOY_HEIGHT * m_RenderingScale);
-    DEBUG("Resized the window to " << (GAMEBOY_WIDTH * m_RenderingScale) << "x" << (GAMEBOY_HEIGHT * m_RenderingScale) << ".");
+    SDL_SetWindowSize(m_Window, SCREEN_WIDTH * m_RenderingScale, SCREEN_HEIGHT * m_RenderingScale);
+    DEBUG("Resized the window to " << (SCREEN_WIDTH * m_RenderingScale) << "x" << (SCREEN_HEIGHT * m_RenderingScale) << ".");
 }
 
-auto Screen::getRenderingScale() -> u32
+auto Screen::getRenderingScale() const -> u32
 {
     return m_RenderingScale;
 }

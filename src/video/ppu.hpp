@@ -105,16 +105,4 @@ class PPU
         VideoMode m_Mode;
         u16 m_Cycles;
         u8 m_Line;
-
-        // Temp drawing before implementing pixel FIFO
-        // HBLANK and DRAWING clocks might be different with FIFO
-        static constexpr u16 CYCLES_PER_HBLANK   = 204;
-        static constexpr u16 CYCLES_PER_VBLANK   = 4560;
-        static constexpr u16 CYCLES_PER_OAM_SCAN = 80;
-        static constexpr u16 CYCLES_PER_TRANSFER = 172;
-
-        static constexpr u16 CYCLES_PER_LINE     = CYCLES_PER_HBLANK
-                                                 + CYCLES_PER_OAM_SCAN
-                                                 + CYCLES_PER_TRANSFER;
-
 };
