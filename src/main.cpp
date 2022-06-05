@@ -201,8 +201,8 @@ void foo_callback(void*, u8* buf, u32 len)
     {
         if(high)
         {
-            buf[i] = 127;
-            buf[i + 1] = 127;
+            buf[i] = 15;
+            buf[i + 1] = 15;
         }
         else
         {
