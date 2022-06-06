@@ -69,7 +69,14 @@ auto Joypad::getInput() -> u8
     bit_functions::set_bit_to(input, P14_INPUT_BIT, direction);
     bit_functions::set_bit_to(input, P15_INPUT_BIT, action);
 
-    return input;
+    // Temp check to ignore SGB
+    u8 checkSGB = input & 0x30;
+    if(checkSGB == 0x10 || checkSGB == 0x20)
+    {
+        return input;
+    }
+
+    return 0xFF;
 }
 
 // TODO: Allow for rebinding
