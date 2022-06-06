@@ -16,7 +16,6 @@ CPU::CPU(Gameboy& gb)
       m_IME(false), m_Branched(false)
 {
     DEBUG("Initializing CPU.");
-    reset();
 }
 
 CPU::~CPU() = default;

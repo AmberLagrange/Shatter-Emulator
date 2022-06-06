@@ -45,6 +45,7 @@ void Gameboy::save()
 void Gameboy::start()
 {
     DEBUG("Starting Gameboy.");
+    reset();
     m_Running = true;
     m_Screen.setTitleFPS(0);
 }
