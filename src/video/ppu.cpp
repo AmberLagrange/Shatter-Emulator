@@ -199,9 +199,8 @@ void PPU::drawBackgroundLine(u8 line)
         u8 low  = m_Gameboy.read(tileAddress    );
         u8 high = m_Gameboy.read(tileAddress + 1);
 
-        Colour::GBColour    gbc = getGBColour(pixelXPos, tileAddress);
-        Colour::ScreenColour sc = getScreenColour(gbc);
-        drawPixel(col, line, sc);
+        Colour::GBColour c = getGBColour(pixelXPos, tileAddress);
+        drawPixel(col, line, c);
     }
 }
 
@@ -258,9 +257,8 @@ void PPU::drawWindowLine(u8 line)
         // add 2 bytes/line based on the y offset into the tile
         u16 tileAddress = tileDataAddress + tileDataOffset + 2 * pixelYPos;
 
-        Colour::GBColour gbc    = getGBColour(pixelXPos, tileAddress);
-        Colour::ScreenColour sc = getScreenColour(gbc);
-        drawPixel(col, line, sc);
+        Colour::GBColour c = getGBColour(pixelXPos, tileAddress);
+        drawPixel(col, line, c);
     }
 }
 
@@ -316,16 +314,15 @@ void PPU::drawSprites(u8 line)
             // Greater than the screen's width would not, so go to the next sprite
             if(screenXPos >= SCREEN_WIDTH) break;
 
-            Colour::GBColour gbc = getGBColour(pixelXPos, tileAddress);
+            Colour::GBColour c = getGBColour(pixelXPos, tileAddress);
 
             // Don't render white pixels, as they're transparent
-            if (gbc == Colour::GBColour::WHITE) continue;
+            if (c == Colour::GBColour::WHITE) continue;
 
             // Don't draw if the background has priority, unless the colour is white
             if(!bgPriority || getPixel(screenXPos, line) == Colour::GBColour::WHITE)
             {
-                Colour::ScreenColour sc = getScreenColour(gbc);
-                drawPixel(spriteXPos + x, line, sc);
+                drawPixel(spriteXPos + x, line, c);
             }
        }
     }
@@ -380,39 +377,22 @@ auto PPU::getScreenColour(Colour::GBColour colour) const -> Colour::ScreenColour
     return c;
 }
 
-void PPU::drawPixel(u8 x, u8 y, Colour::ScreenColour c)
+void PPU::drawPixel(u8 x, u8 y, Colour::GBColour c)
 {
-    ASSERT(((x + y * SCREEN_WIDTH) * 4 < 0x16800), "INVALID PIXEL POSITION! X: " << (int)x << ", Y: " << (int)y << ", Pos: " << (int)((x + y * SCREEN_WIDTH) * 4));
+    ASSERT((x + y * SCREEN_WIDTH < COLOUR_BUFFER_SIZE), "INVALID PIXEL POSITION! X: " << (int)x << ", Y: " << (int)y << ", Pos: " << (int)((x + y * SCREEN_WIDTH) * 4));
     
-    m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4    ] = c.red;
-    m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4 + 1] = c.green;
-    m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4 + 2] = c.blue;
-    m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4 + 3] = c.alpha;
+    m_ColourBuffer[x + y * SCREEN_WIDTH] = c;
+
+    Colour::ScreenColour sc = getScreenColour(c);
+    m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4    ] = sc.red;
+    m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4 + 1] = sc.green;
+    m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4 + 2] = sc.blue;
+    m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4 + 3] = sc.alpha;
 }
 
 auto PPU::getPixel(u8 x, u8 y) const -> Colour::GBColour
 {
-    Colour::ScreenColour c;
-    c.red   = m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4    ];
-    c.green = m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4 + 1];
-    c.blue  = m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4 + 2]; 
-    c.alpha = m_FrameBuffer[(x + y * SCREEN_WIDTH) * 4 + 3];
-
-    // TODO: Better conversion between screen colour and internal colour
-    // Also handle pallets better
-
-    switch(c.red)
-    {
-        case 0x9B:
-            return Colour::GBColour::WHITE;
-        case 0x8B:
-            return Colour::GBColour::LIGHT_GRAY;
-        case 0x30:
-            return Colour::GBColour::DARK_GRAY;
-        case 0x0F:
-            return Colour::GBColour::BLACK;
-        default:
-            ASSERT(false, "Invalid colour at pixel!");
-            return Colour::GBColour::WHITE;
-    }
+    ASSERT((x + y * SCREEN_WIDTH < COLOUR_BUFFER_SIZE), "INVALID PIXEL POSITION! X: " << (int)x << ", Y: " << (int)y << ", Pos: " << (int)((x + y * SCREEN_WIDTH) * 4));
+    
+    return m_ColourBuffer[x + y * SCREEN_WIDTH];
 }

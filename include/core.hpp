@@ -80,35 +80,36 @@ constexpr u8  STAT_OAM_BIT      = 5;
 constexpr u8  STAT_LYC_BIT      = 6;
 
 //Graphics Data
-constexpr u8  DMA_TRANSFER_SIZE = 0xA0;
+constexpr u8  DMA_TRANSFER_SIZE     = 0xA0;
 
-constexpr u16 TILE_DATA_LOW     = 0x8800;
-constexpr u16 TILE_DATA_HIGH    = 0x8000;
+constexpr u16 TILE_DATA_LOW         = 0x8800;
+constexpr u16 TILE_DATA_HIGH        = 0x8000;
 
-constexpr u8  TILE_ONE_OFFSET   = 128;
+constexpr u8  TILE_ONE_OFFSET       = 128;
 
-constexpr u16 TILE_MAP_LOW      = 0x9800;
-constexpr u16 TILE_MAP_HIGH     = 0x9C00;
+constexpr u16 TILE_MAP_LOW          = 0x9800;
+constexpr u16 TILE_MAP_HIGH         = 0x9C00;
 
-constexpr u16 BG_WIDTH          = 0x0100;
-constexpr u16 BG_HEIGHT         = 0x0100;
+constexpr u16 BG_WIDTH              = 0x0100;
+constexpr u16 BG_HEIGHT             = 0x0100;
 
-constexpr u8  TILE_WIDTH        = 8;
-constexpr u8  TILE_HEIGHT       = 8;
-constexpr u8  TILES_PER_LINE    = 32;
-constexpr u8  BYTES_PER_TILE    = 16;
+constexpr u8  TILE_WIDTH            = 8;
+constexpr u8  TILE_HEIGHT           = 8;
+constexpr u8  TILES_PER_LINE        = 32;
+constexpr u8  BYTES_PER_TILE        = 16;
 
-constexpr u8  BYTES_PER_SPRITE  = 4;
-constexpr u8  SPRITE_WIDTH      = 8;
-constexpr u8  SPRITE_HEIGHT     = 8;
-constexpr u8  SPRITE_X_OFFSET   = 8;
-constexpr u8  SPRITE_Y_OFFSET   = 16;
+constexpr u8  BYTES_PER_SPRITE      = 4;
+constexpr u8  SPRITE_WIDTH          = 8;
+constexpr u8  SPRITE_HEIGHT         = 8;
+constexpr u8  SPRITE_X_OFFSET       = 8;
+constexpr u8  SPRITE_Y_OFFSET       = 16;
 
-constexpr u8  SCREEN_WIDTH       = 160;
-constexpr u8  SCREEN_HEIGHT      = 144;
-constexpr u8  VBLANK_HEIGHT      = 154;
+constexpr u8  SCREEN_WIDTH          = 160;
+constexpr u8  SCREEN_HEIGHT         = 144;
+constexpr u8  VBLANK_HEIGHT         = 154;
 
-constexpr u32 FRAME_BUFFER_SIZE = SCREEN_WIDTH * SCREEN_HEIGHT * 4;
+constexpr u32 COLOUR_BUFFER_SIZE    = SCREEN_WIDTH * SCREEN_HEIGHT;
+constexpr u32 FRAME_BUFFER_SIZE     = COLOUR_BUFFER_SIZE * 4;
 
 //Rendering Defaults
 constexpr float TARGET_SPEED_MULTIPLIER     = 100.0f / 60.0f; // 60fps in percentage, same as '/ 60.0f * 100.0f'

@@ -85,7 +85,7 @@ class PPU
          *
          * @param c The colour of the pixel
          */
-        void drawPixel(u8 x, u8 y, Colour::ScreenColour c);
+        void drawPixel(u8 x, u8 y, Colour::GBColour);
 
         /**
          * @brief Get the colour of a pixel on the screen
@@ -99,7 +99,8 @@ class PPU
     private:
         Gameboy& m_Gameboy;
 
-        std::array<u8, FRAME_BUFFER_SIZE> m_FrameBuffer      {{}};
+        std::array<Colour::GBColour, COLOUR_BUFFER_SIZE> m_ColourBuffer {{}};
+        std::array<u8,               FRAME_BUFFER_SIZE>  m_FrameBuffer  {{}};
         std::function<void(std::array<u8, FRAME_BUFFER_SIZE> buffer)> m_DrawCallback;
 
         VideoMode m_Mode;
