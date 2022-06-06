@@ -12,6 +12,13 @@ Gameboy::Gameboy()
 
 void Gameboy::reset()
 {
+    DEBUG("Resetting Gameboy.");
+
+    if(!m_BootPath.empty()) // Small hack to re-enable the boot rom
+    {
+        m_MMU.write(BOOT_REGISTER, 0);
+    }
+    
     m_CPU.reset();
 }
 
@@ -34,7 +41,8 @@ void Gameboy::load(const std::string& path)
 
 void Gameboy::loadBoot(const std::string& path)
 {
-    m_MMU.loadBoot(path);
+    m_BootPath = path;
+    m_MMU.loadBoot(m_BootPath);
 }
 
 void Gameboy::save()

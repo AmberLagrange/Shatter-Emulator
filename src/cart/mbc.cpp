@@ -56,6 +56,11 @@ auto MBC::getCartTitle(const std::vector<u8>& data) -> const std::string
         title = ss.str();
     }
 
+    //Temporarily remove 'negative' characters while I don't have proper
+    //cartridge header parsing yet
+    title.erase(std::remove_if(title.begin(), title.end(), 
+    [](auto const& c) -> bool { return c < 0; }), title.end());
+
     return title;
 }
 

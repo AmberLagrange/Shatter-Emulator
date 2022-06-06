@@ -229,6 +229,7 @@ class Gameboy
         Screen m_Screen;
 
         std::string m_Path;
+        std::string m_BootPath;
         bool m_Running;
 };
 
