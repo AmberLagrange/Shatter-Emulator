@@ -267,7 +267,7 @@ void PPU::drawSprites(u8 line)
     u8 lcdc = m_Gameboy.read(LCD_CONTROL_REGISTER);
     u8 spriteSize = bit_functions::get_bit(lcdc, 2) ? 2 * SPRITE_HEIGHT : SPRITE_HEIGHT;
     
-    for (int sprite = 0; sprite < 40; sprite++)
+    for (int sprite = 39; sprite >= 0; sprite--)
     {
         u8 spriteIndex = sprite * BYTES_PER_SPRITE;
 
