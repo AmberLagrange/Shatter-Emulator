@@ -98,7 +98,7 @@ auto CPU::tick() -> u8
         instruction = instructions[opcode];
         ASSERT(instruction.op, "Opcode 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u16>(opcode) << ": " << instruction.mnemonic);
     }
-    
+
     LOG_OP();
     std::invoke(instruction.op);
 
