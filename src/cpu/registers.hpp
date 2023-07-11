@@ -5,8 +5,6 @@
 #include <array>
 #include <variant>
 
-#define UNSAFE
-
 class Registers
 {
     public:
@@ -255,8 +253,13 @@ class Registers
             {
                 struct
                 {
+                    #ifdef IS_BIG_ENDIAN
+                    u8 a;
+                    u8 f;
+                    #else
                     u8 f;
                     u8 a;
+                    #endif
                 };
                 u16 af;
             };
@@ -265,8 +268,13 @@ class Registers
             {
                 struct
                 {
+                    #ifdef IS_BIG_ENDIAN
+                    u8 b;
+                    u8 c;
+                    #else
                     u8 c;
                     u8 b;
+                    #endif
                 };
                 u16 bc;
             };
@@ -275,8 +283,13 @@ class Registers
             {
                 struct
                 {
+                    #ifdef IS_BIG_ENDIAN
+                    u8 d;
+                    u8 e;
+                    #else
                     u8 e;
                     u8 d;
+                    #endif
                 };
                 u16 de;
             };
@@ -285,8 +298,13 @@ class Registers
             {
                 struct
                 {
+                    #ifdef IS_BIG_ENDIAN
+                    u8 h;
+                    u8 l;
+                    #else
                     u8 l;
                     u8 h;
+                    #endif
                 };
                 u16 hl;
             };

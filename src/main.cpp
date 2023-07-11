@@ -1,7 +1,8 @@
+#include "core.hpp"
+
 #include "SDL_keyboard.h"
 #include "SDL_keycode.h"
 #include "SDL_timer.h"
-#include "core.hpp"
 
 #include "CLI11.hpp"
 
@@ -11,18 +12,9 @@
 #include "gameboy.hpp"
 #include "video/screen.hpp"
 
-auto run(int argc, char** argv) -> int;
 void pollEvents(Gameboy* gb);
 
 auto main(int argc, char** argv) -> int
-{
-    // SDL Segfaults if I don't calll _Exit, so this is 
-    // just a hack to get around that, while preserving
-    // a stack for objects to get destroyed
-    _Exit(run(argc, argv));
-}
-
-auto run(int argc, char** argv) -> int
 {
     Logger::setDefaultStream(std::cout);
 

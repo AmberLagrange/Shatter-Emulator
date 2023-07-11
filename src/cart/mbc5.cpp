@@ -1,15 +1,15 @@
 #include "core.hpp"
 
-#include "mbc3.hpp"
+#include "mbc5.hpp"
 
-MBC3::MBC3(std::vector<u8>&& rom, std::vector<u8>&& ram)
+MBC5::MBC5(std::vector<u8>&& rom, std::vector<u8>&& ram)
     : MBC(std::move(rom), std::move(ram)),
-      m_RomBankNumber(1), m_RamBankNumber(0),
+      m_RomBankNumber(0), m_RamBankNumber(0),
       m_RamEnabled(false), m_RTCEnabled(false) {}
 
-MBC3::~MBC3() = default;
+MBC5::~MBC5() = default;
 
-auto MBC3::read(u16 address) const -> u8
+auto MBC5::read(u16 address) const -> u8
 {
     switch(address & 0xE000)
     {
@@ -27,7 +27,7 @@ auto MBC3::read(u16 address) const -> u8
     }
 }
 
-void MBC3::write(u16 address, u8 val)
+void MBC5::write(u16 address, u8 val)
 {
     switch(address & 0xE000)
     {
@@ -35,9 +35,11 @@ void MBC3::write(u16 address, u8 val)
             if(val == 0x0A) { m_RamEnabled = true; }
             else if(val == 0x00) { m_RamEnabled = false; }
             break;
-        case 0x2000: // ROM Bank Switching
-            if(val == 0x00) { val = 0x01; }
-            m_RomBankNumber = (val & 0x7F);
+        case 0x2000: // ROM Bank Switching: Bits 0-7
+            m_RomBankNumber = (m_RomBankNumber & 0x10) | val;
+            break;
+        case 0x3000: // Rom Bank Switching: Bit 8
+            if(val) { m_RomBankNumber = m_RomBankNumber | 0b100000000; }
             break;
         case 0x4000: // RAM Bank Switching
             if(val <= 0x03)

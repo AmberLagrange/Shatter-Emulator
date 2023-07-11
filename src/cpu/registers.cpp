@@ -32,18 +32,17 @@ auto Registers::getHigh(Register& reg) -> u8&
     return std::visit([&reg] (auto&& arg) -> u8&
     {
         using T = std::decay_t<decltype(arg)>;
-        if constexpr (std::is_same_v<T, std::array<u8, 2>>)
-        {
-            return std::get<std::array<u8, 2>>(reg).at(0);
-        }
-        else
+        
+        if constexpr (std::is_same_v<T, u16>)
         {
             u16 full = std::get<u16>(reg);
             u8  high = static_cast<u8>(full >> CHAR_BIT);
             u8   low = static_cast<u8>(full & UINT8_MAX);
             reg = std::array<u8, 2> {high, low};
-            return std::get<std::array<u8, 2>>(reg).at(0);
         }
+
+        return std::get<std::array<u8, 2>>(reg).at(0);
+        
     }, reg);
 }
 
@@ -52,18 +51,17 @@ auto Registers::getLow(Register& reg) -> u8&
     return std::visit([&reg] (auto&& arg) -> u8&
     {
         using T = std::decay_t<decltype(arg)>;
-        if constexpr (std::is_same_v<T, std::array<u8, 2>>)
-        {
-            return std::get<std::array<u8, 2>>(reg).at(1);
-        }
-        else
+
+        if constexpr (std::is_same_v<T, u16>)
         {
             u16 full = std::get<u16>(reg);
             u8  high = static_cast<u8>(full >> CHAR_BIT);
             u8   low = static_cast<u8>(full & UINT8_MAX);
             reg = std::array<u8, 2> {high, low};
-            return std::get<std::array<u8, 2>>(reg).at(1);
         }
+            
+        return std::get<std::array<u8, 2>>(reg).at(1);
+        
     }, reg);
 }
 
@@ -72,18 +70,16 @@ auto Registers::getFull(Register& reg) -> u16&
     return std::visit([&reg] (auto&& arg) -> u16&
     {
         using T = std::decay_t<decltype(arg)>;
+
         if constexpr (std::is_same_v<T, std::array<u8, 2>>)
         {
             std::array<u8, 2>& full = std::get<std::array<u8, 2>>(reg);
             u16 high = static_cast<u16>(full.at(0) << CHAR_BIT);
             u16  low = static_cast<u16>(full.at(1)            );
             reg = static_cast<u16>(high | low);
-            return std::get<u16>(reg);
         }
-        else
-        {
-            return std::get<u16>(reg);
-        }
+        
+        return std::get<u16>(reg);
     }, reg);
 }
 

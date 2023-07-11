@@ -8,6 +8,7 @@
 #include "cart/romonly.hpp"
 #include "cart/mbc1.hpp"
 #include "cart/mbc3.hpp"
+#include "cart/mbc5.hpp"
 
 class Gameboy;
 

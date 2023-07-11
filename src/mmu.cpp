@@ -43,6 +43,14 @@ void MMU::load(const std::string& path)
         case Cart::Type::MBC3_RAM_BATTERY_2:
             m_Cart = std::make_unique<MBC3>(std::move(rom), std::move(ram));
             break;
+        case Cart::Type::MBC5:
+        case Cart::Type::MBC5_RAM:
+        case Cart::Type::MBC5_RAM_BATTERY:
+        case Cart::Type::MBC5_RUMBLE:
+        case Cart::Type::MBC5_RUMBLE_RAM:
+        case Cart::Type::MBC5_RUMBLE_RAM_BATTERY:
+            m_Cart = std::make_unique<MBC5>(std::move(rom), std::move(ram));
+            break;
         default:
             m_Cart = std::make_unique<RomOnly>(std::move(rom));
     }
@@ -191,6 +199,7 @@ void MMU::write(u16 address, u8 val)
                 break;
             case BOOT_REGISTER:
                 m_BootRomEnabled = (val == 0);
+                break;
             default:
                 m_Memory[address - ROM_SIZE] = val;
         }

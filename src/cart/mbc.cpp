@@ -27,6 +27,14 @@ auto MBC::getCartType(const std::vector<u8>& data) -> Cart::Type
         case Cart::Type::MBC3_RAM_BATTERY_2:
             DEBUG("Loaded MBC3.");
             break;
+        case Cart::Type::MBC5:
+        case Cart::Type::MBC5_RAM:
+        case Cart::Type::MBC5_RAM_BATTERY:
+        case Cart::Type::MBC5_RUMBLE:
+        case Cart::Type::MBC5_RUMBLE_RAM:
+        case Cart::Type::MBC5_RUMBLE_RAM_BATTERY:
+            DEBUG("Loaded MBC5.");
+            break;
         default:
             WARN("Unknown MBC Type: 0x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(cartType) << ", falling back to ROM Only!");
         }
