@@ -30,8 +30,8 @@
 *.exe
 *.out
 *.app
-/build
-/debug
+build/
+debug/
 
 # Rom Files and Directory
 /roms
