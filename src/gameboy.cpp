@@ -1,6 +1,5 @@
 #include "core.hpp"
 
-#include "flags.hpp"
 #include "gameboy.hpp"
 
 Gameboy::Gameboy()
@@ -82,6 +81,7 @@ void Gameboy::stop()
 {
     DEBUG("Stopping Gameboy.");
     m_Running = false;
+    
 }
 
 auto Gameboy::isRunning() const -> bool

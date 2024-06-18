@@ -21,6 +21,12 @@ void PPU::tick(u8 cycles)
 {
     m_Cycles += cycles;
 
+    u8 lcdc = m_Gameboy.read(LCD_CONTROL_REGISTER);
+
+    if(!bit_functions::get_bit(lcdc, 7)) {
+        return;
+    }
+
     switch(m_Mode)
     {
         case VideoMode::HBlank: // Mode 0

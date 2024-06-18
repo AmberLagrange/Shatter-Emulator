@@ -79,20 +79,20 @@ auto main(int argc, char** argv) -> int
 
     Screen::initSDL();
 
-    Gameboy* gb = new Gameboy;
-    gb->load(path);
+    Gameboy gb;
+    gb.load(path);
 
     if(!bootPath.empty())
     {
-        gb->loadBoot(bootPath);
+        gb.loadBoot(bootPath);
     }
 
     if(renderingScale > 0)
     {
-        gb->setRenderingScale(renderingScale);
+        gb.setRenderingScale(renderingScale);
     }
 
-    gb->start();
+    gb.start();
 
     u64 frameStart, frameEnd, fpsStart, fpsEnd;
     float frameDelta, fpsDelta;
@@ -110,11 +110,11 @@ auto main(int argc, char** argv) -> int
     }
 
     fpsStart = SDL_GetPerformanceCounter();
-    while(gb->isRunning())
+    while(gb.isRunning())
     {
         frameStart = SDL_GetPerformanceCounter();
-        pollEvents(gb);
-        gb->renderFrame();
+        pollEvents(&gb);
+        gb.renderFrame();
         frameEnd = SDL_GetPerformanceCounter();
 
         if(!unlimited)
@@ -130,7 +130,7 @@ auto main(int argc, char** argv) -> int
         fpsDelta = (fpsEnd - fpsStart) / static_cast<float>(SDL_GetPerformanceFrequency());
         if(fpsDelta >= DEFAULT_TITLE_UPDATE_RATE)
         {
-            gb->setTitleFPS(static_cast<float>(fps) / fpsDelta);
+            gb.setTitleFPS(static_cast<float>(fps) / fpsDelta);
             fpsStart = fpsEnd;
             fps = 0;
         }
