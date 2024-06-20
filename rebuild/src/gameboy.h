@@ -6,6 +6,7 @@
 #include <video/ppu.h>
 
 struct Gameboy {
+    
     struct APU *apu;
     struct CPU *cpu;
     struct PPU *ppu;

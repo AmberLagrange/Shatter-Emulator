@@ -1,15 +1,22 @@
 #include "apu.h"
 
+#include <stdlib.h>
 #include <logging/logging.h>
 
-int init_apu(struct APU *apu) {
+int init_apu(struct APU **apu) {
 
-    log_info("Initialized APU!");
+    *apu = malloc(sizeof(struct APU));
 
-    return 0;
+    if (!*apu) {
+        return INIT_FAIL;
+    }
+
+    gameboy_log(LOG_DEBUG, "Initialized APU!");
+    return RETURN_OK;
 }
 
 void destroy_apu(struct APU *apu) {
     
-    log_info("Destroyed APU!");
+    free(apu);
+    gameboy_log(LOG_DEBUG, "Destroyed APU!");
 }

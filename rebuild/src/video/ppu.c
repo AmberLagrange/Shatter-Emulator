@@ -1,15 +1,22 @@
 #include "ppu.h"
 
+#include <stdlib.h>
 #include <logging/logging.h>
 
-int init_ppu(struct PPU *ppu) {
+int init_ppu(struct PPU **ppu) {
 
-    log_info("Initialized PPU!");
+    *ppu = malloc(sizeof(struct PPU));
 
-    return 0;
+    if (!*ppu) {
+        return INIT_FAIL;
+    }
+
+    gameboy_log(LOG_DEBUG, "Initialized PPU!");
+    return RETURN_OK;
 }
 
 void destroy_ppu(struct PPU *ppu) {
     
-    log_info("Destroyed PPU!");
+    free(ppu);
+    gameboy_log(LOG_DEBUG, "Destroyed PPU!");
 }

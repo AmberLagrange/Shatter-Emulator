@@ -15,6 +15,6 @@ add_executable("${PROJECT_NAME}"
     src/video/ppu.cpp src/video/screen.cpp
     src/flags.cpp src/gameboy.cpp src/joypad.cpp src/main.cpp src/mmu.cpp)
 
-target_precompile_headers(Shatter PRIVATE include/core.hpp)
+target_precompile_headers("${PROJECT_NAME}" PRIVATE include/core.hpp)
 
 target_link_libraries("${PROJECT_NAME}" ${SDL2_LIBRARIES})

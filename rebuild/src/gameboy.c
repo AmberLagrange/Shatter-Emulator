@@ -1,17 +1,19 @@
 #include "gameboy.h"
+#include "cpu/cpu.h"
+#include "logging/logging.h"
 #include "video/ppu.h"
 
 int init_gameboy(struct Gameboy *gb) {
     
-    if (init_apu(gb->apu)) {
+    if (init_apu(&gb->apu)) {
         goto cleanup_apu;
     }
 
-    if (init_cpu(gb->cpu)) {
+    if (init_cpu(&gb->cpu)) {
         goto cleanup_cpu;
     }
 
-    if (init_ppu(gb->ppu)) {
+    if (init_ppu(&gb->ppu)) {
         goto cleanup_ppu;
     }
 
@@ -29,10 +31,10 @@ int init_gameboy(struct Gameboy *gb) {
     destroy_apu(gb->apu);
 
     init_fail:
-    return 1;
+    return INIT_FAIL;
 
     init_success:
-    return 0;
+    return RETURN_OK;
 }
 
 void destroy_gameboy(struct Gameboy *gb) {
@@ -44,5 +46,7 @@ void destroy_gameboy(struct Gameboy *gb) {
 
 void start_gameboy(struct Gameboy* gb) {
     
+    gameboy_log(LOG_DEBUG, "Starting Gameboy:");
+    reset_cpu(gb->cpu);
     gb->running = 1;
 }
