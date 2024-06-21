@@ -11,6 +11,7 @@ add_executable("${PROJECT_NAME}"
     src/main.c src/gameboy.c
     src/audio/apu.c
     src/cpu/cpu.c
+    src/memory/mmu.c
     src/video/ppu.c
     src/logging/logging.c)
 

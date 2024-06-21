@@ -3,16 +3,16 @@
 #include <stdlib.h>
 #include <logging/logging.h>
 
-int init_ppu(struct PPU **ppu) {
+struct PPU *init_ppu() {
 
-    *ppu = malloc(sizeof(struct PPU));
+    struct PPU *ppu = malloc(sizeof(struct PPU));
 
-    if (!*ppu) {
-        return INIT_FAIL;
+    if (!ppu) {
+        return NULL;
     }
 
     gameboy_log(LOG_DEBUG, "Initialized PPU!");
-    return RETURN_OK;
+    return ppu;
 }
 
 void destroy_ppu(struct PPU *ppu) {

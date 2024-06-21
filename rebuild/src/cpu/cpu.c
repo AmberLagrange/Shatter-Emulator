@@ -3,16 +3,16 @@
 #include <stdlib.h>
 #include <logging/logging.h>
 
-int init_cpu(struct CPU **cpu) {
+struct CPU *init_cpu() {
 
-    *cpu = malloc(sizeof(struct CPU));
+    struct CPU *cpu = malloc(sizeof(struct CPU));
 
-    if (!*cpu) {
-        return INIT_FAIL;
+    if (!cpu) {
+        return NULL;
     }
 
     gameboy_log(LOG_DEBUG, "Initialized CPU!");
-    return RETURN_OK;
+    return cpu;
 }
 
 void destroy_cpu(struct CPU *cpu) {
@@ -30,6 +30,7 @@ void reset_cpu(struct CPU *cpu) {
     cpu->registers.sp = SP_RESET;
     cpu->registers.pc = PC_RESET;
 
+    gameboy_log(LOG_DEBUG, "CPU reset sequence:");
     gameboy_log(LOG_DEBUG, "\tAF: 0x%04X", cpu->registers.af);
     gameboy_log(LOG_DEBUG, "\tBC: 0x%04X", cpu->registers.bc);
     gameboy_log(LOG_DEBUG, "\tDE: 0x%04X", cpu->registers.de);

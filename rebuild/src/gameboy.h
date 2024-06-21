@@ -3,12 +3,14 @@
 
 #include <audio/apu.h>
 #include <cpu/cpu.h>
+#include <memory/mmu.h>
 #include <video/ppu.h>
 
 struct Gameboy {
     
     struct APU *apu;
     struct CPU *cpu;
+    struct MMU *mmu;
     struct PPU *ppu;
 
     int running;

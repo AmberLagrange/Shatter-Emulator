@@ -3,16 +3,16 @@
 #include <stdlib.h>
 #include <logging/logging.h>
 
-int init_apu(struct APU **apu) {
+struct APU *init_apu() {
 
-    *apu = malloc(sizeof(struct APU));
+    struct APU *apu = malloc(sizeof(struct APU));
 
-    if (!*apu) {
-        return INIT_FAIL;
+    if (!apu) {
+        return NULL;
     }
 
     gameboy_log(LOG_DEBUG, "Initialized APU!");
-    return RETURN_OK;
+    return apu;
 }
 
 void destroy_apu(struct APU *apu) {
