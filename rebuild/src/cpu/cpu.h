@@ -83,7 +83,7 @@ struct CPU {
     struct Registers registers;
 };
 
-struct CPU *init_cpu();
+struct CPU *create_cpu();
 void destroy_cpu(struct CPU *cpu);
 
 void reset_cpu(struct CPU *cpu);

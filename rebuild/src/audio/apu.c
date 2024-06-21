@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <logging/logging.h>
 
-struct APU *init_apu() {
+struct APU *create_apu() {
 
     struct APU *apu = malloc(sizeof(struct APU));
 

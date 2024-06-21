@@ -22,7 +22,7 @@ struct MMU {
     // ie maps to other functions
 };
 
-struct MMU *init_mmu();
+struct MMU *create_mmu();
 void destroy_mmu(struct MMU *mmu);
 
 void set_address(struct MMU *mmu, u16 address);

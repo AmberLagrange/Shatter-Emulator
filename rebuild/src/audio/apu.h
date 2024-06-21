@@ -7,7 +7,7 @@ struct APU {
 
 };
 
-struct APU *init_apu();
+struct APU *create_apu();
 void destroy_apu(struct APU *apu);
 
 #endif // APU_H

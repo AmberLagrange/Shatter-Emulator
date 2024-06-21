@@ -1,28 +1,25 @@
 #include "gameboy.h"
 
-#include "audio/apu.h"
-#include "cpu/cpu.h"
 #include "logging/logging.h"
-#include "memory/mmu.h"
 
 int init_gameboy(struct Gameboy *gb) {
     
-    gb->apu = init_apu();
+    gb->apu = create_apu();
     if (!gb->apu) {
         goto cleanup_apu;
     }
 
-    gb->cpu = init_cpu();
+    gb->cpu = create_cpu();
     if (!gb->cpu) {
         goto cleanup_cpu;
     }
 
-    gb->mmu = init_mmu();
+    gb->mmu = create_mmu();
     if (!gb->mmu) {
         goto cleanup_mmu;
     }
 
-    gb->ppu = init_ppu();
+    gb->ppu = create_ppu();
     if (!gb->ppu) {
         goto cleanup_ppu;
     }

@@ -7,7 +7,7 @@ struct PPU {
 
 };
 
-struct PPU *init_ppu();
+struct PPU *create_ppu();
 void destroy_ppu(struct PPU *ppu);
 
 #endif // PPU_H

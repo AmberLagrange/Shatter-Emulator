@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <logging/logging.h>
 
-struct CPU *init_cpu() {
+struct CPU *create_cpu() {
 
     struct CPU *cpu = malloc(sizeof(struct CPU));
 

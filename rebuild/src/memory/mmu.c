@@ -4,7 +4,7 @@
 
 #include <logging/logging.h>
 
-struct MMU *init_mmu() {
+struct MMU *create_mmu() {
 
     struct MMU *mmu = malloc(sizeof(struct MMU));
     if (!mmu) {

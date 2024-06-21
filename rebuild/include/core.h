@@ -49,7 +49,7 @@ typedef int64_t     i64;
 #define VIDEO_RAM_START             0x8000
 #define VIDEO_RAM_END               0x9FFF
 #define VIDEO_RAM_SIZE              0x2000
-#define VIDEO_RAM_BANK_COUNT        0x0002  // GBC Mode allows for 2 vram banks
+#define VIDEO_RAM_BANK_COUNT        0x0002  // CGB Mode allows for 2 vram banks
 
 #define EXTERNAL_RAM_START          0xA000
 #define EXTERNAL_RAM_END            0xBFFF
@@ -59,7 +59,7 @@ typedef int64_t     i64;
 #define WORK_RAM_0_END              0xCFFF
 #define WORK_RAM_0_SIZE             0x1000
 
-#define WORK_RAM_SWAPPABLE_START    0xD000  // GBC Mode allows swapping banks
+#define WORK_RAM_SWAPPABLE_START    0xD000  // CGB Mode allows swapping banks
 #define WORK_RAM_SWAPPABLE_END      0xDFFF
 #define WORK_RAM_SWAPPABLE_SIZE     0x1000
 #define WORK_RAM_SWAPPABLE_COUNT    0x0007  // Treating the swappable work ram as a continuous 

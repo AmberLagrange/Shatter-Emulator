@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <logging/logging.h>
 
-struct PPU *init_ppu() {
+struct PPU *create_ppu() {
 
     struct PPU *ppu = malloc(sizeof(struct PPU));
 
