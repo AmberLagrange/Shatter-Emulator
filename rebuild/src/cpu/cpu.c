@@ -1,23 +1,15 @@
 #include "cpu.h"
 
-#include <stdlib.h>
 #include <logging/logging.h>
 
-struct CPU *create_cpu() {
-
-    struct CPU *cpu = malloc(sizeof(struct CPU));
-
-    if (!cpu) {
-        return NULL;
-    }
+int init_cpu(struct CPU *cpu) {
 
     gameboy_log(LOG_DEBUG, "Initialized CPU!");
-    return cpu;
+    return RETURN_OK;
 }
 
-void destroy_cpu(struct CPU *cpu) {
+void cleanup_cpu(struct CPU *cpu) {
     
-    free(cpu);
     gameboy_log(LOG_DEBUG, "Destroyed CPU!");
 }
 

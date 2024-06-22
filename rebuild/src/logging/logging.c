@@ -3,6 +3,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+enum LogLevel MINIMUM_LOGGING_LEVEL = LOG_INFO;
+
 #define ANSI_BLACK      "\e[0;30m"
 #define ANSI_RED        "\e[0;31m"
 #define ANSI_GREEN      "\e[0;32m"
@@ -15,37 +17,45 @@
 
 void gameboy_log(enum LogLevel level, const char *fmt, ...) {
 
+    if (level > MINIMUM_LOGGING_LEVEL) {
+        return;
+    }
+
     va_list args;
     va_start(args, fmt);
 
     switch(level) {
 
         case LOG_OPCODE:
-            printf("[%sOPCODE%s] ", ANSI_WHITE, ANSI_RESET);
+            printf("[%sOPCODE%s]\t", ANSI_WHITE, ANSI_RESET);
             break;
 
         case LOG_TRACE:
-            printf("[%sTRACE%s] ", ANSI_GREEN, ANSI_RESET);
+            printf("[%sTRACE%s]\t", ANSI_GREEN, ANSI_RESET);
             break;
 
         case LOG_DEBUG:
-            printf("[%sDEBUG%s] ", ANSI_BLUE, ANSI_RESET);
+            printf("[%sDEBUG%s]\t", ANSI_BLUE, ANSI_RESET);
+            break;
+
+        case LOG_INFO:
+            printf("[%sINFO%s]\t", ANSI_GREEN, ANSI_RESET);
             break;
 
         case LOG_WARN:
-            printf("[%sWARN%s] ", ANSI_YELLOW, ANSI_RESET);
+            printf("[%sWARN%s]\t", ANSI_YELLOW, ANSI_RESET);
             break;
 
         case LOG_ERROR:
-            printf("[%sERROR%s] ", ANSI_RED, ANSI_RESET);
+            printf("[%sERROR%s]\t", ANSI_RED, ANSI_RESET);
             break;
 
         case LOG_CRITICAL:
-            printf("[%sCRITICAL%s] ", ANSI_MAGENTA, ANSI_RESET);
+            printf("[%sCRITICAL%s]\t", ANSI_MAGENTA, ANSI_RESET);
             break;
 
         default:
-            printf("[NONE] ");
+            printf("[NONE]\t");
     }
 
     vprintf(fmt, args);

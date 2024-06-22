@@ -83,9 +83,26 @@ struct CPU {
     struct Registers registers;
 };
 
-struct CPU *create_cpu();
-void destroy_cpu(struct CPU *cpu);
+/**
+ * @brief Initializes the CPU
+ * 
+ * @param cpu 
+ * @return int 
+ */
+int init_cpu(struct CPU *cpu);
 
+/**
+ * @brief Cleans up the CPU
+ * 
+ * @param cpu 
+ */
+void cleanup_cpu(struct CPU *cpu);
+
+/**
+ * @brief Resets the registers in the CPU to the values after the Boot ROM (or to 0 if a Boot ROM is provided)
+ * 
+ * @param cpu 
+ */
 void reset_cpu(struct CPU *cpu);
 
 #endif // CPU_H

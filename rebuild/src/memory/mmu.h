@@ -22,11 +22,19 @@ struct MMU {
     // ie maps to other functions
 };
 
-struct MMU *create_mmu();
-void destroy_mmu(struct MMU *mmu);
+/**
+ * @brief Initializes the MMU
+ * 
+ * @param mmu 
+ * @return int 
+ */
+int init_mmu(struct MMU *mmu);
 
-void set_address(struct MMU *mmu, u16 address);
-u8   read_byte(struct MMU *mmu);
-void write_byte(struct MMU *mmu, u8 byte);
+/**
+ * @brief Cleans up the MMU
+ * 
+ * @param mmu 
+ */
+void cleanup_mmu(struct MMU *mmu);
 
 #endif // MMU_H

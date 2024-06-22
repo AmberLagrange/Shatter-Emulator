@@ -1,6 +1,8 @@
 #ifndef CORE_H
 #define CORE_H
 
+#define NULL ((void*)0)
+
 // Return type values
 #define RETURN_OK 0
 #define INIT_FAIL -1
@@ -88,6 +90,56 @@ typedef int64_t     i64;
 #define HIGH_RAM_END                0xFFFE
 #define HIGH_RAM_SIZE               0x007F
 
-#define INTERUPT_ENABLE_REGISTER    0xFFFF  // No need for size as it's one byte
+#define IE_REGISTER_ADDRESS         0xFFFF  // No need for size as it's one byte
+
+// Cartridge Header
+#define HEADER_START                0x0100
+#define HEADER_END                  0x0150
+#define HEADER_SIZE                 0x0050
+
+#define ENTRY_LOCATION_START        0x0100
+#define ENTRY_LOCATION_END          0x0103
+#define ENTRY_LOCATION_SIZE         0x0004
+
+#define NINTENDO_LOGO_START         0x0104
+#define NINTENDO_LOGO_END           0x0133
+#define NINTENDO_LOGO_SIZE          0x0030
+
+#define CARTRIDGE_TITLE_START       0x0134
+#define CARTRIDGE_TITLE_END         0x0143
+#define CARTRIDGE_TITLE_SIZE        0x0010
+
+#define MANUFACTURER_CODE_START     0x013F  // Note: In older cartridges, this is
+#define MANUFACTURER_CODE_END       0x0142  // Part of the title.
+#define MANUFACTURER_CODE_SIZE      0x0004  // TODO: Proper handling of this
+
+#define CGB_FLAG_ADDRESS            0x0143  // See above
+
+#define NEW_LICENSEE_CODE_START     0x0144
+#define NEW_LICENSEE_CODE_END       0x0145
+#define NEW_LICENSEE_CODE_SIZE      0x0002
+
+#define SGB_FLAG_ADDRESS            0x0146
+
+#define CARTRIDGE_TYPE_ADDRESS      0x0147
+
+#define ROM_SIZE_ADDRESS            0x0148
+
+#define RAM_SIZE_ADDRESS            0x0149
+
+#define DESTINATION_CODE_ADDRESS    0x014A
+
+#define OLD_LICENSEE_CODE_ADDRESS   0x014B
+
+#define ROM_VERSION_NUMBER_ADDRESS  0x014C
+
+#define HEADER_CHECKSUM_ADDRESS     0x014D
+
+#define GLOBAL_CHECKSUM_START       0x014E
+#define GLOBAL_CHECKSUM_END         0x014F
+#define GLOBAL_CHECKSUM_SIZE        0x0002
+
+// SGB
+#define SGB_ENABLE_FLAG             0x0003
 
 #endif

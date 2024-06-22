@@ -8,11 +8,21 @@ find_package(SDL2 REQUIRED)
 include_directories("${PROJECT_NAME}" ${SDL2_INCLUDE_DIRS} src include)
 
 add_executable("${PROJECT_NAME}"
-    src/main.c src/gameboy.c
+    src/main.c
+    src/gameboy.c
+
     src/audio/apu.c
+
+    src/cartridge/cartridge_helper.c
+    src/cartridge/cartridge.c
+
     src/cpu/cpu.c
+
     src/memory/mmu.c
+    src/memory/bus.c
+
     src/video/ppu.c
+
     src/logging/logging.c)
 
 target_link_libraries("${PROJECT_NAME}" ${SDL2_LIBRARIES})
