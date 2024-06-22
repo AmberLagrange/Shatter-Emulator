@@ -13,7 +13,7 @@ struct CartridgeHeader {
         u8 cartridge_title[CARTRIDGE_TITLE_SIZE];
         struct {
 
-            u8 sgb_cartridge_title[CGB_CARTRIDGE_TITLE_SIZE];
+            u8 cgb_cartridge_title[CGB_CARTRIDGE_TITLE_SIZE];
             u8 manufacturer_code[MANUFACTURER_CODE_SIZE];
             u8 cgb_flag;
         };

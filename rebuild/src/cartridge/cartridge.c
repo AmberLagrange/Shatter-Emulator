@@ -15,24 +15,31 @@ int parse_cartridge_header(struct Cartridge *cart, u8 *contents) {
     memcpy(&cart->header, contents + HEADER_START, HEADER_SIZE);
 
     u8 title_length;
+    u8 *title;
+
     u8 cgb_flag = cart->header.cgb_flag;
     const char *cgb_support;
+
     int manufacturer_code = 1;
 
     switch (cgb_flag) {
         
         case CGB_SUPPORT_FLAG:
             cgb_support = "Supported";
+            title = cart->header.cgb_cartridge_title;
             title_length = CGB_CARTRIDGE_TITLE_SIZE;
             break;
 
         case CGB_REQUIRE_FLAG:
             cgb_support = "Required";
+            title = cart->header.cgb_cartridge_title;
             title_length = CGB_CARTRIDGE_TITLE_SIZE;
             break;
 
         default:
             cgb_support = "Unsupported";
+            title = cart->header.cartridge_title;
+            title_length = CARTRIDGE_TITLE_SIZE;
             manufacturer_code = 0;
     }
 
@@ -40,7 +47,7 @@ int parse_cartridge_header(struct Cartridge *cart, u8 *contents) {
                 cgb_support);
 
     gameboy_log(LOG_INFO, "Title:\t\t%.*s",
-                title_length, cart->header.cartridge_title);
+                title_length, title);
 
     if (manufacturer_code) {
         gameboy_log(LOG_INFO, "Manufacturer:\t%.4s",
