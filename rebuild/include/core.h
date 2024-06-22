@@ -109,6 +109,10 @@ typedef int64_t     i64;
 #define CARTRIDGE_TITLE_END         0x0143
 #define CARTRIDGE_TITLE_SIZE        0x0010
 
+#define CGB_CARTRIDGE_TITLE_START   0x0134
+#define CGB_CARTRIDGE_TITLE_END     0x013E
+#define CGB_CARTRIDGE_TITLE_SIZE    0x000B
+
 #define MANUFACTURER_CODE_START     0x013F  // Note: In older cartridges, this is
 #define MANUFACTURER_CODE_END       0x0142  // Part of the title.
 #define MANUFACTURER_CODE_SIZE      0x0004  // TODO: Proper handling of this
@@ -140,6 +144,8 @@ typedef int64_t     i64;
 #define GLOBAL_CHECKSUM_SIZE        0x0002
 
 // SGB
-#define SGB_ENABLE_FLAG             0x0003
+#define CGB_SUPPORT_FLAG            0x80
+#define CGB_REQUIRE_FLAG            0xC0
+#define SGB_ENABLE_FLAG             0x03
 
 #endif

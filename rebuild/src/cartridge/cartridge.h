@@ -7,7 +7,18 @@ struct CartridgeHeader {
 
     u8 entry_location[ENTRY_LOCATION_SIZE];
     u8 nintendo_logo[NINTENDO_LOGO_SIZE];
-    u8 cartridge_title[CARTRIDGE_TITLE_SIZE];
+
+    union {
+        
+        u8 cartridge_title[CARTRIDGE_TITLE_SIZE];
+        struct {
+
+            u8 sgb_cartridge_title[CGB_CARTRIDGE_TITLE_SIZE];
+            u8 manufacturer_code[MANUFACTURER_CODE_SIZE];
+            u8 cgb_flag;
+        };
+    };
+
     u8 new_licensee_code[NEW_LICENSEE_CODE_SIZE];
     u8 sgb_flag;
     u8 cartridge_type;
