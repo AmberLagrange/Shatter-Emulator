@@ -2,6 +2,25 @@
 
 #include <logging/logging.h>
 
+bool check_cgb_support(u8 cgb_flag, const char **cgb_support_str) {
+
+    switch (cgb_flag) {
+        
+        case CGB_SUPPORT_FLAG:
+            *cgb_support_str = "Supported";
+            return true;
+
+        case CGB_REQUIRE_FLAG:
+            *cgb_support_str = "Required";
+            return true;
+
+        default:
+            *cgb_support_str = "Unsupported";
+    }
+
+    return false;
+}
+
 enum NewLicenseeCode convert_ascii_license_to_enum(u8 *new_licensee_code) {
     return TODO;
 }
@@ -564,6 +583,8 @@ const char *get_cart_type_str(u8 cart_type) {
     gameboy_log(LOG_WARN, "Invalid cartridge type given: 0x%02X", cart_type);
 }
 
+// Note: This doesn't account for the 72, 80 and 96 ROMS banks
+// However, no known ROMS have these, and no official documents list them
 __attribute__((always_inline)) int get_rom_bank_count(u8 rom_size) {
 
     return 2 << rom_size;

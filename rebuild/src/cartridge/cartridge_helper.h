@@ -3,6 +3,8 @@
 
 #include <core.h>
 
+#include <stdbool.h>
+
 enum OldLicenseeCode {
 
     LICENSE_NONE                    = 0x00,
@@ -188,6 +190,15 @@ enum CartridgeType {
      HUC3                           = 0xFE,
      HUC1_RAM_BATTERY               = 0xFF
 };
+
+
+/**
+ * @brief Checks if the cartridge supports CGB
+ * 
+ * @param cgb_support_str 
+ * @return int 
+ */
+bool check_cgb_support(u8 cgb_flag, const char **cgb_support_str);
 
 /**
  * @brief Converts two ASCII characters from the cartridge header

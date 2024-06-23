@@ -40,6 +40,7 @@ u8 read_byte(struct Bus *bus) {
     struct MMU *mmu = bus->mmu;
 
     if (address < ROM_SIZE) {
+        (void)(cart);
         return 0; // TODO: Cart
     }
 
@@ -111,6 +112,7 @@ void write_byte(struct Bus *bus, u8 byte) {
     struct MMU *mmu = bus->mmu;
 
     if (address < ROM_SIZE) {
+        (void)(cart);
         return; // TODO: Cart
     }
 
