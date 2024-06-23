@@ -1,5 +1,10 @@
 #include "cartridge_helper.h"
 
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <logging/logging.h>
 
 bool check_cgb_support(u8 cgb_flag, const char **cgb_support_str) {
@@ -630,6 +635,38 @@ const char *get_rom_size_str(u8 rom_size) {
     return "Unknown ROM Size";
 }
 
+int get_ram_bank_count(u8 ram_size) {
+
+    switch (ram_size) {
+
+        case 0x00:
+            return 0;
+
+        case 0x01:
+            gameboy_log(LOG_ERROR, "Unused RAM Size.");
+            return 0;
+
+        case 0x02:
+            return 1;
+
+        case 0x03:
+            return 4;
+
+        case 0x04:
+            return 16;
+
+        case 0x05:
+            return 8;
+
+        default:
+            // Fallthrough
+            break;
+    }
+
+    gameboy_log(LOG_ERROR, "Unknown RAM size: 0x%02X", ram_size);
+    return 0;
+}
+
 const char *get_ram_size_str(u8 ram_size) {
 
     switch (ram_size) {
@@ -638,7 +675,7 @@ const char *get_ram_size_str(u8 ram_size) {
             return "No RAM";
 
         case 0x01:
-            gameboy_log(LOG_WARN, "Unused RAM Size.");
+            gameboy_log(LOG_ERROR, "Unused RAM Size.");
             return "Unused";
 
         case 0x02:
@@ -679,4 +716,64 @@ const char *get_destination_str(u8 destination_code) {
 
     gameboy_log(LOG_ERROR, "Unknown destination: 0x%02X", destination_code);
     return "Unknown destination";
+}
+
+u8 *load_data_from_file(const char *file_path, enum LogLevel level) {
+
+    FILE *file = fopen(file_path, "rb");
+    if (!file) {
+        gameboy_log(level, "Could not open %s. %s", file_path, strerror(errno));
+        goto fopen_fail;
+    }
+
+    if (fseek(file, 0, SEEK_END)) {
+        gameboy_log(level, "Could not reach end of %s. %s", file_path, strerror(errno));
+        goto fseek_fail;
+    }
+
+    int file_len = ftell(file);
+    if (file_len < 0) {
+        gameboy_log(level, "Could not get length of %s. %s", file_path, strerror(errno));
+        goto ftell_fail;
+    }
+
+    rewind(file);
+    if (errno) {
+        gameboy_log(level, "Could not rewind %s to the beginning. %s", file_path, strerror(errno));
+        goto rewind_fail;
+    }
+
+    u8 *contents = malloc(sizeof(u8) * file_len);
+    if (!contents) {
+        gameboy_log(level, "Could not allocate data for the contents of %s.", file_path);
+        goto malloc_fail;
+    }
+
+    if (!fread(contents, file_len, 1, file)) {
+        gameboy_log(level, "Could not read %s in its entirety.", file_path);
+        goto fread_fail;
+    }
+
+    if (fclose(file)) {
+        gameboy_log(level, "Could not close %s. %s", file_path, strerror(errno));
+    }
+
+    goto load_success;
+
+    fread_fail:
+    free(contents);
+
+    malloc_fail:
+    rewind_fail:
+    ftell_fail:
+    fseek_fail:
+    if (fclose(file)) {
+        gameboy_log(LOG_ERROR, "Could not close %s. %s", file_path, strerror(errno));
+    }
+
+    fopen_fail:
+    return NULL;
+
+    load_success:
+    return contents;
 }

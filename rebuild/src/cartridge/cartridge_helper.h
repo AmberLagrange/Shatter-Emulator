@@ -5,6 +5,8 @@
 
 #include <stdbool.h>
 
+#include <logging/logging.h>
+
 enum OldLicenseeCode {
 
     LICENSE_NONE                    = 0x00,
@@ -191,7 +193,6 @@ enum CartridgeType {
      HUC1_RAM_BATTERY               = 0xFF
 };
 
-
 /**
  * @brief Checks if the cartridge supports CGB
  * 
@@ -243,6 +244,14 @@ __attribute__((always_inline)) int get_rom_bank_count(u8 rom_size);
 const char *get_rom_size_str(u8 rom_size);
 
 /**
+ * @brief Gets the number of RAM banks in the cartridge from the header
+ * 
+ * @param ram_size 
+ * @return int 
+ */
+int get_ram_bank_count(u8 ram_size);
+
+/**
  * @brief Get the size of RAM in human readable format 
  * 
  * @param bank_count 
@@ -257,5 +266,14 @@ const char *get_ram_size_str(u8 ram_size);
  * @return const char* 
  */
 const char *get_destination_str(u8 destination_code);
+
+/**
+ * @brief Loads data from a given file into a buffer to read into a cart
+ * 
+ * @param file_path 
+ * @param level 
+ * @return u8* 
+ */
+u8 *load_data_from_file(const char *file_path, enum LogLevel level);
 
 #endif // CARTRIDGE_HELPER_H

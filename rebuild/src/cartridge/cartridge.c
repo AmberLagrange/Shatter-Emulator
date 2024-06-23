@@ -3,28 +3,27 @@
 #include <stdbool.h>
 
 #include "cartridge_helper.h"
-#include "core.h"
 
 #include <logging/logging.h>
 
-#include <errno.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-int parse_cartridge_header(struct Cartridge *cart, u8 *contents) {
+int parse_cartridge_header(struct Cartridge *cart, u8 *rom_contents) {
 
-    memcpy(&cart->header, contents + HEADER_START, HEADER_SIZE);
+    memcpy(&cart->header, rom_contents + HEADER_START, HEADER_SIZE);
 
-    u8 *title = cart->header.cartridge_title;
+    struct CartridgeHeader header = cart->header;
+
+    u8 *title = header.cartridge_title;
     u8 title_length = CARTRIDGE_TITLE_SIZE;
 
     const char *cgb_support_str;
-    bool cgb_support = check_cgb_support(cart->header.cgb_flag, &cgb_support_str);
+    bool cgb_support = check_cgb_support(header.cgb_flag, &cgb_support_str);
 
     if (cgb_support) {
 
-        title = cart->header.cgb_cartridge_title;
+        title = header.cgb_cartridge_title;
         title_length = CGB_CARTRIDGE_TITLE_SIZE;
     }
 
@@ -32,153 +31,100 @@ int parse_cartridge_header(struct Cartridge *cart, u8 *contents) {
                 title_length, title);
 
     gameboy_log(LOG_INFO, "Manufacturer:\t%.4s",
-                (cgb_support) ? cart->header.manufacturer_code : (u8 *)"");
+                (cgb_support) ? header.manufacturer_code : (u8 *)"");
 
     gameboy_log(LOG_INFO, "Supports CGB:\t%s",
                 cgb_support_str);
 
     gameboy_log(LOG_INFO, "Licensee:\t%s",
-                get_licensee_str(cart->header.old_licensee_code,
-                                 cart->header.new_licensee_code));
+                get_licensee_str(header.old_licensee_code,
+                                 header.new_licensee_code));
 
     gameboy_log(LOG_INFO, "SGB Enabled:\t%s",
-                (cart->header.sgb_flag == SGB_ENABLE_FLAG) ? "Yes" : "No");
+                (header.sgb_flag == SGB_ENABLE_FLAG) ? "Yes" : "No");
 
     gameboy_log(LOG_INFO, "Cartridge Type:\t%s",
-                get_cart_type_str(cart->header.cartridge_type));
+                get_cart_type_str(header.cartridge_type));
 
     gameboy_log(LOG_INFO, "ROM Size:\t%s",
-                get_rom_size_str(cart->header.rom_size));
+                get_rom_size_str(header.rom_size));
 
     gameboy_log(LOG_INFO, "RAM Size:\t%s",
-                get_ram_size_str(cart->header.ram_size));
+                get_ram_size_str(header.ram_size));
 
     gameboy_log(LOG_INFO, "Destination:\t%s",
-                get_destination_str(cart->header.destination_code));
+                get_destination_str(header.destination_code));
 
     gameboy_log(LOG_INFO, "Version Number:\t%d",
-                cart->header.rom_version_number);
+                header.rom_version_number);
 
     return RETURN_OK;
 }
 
-int init_cartridge(struct Cartridge *cart) {
+int init_cartridge(struct Cartridge *cart, u8 *rom_contents, u8 *ram_contents) {
 
-    cart->rom_0 = malloc(sizeof(u8) * ROM_BANK_0_SIZE);
-    if (!cart->rom_0) {
-        goto rom_0_init_fail;
+    struct CartridgeHeader header = cart->header;
+
+    size_t rom_size = ROM_BANK_SIZE * get_rom_bank_count(header.rom_size);
+    cart->rom_banks = malloc(sizeof(u8) * rom_size);
+    if (!cart->rom_banks) {
+        goto rom_init_fail;
+    }
+    memcpy(cart->rom_banks, rom_contents, rom_size);
+    cart->rom_bank_index = 0;
+
+    size_t ram_size = EXTERNAL_RAM_SIZE * get_ram_bank_count(header.ram_size);
+    cart->ram_banks = malloc(sizeof(u8) * ram_size);
+    if (!cart->ram_banks) {
+        goto ram_init_fail;
     }
 
-    cart->rom_swappable = malloc(sizeof(u8) * ROM_BANK_SWAPPABLE_SIZE);
-    if (!cart->rom_swappable) {
-        goto rom_swappable_init_fail;
+    if (ram_contents) {
+        memcpy(cart->ram_banks, ram_contents, ram_size);
     }
+    cart->ram_bank_index = 0;
 
-    cart->rom_bank = 0;
+    goto init_finish;
 
-    cart->ram_0 = malloc(sizeof(u8) * EXTERNAL_RAM_SIZE);
-    if (!cart->ram_0) {
-        goto ram_0_init_fail;
-    }
+    ram_init_fail:
+    gameboy_log(LOG_ERROR, "Could not load RAM into RAM banks.");
+    goto init_finish;
 
-    cart->ram_swappable = malloc(sizeof(u8) * EXTERNAL_RAM_SIZE);
-    if (!cart->ram_swappable) {
-        goto ram_swappable_init_fail;
-    }
-
-    cart->ram_bank = 0;
-
-    goto init_success;
-
-    ram_swappable_init_fail:
-    free(cart->ram_0);
-
-    ram_0_init_fail:
-    free(cart->rom_swappable);
-
-    rom_swappable_init_fail:
-    free(cart->rom_0);
-
-    rom_0_init_fail:
+    rom_init_fail:
     return INIT_FAIL;
 
-    init_success:
+    init_finish:
     gameboy_log(LOG_DEBUG, "Initialized Cartridge!");
     return RETURN_OK;
 }
 
 void cleanup_cartridge(struct Cartridge *cart) {
 
-    if (cart->rom_0) {                  // If rom_0 is allocated, then the rest are as well
-        free(cart->ram_swappable);
-        free(cart->ram_0);
-        free(cart->rom_swappable);
-        free(cart->rom_0);
+    if (cart->rom_banks) {                  // If rom_banks is allocated, then the rest are as well
+        free(cart->ram_banks);
+        free(cart->rom_banks);
     }
 
     gameboy_log(LOG_DEBUG, "Destroyed Cartridge!");
 }
 
-int load_rom(struct Cartridge *cart, const char *rom_path) {
+int load_rom_from_path(struct Cartridge *cart, const char *rom_path) {
 
-    FILE *rom_file = fopen(rom_path, "rb");
+    u8 *rom_contents = load_data_from_file(rom_path, LOG_CRITICAL);
 
-    if (!rom_file) {
-        gameboy_log(LOG_CRITICAL, "Could not open %s. %s", rom_path, strerror(errno));
-        goto fopen_fail;
+    if (!rom_contents) {
+        return INIT_FAIL;
     }
 
-    if (fseek(rom_file, 0, SEEK_END)) {
-        gameboy_log(LOG_CRITICAL, "Could not reach end of %s. %s", rom_path, strerror(errno));
-        goto fseek_fail;
-    }
+    char ram_path[MAX_STR_LEN] = { 0 };
+    strcpy(ram_path, rom_path);
+    strcat(ram_path, ".sav");
+    u8 *ram_contents = load_data_from_file(ram_path, LOG_WARN);
 
-    int file_len = ftell(rom_file);
-    if (file_len < 0) {
-        gameboy_log(LOG_CRITICAL, "Could not get length of %s. %s", rom_path, strerror(errno));
-        goto ftell_fail;
-    }
+    parse_cartridge_header(cart, rom_contents);
+    init_cartridge(cart, rom_contents, NULL);
 
-    rewind(rom_file);
-    if (errno) {
-        gameboy_log(LOG_CRITICAL, "Could not rewind %s to the beginning. %s", rom_path, strerror(errno));
-        goto rewind_fail;
-    }
-
-    u8 *contents = malloc(sizeof(u8) * file_len);
-    if (!contents) {
-        gameboy_log(LOG_CRITICAL, "Could not allocate data for the contents of %s.", rom_path);
-        goto malloc_fail;
-    }
-
-    if (!fread(contents, file_len, 1, rom_file)) {
-        gameboy_log(LOG_CRITICAL, "Could not read %s in its entirety.", rom_path);
-        goto fread_fail;
-    }
-
-    if (fclose(rom_file)) {
-        gameboy_log(LOG_ERROR, "Could not close %s. %s", rom_path, strerror(errno));
-    }
-
-    goto load_success;
-
-    fread_fail:
-    free(contents);
-
-    malloc_fail:
-    rewind_fail:
-    ftell_fail:
-    fseek_fail:
-    if (fclose(rom_file)) {
-        gameboy_log(LOG_ERROR, "Could not close %s. %s", rom_path, strerror(errno));
-    }
-
-    fopen_fail:
-    return INIT_FAIL;
-
-    load_success:
-    parse_cartridge_header(cart, contents);
-    init_cartridge(cart);
-    free(contents);
+    free(ram_contents);
+    free(rom_contents);
     return RETURN_OK;
 }

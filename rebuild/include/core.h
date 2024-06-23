@@ -1,7 +1,9 @@
 #ifndef CORE_H
 #define CORE_H
 
+// General C Macros
 #define NULL ((void*)0)
+#define MAX_STR_LEN 256
 
 // Return type values
 #define RETURN_OK 0
@@ -42,11 +44,9 @@ typedef int64_t     i64;
 
 #define ROM_BANK_0_START            0x0000
 #define ROM_BANK_0_END              0x3FFF
-#define ROM_BANK_0_SIZE             0x4000
-
 #define ROM_BANK_SWAPPABLE_START    0x4000
 #define ROM_BANK_SWAPPABLE_END      0x7FFF
-#define ROM_BANK_SWAPPABLE_SIZE     0x4000
+#define ROM_BANK_SIZE               0x4000
 
 #define VIDEO_RAM_START             0x8000
 #define VIDEO_RAM_END               0x9FFF
@@ -64,7 +64,7 @@ typedef int64_t     i64;
 #define WORK_RAM_SWAPPABLE_START    0xD000  // CGB Mode allows swapping banks
 #define WORK_RAM_SWAPPABLE_END      0xDFFF
 #define WORK_RAM_SWAPPABLE_SIZE     0x1000
-#define WORK_RAM_SWAPPABLE_COUNT    0x0007  // Treating the swappable work ram as a continuous 
+#define WORK_RAM_SWAPPABLE_COUNT    0x0007
 
 #define ECHO_RAM_0_START            0xE000  // Prohibited by Nintendo
 #define ECHO_RAM_0_END              0xEFFF

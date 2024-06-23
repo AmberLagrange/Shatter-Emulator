@@ -35,13 +35,11 @@ struct Cartridge {
 
     struct CartridgeHeader header;
 
-    u8 *rom_0;
-    u8 *rom_swappable;
-    u8 rom_bank;
+    u8 *rom_banks;
+    u8 rom_bank_index;
     
-    u8 *ram_0;
-    u8 *ram_swappable;
-    u8 ram_bank;
+    u8 *ram_banks;
+    u8 ram_bank_index;
 
     // TODO: Rest of cartridge features
 };
@@ -49,18 +47,21 @@ struct Cartridge {
 /**
  * @brief Parse information from the cartridge header.
  * 
- * @param rom_path 
+ * @param cart 
+ * @param contents 
  * @return int 
  */
-int parse_cartridge_header(struct Cartridge *cart, u8 *contents);
+int parse_cartridge_header(struct Cartridge *cart, u8 *rom_contents);
 
 /**
- * @brief Initializes the cartridge
+ * @brief Initializes the cartridge and copy contents into its buffers
  * 
  * @param cart 
+ * @param rom_contents 
+ * @param ram_contents 
  * @return int 
  */
-int init_cartridge(struct Cartridge *cart);
+int init_cartridge(struct Cartridge *cart, u8 *rom_contents, u8 *ram_contents);
 
 /**
  * @brief Cleans up the cartridge
@@ -76,6 +77,6 @@ void cleanup_cartridge(struct Cartridge *cart);
  * @param rom_path 
  * @return int 
  */
-int load_rom(struct Cartridge *cart, const char *rom_path);
+int load_rom_from_path(struct Cartridge *cart, const char *rom_path);
 
 #endif // CART_H

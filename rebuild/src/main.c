@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
     struct Gameboy gb;
     init_gameboy(&gb);
 
-    load_rom(&gb.cart, argv[1]);
+    load_rom_from_path(&gb.cart, argv[1]);
 
     start_gameboy(&gb);
 
