@@ -131,6 +131,7 @@ void write_byte(struct Bus *bus, u8 byte) {
         translated_address = address - VIDEO_RAM_START;
         translated_address += mmu->video_ram_bank * VIDEO_RAM_SIZE; // Account for multiple vram banks
         mmu->video_ram[translated_address] = byte;
+        return;
     }
 
     if (address <= EXTERNAL_RAM_END) {
@@ -140,28 +141,33 @@ void write_byte(struct Bus *bus, u8 byte) {
     if (address <= WORK_RAM_0_END) {
         translated_address = address - WORK_RAM_0_START;
         mmu->work_ram_0[translated_address] = byte;
+        return;
     }
 
     if (address <= WORK_RAM_SWAPPABLE_END) {
         translated_address = address - WORK_RAM_SWAPPABLE_START;
         translated_address += mmu->work_ram_bank * WORK_RAM_SWAPPABLE_SIZE; // Account for multiple work ram banks
         mmu->work_ram_swappable[translated_address] = byte;
+        return;
     }
 
     if (address <= ECHO_RAM_0_END) {
         translated_address = address - ECHO_RAM_0_START;
         mmu->work_ram_0[translated_address] = byte; // Echo ram maps to work ram
+        return;
     }
 
     if (address <= ECHO_RAM_SWAPPABLE_END) {
         translated_address = address - ECHO_RAM_SWAPPABLE_START;
         translated_address += mmu->work_ram_bank * WORK_RAM_SWAPPABLE_SIZE; // Account for multiple work ram banks
         mmu->work_ram_swappable[translated_address] = byte; // Echo ram maps to work ram
+        return;
     }
 
     if (address <= OAM_END) {
         translated_address = address - OAM_START;
         mmu->oam[translated_address] = byte;
+        return;
     }
 
     if (address <= NOT_USABLE_END) {
@@ -176,6 +182,7 @@ void write_byte(struct Bus *bus, u8 byte) {
     if (address <= HIGH_RAM_END) {
         translated_address = address - HIGH_RAM_START;
         mmu->high_ram[address] = byte;
+        return;
     }
 
     if (address == IE_REGISTER_ADDRESS) {

@@ -3,13 +3,16 @@
 
 enum Opcode {
     OPCODE_NOP              = 0x00,
+    OPCODE_DEC_B            = 0x05,
     OPCODE_LD_B_U8          = 0x06,
+    OPCODE_DEC_C            = 0x0D,
     OPCODE_LD_C_U8          = 0x0E,
 
     OPCODE_JP_NZ_I8         = 0x20,
     OPCODE_LD_HL_U16        = 0x21,
 
     OPCODE_IND_HLD_A        = 0x32,
+    OPCODE_LD_A_U8          = 0x3E,
 
     OPCODE_XOR_A_A          = 0xAF,
 
