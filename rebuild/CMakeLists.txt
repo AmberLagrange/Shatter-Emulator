@@ -17,6 +17,7 @@ add_executable("${PROJECT_NAME}"
     src/cartridge/cartridge.c
 
     src/cpu/cpu.c
+    src/cpu/instructions.c
 
     src/memory/mmu.c
     src/memory/bus.c

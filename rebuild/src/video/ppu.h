@@ -22,4 +22,11 @@ int init_ppu(struct PPU *ppu);
  */
 void cleanup_ppu(struct PPU *ppu);
 
+/**
+ * @brief Ticks the PPU by 1 M cycle
+ * 
+ * @param gb 
+ */
+void tick_ppu(struct PPU *ppu);
+
 #endif // PPU_H

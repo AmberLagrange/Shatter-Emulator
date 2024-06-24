@@ -3,6 +3,8 @@
 
 #include <core.h>
 
+struct Bus;
+
 struct CartridgeHeader {
 
     u8 entry_location[ENTRY_LOCATION_SIZE];
@@ -78,5 +80,15 @@ void cleanup_cartridge(struct Cartridge *cart);
  * @return int 
  */
 int load_rom_from_path(struct Cartridge *cart, const char *rom_path);
+
+/**
+ * @brief Read a byte from the cartridge at a specific address
+ *        Will handle ROM banks behind the scenes
+ * 
+ * @param cart 
+ * @param address 
+ * @return u8 
+ */
+u8 read_byte_from_cart(struct Cartridge *cart, u16 address);
 
 #endif // CART_H

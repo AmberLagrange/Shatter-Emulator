@@ -1,8 +1,7 @@
 #include "cartridge.h"
+#include "cartridge_helper.h"
 
 #include <stdbool.h>
-
-#include "cartridge_helper.h"
 
 #include <logging/logging.h>
 
@@ -66,6 +65,7 @@ int init_cartridge(struct Cartridge *cart, u8 *rom_contents, u8 *ram_contents) {
     struct CartridgeHeader header = cart->header;
 
     size_t rom_size = ROM_BANK_SIZE * get_rom_bank_count(header.rom_size);
+    gameboy_log(LOG_DEBUG, "ROM SIZE:\t%02X", rom_size);
     cart->rom_banks = malloc(sizeof(u8) * rom_size);
     if (!cart->rom_banks) {
         goto rom_init_fail;
@@ -127,4 +127,12 @@ int load_rom_from_path(struct Cartridge *cart, const char *rom_path) {
     free(ram_contents);
     free(rom_contents);
     return RETURN_OK;
+}
+
+u8 read_byte_from_cart(struct Cartridge *cart, u16 address) {
+
+    // TODO: ROM/RAM banks
+    // This is just for testing Tetris
+
+    return cart->rom_banks[address];
 }

@@ -8,6 +8,7 @@ struct MMU;
 
 struct Bus {
 
+    u8 data;
     u16 address;
 
     struct Cartridge *cart;
@@ -54,12 +55,11 @@ void set_mmu(struct Bus *bus, struct MMU *mmu);
 void set_address(struct Bus *bus, u16 address);
 
 /**
- * @brief Read a byte from the set address on the bus
+ * @brief Sets the data bus the set address on the bus
  * 
  * @param bus 
- * @return u8 
  */
-u8 read_byte(struct Bus *bus);
+void read_byte(struct Bus *bus);
 
 /**
  * @brief Write a byte to the set address on the bus

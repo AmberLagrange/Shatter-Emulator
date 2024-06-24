@@ -12,3 +12,8 @@ void cleanup_apu(struct APU *apu) {
     
     gameboy_log(LOG_DEBUG, "Destroyed APU!");
 }
+
+void tick_apu(struct APU *apu) {
+
+    // TODO:
+}

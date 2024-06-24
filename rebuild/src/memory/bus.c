@@ -31,7 +31,7 @@ void set_address(struct Bus *bus, u16 address) {
     bus->address = address;
 }
 
-u8 read_byte(struct Bus *bus) {
+void read_byte(struct Bus *bus) {
 
     u16 translated_address;
     u16 address = bus->address;
@@ -40,67 +40,78 @@ u8 read_byte(struct Bus *bus) {
     struct MMU *mmu = bus->mmu;
 
     if (address < ROM_SIZE) {
-        (void)(cart);
-        return 0; // TODO: Cart
+        bus->data = read_byte_from_cart(cart, address);
+        return;
     }
 
     if (address <= VIDEO_RAM_END) {
         translated_address = address - VIDEO_RAM_START;
         translated_address += mmu->video_ram_bank * VIDEO_RAM_SIZE; // Account for multiple vram banks
-        return mmu->video_ram[translated_address];
+        bus->data = mmu->video_ram[translated_address];
+        return;
     }
 
     if (address <= EXTERNAL_RAM_END) {
-        return 0; // TODO: Cart
+        bus->data = 0; // TODO: Cart
+        return;
     }
 
     if (address <= WORK_RAM_0_END) {
         translated_address = address - WORK_RAM_0_START;
-        return mmu->work_ram_0[translated_address];
+        bus->data = mmu->work_ram_0[translated_address];
+        return;
     }
 
     if (address <= WORK_RAM_SWAPPABLE_END) {
         translated_address = address - WORK_RAM_SWAPPABLE_START;
         translated_address += mmu->work_ram_bank * WORK_RAM_SWAPPABLE_SIZE; // Account for multiple work ram banks
-        return mmu->work_ram_swappable[translated_address];
+        bus->data = mmu->work_ram_swappable[translated_address];
+        return;
     }
 
     if (address <= ECHO_RAM_0_END) {
         translated_address = address - ECHO_RAM_0_START;
-        return mmu->work_ram_0[translated_address]; // Echo ram maps to work ram
+        bus->data = mmu->work_ram_0[translated_address]; // Echo ram maps to work ram
+        return;
     }
 
     if (address <= ECHO_RAM_SWAPPABLE_END) {
         translated_address = address - ECHO_RAM_SWAPPABLE_START;
         translated_address += mmu->work_ram_bank * WORK_RAM_SWAPPABLE_SIZE; // Account for multiple work ram banks
-        return mmu->work_ram_swappable[translated_address]; // Echo ram maps to work ram
+        bus->data = mmu->work_ram_swappable[translated_address]; // Echo ram maps to work ram
+        return;
     }
 
     if (address <= OAM_END) {
         translated_address = address - OAM_START;
-        return mmu->oam[translated_address];
+        bus->data = mmu->oam[translated_address];
+        return;
     }
 
     if (address <= NOT_USABLE_END) {
         gameboy_log(LOG_ERROR, "Invalid read at address 0x%04X", address);
-        return UINT8_MAX;
+        bus->data = UINT8_MAX;
+        return;
     }
 
     if (address <= IO_REGISTERS_END) {
-        return 0; // TODO: IO
+        bus->data = 0; // TODO: IO
+        return;
     }
 
     if (address <= HIGH_RAM_END) {
         translated_address = address - HIGH_RAM_START;
-        return mmu->high_ram[address];
+        bus->data = mmu->high_ram[address];
+        return;
     }
 
     if (address == IE_REGISTER_ADDRESS) {
-        return 0; // TODO: IE
+        bus->data = 0; // TODO: IE
+        return;
     }
 
     gameboy_log(LOG_ERROR, "Invalid read at address of 0x%X", address);
-    return UINT8_MAX;
+    bus->data = UINT8_MAX;
 }
 
 void write_byte(struct Bus *bus, u8 byte) {

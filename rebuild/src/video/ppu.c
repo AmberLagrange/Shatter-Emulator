@@ -12,3 +12,8 @@ void cleanup_ppu(struct PPU *ppu) {
     
     gameboy_log(LOG_DEBUG, "Destroyed PPU!");
 }
+
+void tick_ppu(struct PPU *ppu) {
+
+    // TODO:
+}

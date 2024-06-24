@@ -22,4 +22,11 @@ int init_apu(struct APU *apu);
  */
 void cleanup_apu(struct APU *apu);
 
+/**
+ * @brief Ticks the APU by 1 M cycle
+ * 
+ * @param gb 
+ */
+void tick_apu(struct APU *apu);
+
 #endif // APU_H

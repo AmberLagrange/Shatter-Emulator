@@ -44,4 +44,11 @@ void cleanup_gameboy(struct Gameboy *gb);
  */
 void start_gameboy(struct Gameboy *gb);
 
+/**
+ * @brief Steps the gameboy through 1 CPU instruction
+ * 
+ * @param gb 
+ */
+void step(struct Gameboy *gb);
+
 #endif // GAMEBOY_H

@@ -1,4 +1,8 @@
 #include "gameboy.h"
+#include "cartridge/cartridge.h"
+#include "memory/bus.h"
+
+#include <cpu/instructions.h>
 
 #include <logging/logging.h>
 
@@ -31,6 +35,7 @@ int init_gameboy(struct Gameboy *gb) {
 
     set_mmu(&gb->bus, &gb->mmu);
     gb->running = 0;
+    gb->bus.cart = &gb->cart;
 
     goto init_success;
 
@@ -63,9 +68,24 @@ void cleanup_gameboy(struct Gameboy *gb) {
     cleanup_bus(&gb->bus);
 }
 
-void start_gameboy(struct Gameboy* gb) {
+void start_gameboy(struct Gameboy *gb) {
     
     gameboy_log(LOG_DEBUG, "Starting Gameboy:");
+    
     reset_cpu(&gb->cpu);
+
+    // Prefetch the first instruction
+    set_address(&gb->bus, gb->cpu.registers.pc);
+    read_byte(&gb->bus);
+    gb->cpu.registers.pc++;
+
     gb->running = 1;
+}
+
+void step(struct Gameboy *gb) {
+
+    execute_opcode(gb);
+
+    // TODO: Halting Bug
+    // TODO: Interrupts
 }
