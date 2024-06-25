@@ -2,9 +2,6 @@
 
 #include <stdbool.h>
 
-// Temp
-#include <stdlib.h>
-
 #include <audio/apu.h>
 #include <gameboy.h>
 #include <memory/bus.h>
@@ -48,6 +45,7 @@ enum Flags {
                                                                     \
     set_address(&gb->bus, gb->cpu.registers.pc);                    \
     read_byte(&gb->bus);                                            \
+    gb->cpu.registers.ir = gb->bus.data;                            \
     gb->cpu.registers.pc++;                                         \
 } while (0)
 
@@ -127,13 +125,13 @@ enum Flags {
     FETCH_CYCLE;                                                    \
 } while(0)
 
-void execute_opcode(struct Gameboy *gb) {
+bool execute_opcode(struct Gameboy *gb) {
 
     u8 byte;
     u8 low_byte;
     u8 high_byte;
 
-    enum Opcode opcode = (enum Opcode)gb->bus.data;
+    enum Opcode opcode = (enum Opcode)gb->cpu.registers.ir;
 
     switch (opcode) {
 
@@ -141,32 +139,32 @@ void execute_opcode(struct Gameboy *gb) {
 
             M_CYCLE_TICK;
             FETCH_CYCLE;
-            return;
+            return true;
 
         case OPCODE_DEC_B:
 
             DEC_REG(gb->cpu.registers.b);
-            return;
+            return true;
 
         case OPCODE_LD_B_U8:
 
             LD_R_U8(gb->cpu.registers.b);
-            return;
+            return true;
 
         case OPCODE_DEC_C:
 
             DEC_REG(gb->cpu.registers.c);
-            return;
+            return true;
 
         case OPCODE_LD_C_U8:
 
             LD_R_U8(gb->cpu.registers.c);
-            return;
+            return true;
 
         case OPCODE_JP_NZ_I8:
 
             JP_COND_REL(!GET_FLAG(FLAG_ZERO));
-            return;
+            return true;
 
         case OPCODE_LD_HL_U16:
 
@@ -184,7 +182,7 @@ void execute_opcode(struct Gameboy *gb) {
             M_CYCLE_TICK;
             gb->cpu.registers.hl = (((u16)high_byte << 8) | low_byte);
             FETCH_CYCLE;
-            return;
+            return true;
 
         case OPCODE_IND_HLD_A:
 
@@ -195,38 +193,47 @@ void execute_opcode(struct Gameboy *gb) {
             //M2
             M_CYCLE_TICK;
             FETCH_CYCLE;
-            return;
+            return true;
 
         case OPCODE_LD_A_U8:
 
             LD_R_U8(gb->cpu.registers.a);
-            return;
+            return true;
 
         case OPCODE_XOR_A_A:
 
             XOR_REG(gb->cpu.registers.a, gb->cpu.registers.a);
-            return;
+            return true;
 
         case OPCODE_JP_U16:
 
             JP_COND_ABS(true);
-            return;
+            return true;
+
+        case OPCODE_DI:
+
+            // M1
+            M_CYCLE_TICK;
+            gb->cpu.ime = false;
+            FETCH_CYCLE;
+            return true;
+
 
         default:
             gameboy_log(LOG_CRITICAL, "Unhandled opcode: 0x%02X", (u8)opcode);
-            abort();
 
     }
 
+    return false;
 }
 
-__attribute__((always_inline)) void execute_cb_opcode(struct Gameboy *gb, enum CB_Opcode cb_opcode) {
+__attribute__((always_inline)) bool execute_cb_opcode(struct Gameboy *gb, enum CB_Opcode cb_opcode) {
     
     switch (cb_opcode) {
         
         default:
             gameboy_log(LOG_CRITICAL, "Unhandled CB opcode: 0x%02X", (u8)cb_opcode);
-            abort();
     }
 
+    return false;
 }

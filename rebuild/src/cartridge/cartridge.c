@@ -68,6 +68,7 @@ int init_cartridge(struct Cartridge *cart, u8 *rom_contents, u8 *ram_contents) {
     gameboy_log(LOG_DEBUG, "ROM SIZE:\t%02X", rom_size);
     cart->rom_banks = malloc(sizeof(u8) * rom_size);
     if (!cart->rom_banks) {
+
         goto rom_init_fail;
     }
     memcpy(cart->rom_banks, rom_contents, rom_size);
@@ -75,11 +76,13 @@ int init_cartridge(struct Cartridge *cart, u8 *rom_contents, u8 *ram_contents) {
 
     size_t ram_size = EXTERNAL_RAM_SIZE * get_ram_bank_count(header.ram_size);
     cart->ram_banks = malloc(sizeof(u8) * ram_size);
-    if (!cart->ram_banks) {
+    if (ram_size && !cart->ram_banks) {
+
         goto ram_init_fail;
     }
 
     if (ram_contents) {
+
         memcpy(cart->ram_banks, ram_contents, ram_size);
     }
     cart->ram_bank_index = 0;
@@ -100,7 +103,8 @@ int init_cartridge(struct Cartridge *cart, u8 *rom_contents, u8 *ram_contents) {
 
 void cleanup_cartridge(struct Cartridge *cart) {
 
-    if (cart->rom_banks) {                  // If rom_banks is allocated, then the rest are as well
+    if (cart->rom_banks) {          // If rom_banks is allocated, then the rest are as well
+
         free(cart->ram_banks);
         free(cart->rom_banks);
     }
@@ -113,6 +117,7 @@ int load_rom_from_path(struct Cartridge *cart, const char *rom_path) {
     u8 *rom_contents = load_data_from_file(rom_path, LOG_CRITICAL);
 
     if (!rom_contents) {
+
         return INIT_FAIL;
     }
 

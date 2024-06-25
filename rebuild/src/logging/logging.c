@@ -3,7 +3,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-enum LogLevel MINIMUM_LOGGING_LEVEL = LOG_OPCODE;
+enum LogLevel MINIMUM_LOGGING_LEVEL = LOG_INFO;
 
 #define ANSI_BLACK      "\e[0;30m"
 #define ANSI_RED        "\e[0;31m"

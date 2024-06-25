@@ -34,8 +34,11 @@ int init_gameboy(struct Gameboy *gb) {
     }
 
     set_mmu(&gb->bus, &gb->mmu);
-    gb->running = 0;
+
+    gb->cart.rom_banks = NULL;
+    gb->cart.ram_banks = NULL;
     gb->bus.cart = &gb->cart;
+    gb->running = false;
 
     goto init_success;
 
@@ -77,14 +80,17 @@ void start_gameboy(struct Gameboy *gb) {
     // Prefetch the first instruction
     set_address(&gb->bus, gb->cpu.registers.pc);
     read_byte(&gb->bus);
+    gb->cpu.registers.ir = gb->bus.data;
     gb->cpu.registers.pc++;
 
-    gb->running = 1;
+    gb->running = true;
 }
 
 void step(struct Gameboy *gb) {
 
-    execute_opcode(gb);
+    if (!execute_opcode(gb)) {
+        gb->running = false; // Temp while setting up opcodes
+    }
 
     // TODO: Halting Bug
     // TODO: Interrupts

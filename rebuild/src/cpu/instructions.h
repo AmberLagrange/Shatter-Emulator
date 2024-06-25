@@ -1,6 +1,9 @@
 #ifndef INSTRUCTIONS_H
 #define INSTRUCTIONS_H
 
+// Temp
+#include <stdbool.h>
+
 enum Opcode {
     OPCODE_NOP              = 0x00,
     OPCODE_DEC_B            = 0x05,
@@ -18,6 +21,8 @@ enum Opcode {
 
     OPCODE_JP_U16           = 0xC3,
     OPCODE_CB_PREFIX        = 0xCB,
+
+    OPCODE_DI               = 0xF3,
 };
 
 enum CB_Opcode {
@@ -30,14 +35,19 @@ struct Gameboy;
  * @brief Execute the next opcode
  * 
  * @param gb 
+ * @return true 
+ * @return false 
  */
-void execute_opcode(struct Gameboy *gb);
+bool execute_opcode(struct Gameboy *gb);
 
 /**
- * @brief Execute a sb prefixed opcode
+ * @brief Execute a CB prefixed opcode
  * 
  * @param gb 
+ * @param cb_opcode 
+ * @return true 
+ * @return false 
  */
-__attribute__((always_inline)) void execute_cb_opcode(struct Gameboy *gb, enum CB_Opcode cb_opcode);
+bool execute_cb_opcode(struct Gameboy *gb, enum CB_Opcode cb_opcode);
 
 #endif // INSTRUCTIONS_H

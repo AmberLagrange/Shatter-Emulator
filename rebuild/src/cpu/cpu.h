@@ -3,7 +3,12 @@
 
 #include <core.h>
 
+#include <stdbool.h>
+
 struct Registers {
+
+    u8 ir;
+    u8 ie;
 
     #ifdef IS_BIG_ENDIAN
 
@@ -80,6 +85,7 @@ struct Registers {
 
 struct CPU {
     
+    bool ime;
     struct Registers registers;
 };
 

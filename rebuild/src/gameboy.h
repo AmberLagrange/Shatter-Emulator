@@ -1,6 +1,8 @@
 #ifndef GAMEBOY_H
 #define GAMEBOY_H
 
+#include <stdbool.h>
+
 #include <audio/apu.h>
 #include <cpu/cpu.h>
 #include <cartridge/cartridge.h>
@@ -19,7 +21,7 @@ struct Gameboy {
     
     struct Cartridge cart;
 
-    int running;
+    bool running;
 };
 
 /**
