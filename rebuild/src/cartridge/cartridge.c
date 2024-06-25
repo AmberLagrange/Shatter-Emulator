@@ -89,19 +89,17 @@ int init_cartridge(struct Cartridge *cart, u8 *rom_contents, u8 *ram_contents) {
 
     if (!ram_contents) {
 
-        gameboy_log(LOG_ERROR, "Could not load RAM into cart");
-        goto init_finish;
+        goto ram_init_fail;
     }
     memcpy(cart->ram_banks, ram_contents, ram_size);
-
-    goto init_finish;
-
-    ram_init_fail:
-    gameboy_log(LOG_ERROR, "Could not load RAM into RAM banks.");
+    
     goto init_finish;
 
     rom_init_fail:
     return INIT_FAIL;
+
+    ram_init_fail:
+    gameboy_log(LOG_WARN, "Could not load RAM into RAM banks.");
 
     init_finish:
     gameboy_log(LOG_DEBUG, "Initialized Cartridge!");
@@ -134,7 +132,7 @@ int load_rom_from_path(struct Cartridge *cart, const char *rom_path) {
     u8 *ram_contents = load_data_from_file(ram_path, LOG_WARN);
 
     parse_cartridge_header(cart, rom_contents);
-    init_cartridge(cart, rom_contents, NULL);
+    init_cartridge(cart, rom_contents, ram_contents);
 
     free(ram_contents);
     free(rom_contents);
