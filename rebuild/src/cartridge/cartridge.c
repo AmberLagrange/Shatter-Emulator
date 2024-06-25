@@ -63,6 +63,8 @@ int parse_cartridge_header(struct Cartridge *cart, u8 *rom_contents) {
 int init_cartridge(struct Cartridge *cart, u8 *rom_contents, u8 *ram_contents) {
 
     struct CartridgeHeader header = cart->header;
+    cart->rom_bank_index = 0;
+    cart->ram_bank_index = 0;
 
     size_t rom_size = ROM_BANK_SIZE * get_rom_bank_count(header.rom_size);
     gameboy_log(LOG_DEBUG, "ROM SIZE:\t%02X", rom_size);
@@ -72,20 +74,25 @@ int init_cartridge(struct Cartridge *cart, u8 *rom_contents, u8 *ram_contents) {
         goto rom_init_fail;
     }
     memcpy(cart->rom_banks, rom_contents, rom_size);
-    cart->rom_bank_index = 0;
 
     size_t ram_size = EXTERNAL_RAM_SIZE * get_ram_bank_count(header.ram_size);
+    if (!ram_size) {
+
+        goto init_finish;
+    }
+
     cart->ram_banks = malloc(sizeof(u8) * ram_size);
-    if (ram_size && !cart->ram_banks) {
+    if (!cart->ram_banks) {
 
         goto ram_init_fail;
     }
 
-    if (ram_contents) {
+    if (!ram_contents) {
 
-        memcpy(cart->ram_banks, ram_contents, ram_size);
+        gameboy_log(LOG_ERROR, "Could not load RAM into cart");
+        goto init_finish;
     }
-    cart->ram_bank_index = 0;
+    memcpy(cart->ram_banks, ram_contents, ram_size);
 
     goto init_finish;
 
