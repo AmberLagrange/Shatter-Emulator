@@ -617,7 +617,7 @@ void CPU::opcode0x27() // DAA
 
     if(a & 0x0100) setFlag(Flags::Register::Carry);
 
-    m_Registers.A() = static_cast<u16>(a);
+    m_Registers.A() = static_cast<u8>(a);
 
     setZeroFromVal(m_Registers.A());
 

@@ -27,10 +27,11 @@ enum Flags {
     tick_ppu(&gb->ppu);                                             \
 } while(0)
 
-#define READ_NEXT_BYTE do {                                         \
+#define READ_NEXT_BYTE(val) do {                                    \
                                                                     \
     set_address(&gb->bus, gb->cpu.registers.pc);                    \
     read_byte(&gb->bus);                                            \
+    val = gb->bus.data;                                             \
     gb->cpu.registers.pc++;                                         \
 } while (0)
 
@@ -64,8 +65,7 @@ enum Flags {
                                                                     \
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
-    READ_NEXT_BYTE;                                                 \
-    byte = gb->bus.data;                                            \
+    READ_NEXT_BYTE(byte);                                           \
                                                                     \
     /* M2 */                                                        \
     M_CYCLE_TICK;                                                   \
@@ -89,13 +89,11 @@ enum Flags {
                                                                     \
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
-    READ_NEXT_BYTE;                                                 \
+    READ_NEXT_BYTE(low_byte);                                       \
                                                                     \
-    low_byte = gb->bus.data;                                        \
     /* M2 */                                                        \
     M_CYCLE_TICK;                                                   \
-    READ_NEXT_BYTE;                                                 \
-    high_byte = gb->bus.data;                                       \
+    READ_NEXT_BYTE(high_byte);                                      \
                                                                     \
     /* M3 */                                                        \
     if (cond) {                                                     \
@@ -112,7 +110,7 @@ enum Flags {
                                                                     \
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
-    READ_NEXT_BYTE;                                                 \
+    READ_NEXT_BYTE(byte);                                           \
     byte = gb->bus.data;                                            \
                                                                     \
     /* M2 */                                                        \
@@ -170,13 +168,11 @@ bool execute_opcode(struct Gameboy *gb) {
 
             // M1
             M_CYCLE_TICK;
-            READ_NEXT_BYTE;
-            low_byte = gb->bus.data;
+            READ_NEXT_BYTE(low_byte);
 
             // M2
             M_CYCLE_TICK;
-            READ_NEXT_BYTE;
-            high_byte = gb->bus.data;
+            READ_NEXT_BYTE(high_byte);
 
             // M3
             M_CYCLE_TICK;
@@ -210,6 +206,39 @@ bool execute_opcode(struct Gameboy *gb) {
             JP_COND_ABS(true);
             return true;
 
+        case OPCODE_LDH_A_U8:
+
+            // M1
+            M_CYCLE_TICK;
+            READ_NEXT_BYTE(low_byte);
+
+            // M2
+            M_CYCLE_TICK;
+            high_byte = UINT8_MAX;
+            WRITE_BYTE(((u16)high_byte << 8) | low_byte, gb->cpu.registers.a);
+
+            // M3
+            M_CYCLE_TICK;
+            FETCH_CYCLE;
+            return true;
+
+            case OPCODE_LDH_U8_A:
+
+            // M1
+            M_CYCLE_TICK;
+            READ_NEXT_BYTE(low_byte);
+
+            // M2
+            M_CYCLE_TICK;
+            high_byte = UINT8_MAX;
+            set_address(&gb->bus, ((u16)high_byte << 8) | low_byte);
+            gb->cpu.registers.a = gb->bus.data;
+
+            // M3
+            M_CYCLE_TICK;
+            FETCH_CYCLE;
+            return true;
+
         case OPCODE_DI:
 
             // M1
@@ -218,6 +247,21 @@ bool execute_opcode(struct Gameboy *gb) {
             FETCH_CYCLE;
             return true;
 
+        case OPCODE_CP_U8:
+
+            // M1
+            M_CYCLE_TICK;
+            READ_NEXT_BYTE(byte);
+
+            // M2
+            M_CYCLE_TICK;
+            (gb->cpu.registers.a == byte) ? SET_FLAG(FLAG_ZERO) : CLEAR_FLAG(FLAG_ZERO);
+            SET_FLAG(FLAG_NEGATIVE);
+            // TODO: Half Carry
+            (gb->cpu.registers.a < byte) ? SET_FLAG(FLAG_CARRY) : CLEAR_FLAG(FLAG_CARRY);
+            FETCH_CYCLE;
+            return true;
+            
 
         default:
             gameboy_log(LOG_CRITICAL, "Unhandled opcode: 0x%02X", (u8)opcode);

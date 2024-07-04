@@ -22,7 +22,11 @@ enum Opcode {
     OPCODE_JP_U16           = 0xC3,
     OPCODE_CB_PREFIX        = 0xCB,
 
+    OPCODE_LDH_A_U8         = 0xE0,
+
+    OPCODE_LDH_U8_A         = 0xF0,
     OPCODE_DI               = 0xF3,
+    OPCODE_CP_U8            = 0xFE,
 };
 
 enum CB_Opcode {
