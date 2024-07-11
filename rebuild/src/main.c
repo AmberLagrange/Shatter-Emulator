@@ -28,6 +28,7 @@ int main(int argc, char **argv) {
 
     cleanup:
     cleanup_gameboy(&gb);
+    quit_sdl();
 
     return 0;
 }
