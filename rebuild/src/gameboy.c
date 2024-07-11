@@ -36,7 +36,6 @@ int init_gameboy(struct Gameboy *gb) {
         goto ppu_init_fail;
     }
 
-    init_sdl();
     if (init_screen(&gb->screen, 5)) {
 
         gameboy_log(LOG_CRITICAL, "Failed to initialized Screen!");

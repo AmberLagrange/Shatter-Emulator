@@ -3,15 +3,7 @@
 #include <logging/logging.h>
 #include <gameboy.h>
 
-static int sdl_initialized = false;
-
 int init_sdl(void) {
-
-    if (sdl_initialized) {
-
-        gameboy_log(LOG_TRACE, "SDL already initialized.");
-        return RETURN_OK;
-    }
 
     int ret;
     if ((ret = SDL_Init(SDL_INIT_VIDEO))) {
@@ -19,7 +11,6 @@ int init_sdl(void) {
         gameboy_log(LOG_CRITICAL, "Could not initialize SDL: %s", SDL_GetError());
     } else {
 
-        sdl_initialized = true;
         gameboy_log(LOG_DEBUG, "Initialized SDL!");
     }
 
@@ -28,15 +19,8 @@ int init_sdl(void) {
 
 void quit_sdl(void) {
 
-    if (!sdl_initialized) {
-
-        gameboy_log(LOG_WARN, "SDL already quit.");
-        return;
-    }
-
     gameboy_log(LOG_DEBUG, "Quitting SDL!");
     SDL_Quit();
-    sdl_initialized = false;
 }
 
 int init_screen(struct Screen *screen, int scale) {

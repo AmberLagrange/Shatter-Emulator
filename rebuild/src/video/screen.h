@@ -14,16 +14,50 @@ struct Screen {
     int             rendering_scale;
 };
 
+/**
+ * @brief Initialized SDL2
+ * 
+ * @return int return code from SDL2
+ */
+int init_sdl(void);
+
+/**
+ * @brief Allows SDL2 to quit gracefully
+ * 
+ */
+void quit_sdl(void);
+
+/**
+ * @brief Initializes the screen for the Gameboy
+ * 
+ * @param screen 
+ * @param scale 
+ * @return int 
+ */
+int init_screen(struct Screen *screen, int scale);
+
+/**
+ * @brief Cleans up the screen for the Gameboy
+ * 
+ * @param screen 
+ */
+void cleanup_screen(struct Screen *screen);
+
+/**
+ * @brief Renders to the Gameboy's screen
+ * 
+ * @param screen 
+ */
+void update_screen(struct Screen *screen);
+
 // TODO: Maybe change how this is handled
 struct Gameboy;
 
-int init_sdl(void);
-void quit_sdl(void);
-
-int init_screen(struct Screen *screen, int scale);
-void cleanup_screen(struct Screen *screen);
-
-void update_screen(struct Screen *screen);
+/**
+ * @brief Poll events from SDL2 for IO and quitting the emulator
+ * 
+ * @param gb 
+ */
 void poll_screen_events(struct Gameboy *gb);
 
 #endif // SCREEN_H

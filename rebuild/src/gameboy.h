@@ -49,7 +49,7 @@ void cleanup_gameboy(struct Gameboy *gb);
 void start_gameboy(struct Gameboy *gb);
 
 /**
- * @brief Steps the gameboy through 1 CPU instruction
+ * @brief Steps the gameboy through one CPU instruction
  * 
  * @param gb 
  */
