@@ -1,11 +1,9 @@
-#include "cartridge_helper.h"
+#include <cartridge/cartridge_helper.h>
 
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <logging/logging.h>
 
 bool check_cgb_support(u8 cgb_flag, const char **cgb_support_str) {
 
@@ -720,6 +718,7 @@ const char *get_destination_str(u8 destination_code) {
 
 u8 *load_data_from_file(const char *file_path, enum LogLevel level) {
 
+    errno = 0;
     FILE *file = fopen(file_path, "rb");
     if (!file) {
         gameboy_log(level, "Could not open %s. %s", file_path, strerror(errno));

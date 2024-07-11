@@ -1,9 +1,8 @@
-#include "bus.h"
+#include <memory/bus.h>
 
 #include <cartridge/cartridge.h>
-#include <memory/mmu.h>
-
 #include <logging/logging.h>
+#include <memory/mmu.h>
 
 int init_bus(struct Bus *bus) {
 
@@ -115,7 +114,7 @@ void read_byte(struct Bus *bus) {
     if (address <= HIGH_RAM_END) {
 
         translated_address = address - HIGH_RAM_START;
-        bus->data = mmu->high_ram[address];
+        bus->data = mmu->high_ram[translated_address];
         return;
     }
 
@@ -211,7 +210,7 @@ void write_byte(struct Bus *bus, u8 byte) {
     if (address <= HIGH_RAM_END) {
 
         translated_address = address - HIGH_RAM_START;
-        mmu->high_ram[address] = byte;
+        mmu->high_ram[translated_address] = byte;
         return;
     }
 

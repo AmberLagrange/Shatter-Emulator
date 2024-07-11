@@ -23,6 +23,7 @@ add_executable("${PROJECT_NAME}"
     src/memory/bus.c
 
     src/video/ppu.c
+    src/video/screen.c
 
     src/logging/logging.c)
 

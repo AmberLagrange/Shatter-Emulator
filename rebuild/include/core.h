@@ -29,13 +29,17 @@ typedef int16_t     i16;
 typedef int32_t     i32;
 typedef int64_t     i64;
 
+// Defines for Gameboy screen
+#define SCREEN_WIDTH                160
+#define SCREEN_HEIGHT               144
+
 // DMG Reset values
-#define AF_RESET 0x01B0
-#define BC_RESET 0x0013
-#define DE_RESET 0x00D8
-#define HL_RESET 0x014D
-#define SP_RESET 0xFFFE
-#define PC_RESET 0x0100
+#define AF_RESET                    0x01B0
+#define BC_RESET                    0x0013
+#define DE_RESET                    0x00D8
+#define HL_RESET                    0x014D
+#define SP_RESET                    0xFFFE
+#define PC_RESET                    0x0100
 
 // Memory addresses
 #define MEMORY_SIZE                 0x10000

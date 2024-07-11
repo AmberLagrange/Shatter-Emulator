@@ -1,4 +1,4 @@
-#include "cpu.h"
+#include <cpu/cpu.h>
 
 #include <logging/logging.h>
 

@@ -1,8 +1,7 @@
-#include "mmu.h"
-
-#include <stdlib.h>
+#include <memory/mmu.h>
 
 #include <logging/logging.h>
+#include <stdlib.h>
 
 int init_mmu(struct MMU *mmu) {
 

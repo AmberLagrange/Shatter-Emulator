@@ -3,9 +3,8 @@
 
 #include <core.h>
 
-#include <stdbool.h>
-
 #include <logging/logging.h>
+#include <stdbool.h>
 
 enum OldLicenseeCode {
 

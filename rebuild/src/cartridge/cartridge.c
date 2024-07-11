@@ -1,10 +1,8 @@
-#include "cartridge.h"
-#include "cartridge_helper.h"
-
-#include <stdbool.h>
+#include <cartridge/cartridge.h>
+#include <cartridge/cartridge_helper.h>
 
 #include <logging/logging.h>
-
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -67,7 +65,6 @@ int init_cartridge(struct Cartridge *cart, u8 *rom_contents, u8 *ram_contents) {
     cart->ram_bank_index = 0;
 
     size_t rom_size = ROM_BANK_SIZE * get_rom_bank_count(header.rom_size);
-    gameboy_log(LOG_DEBUG, "ROM SIZE:\t%02X", rom_size);
     cart->rom_banks = malloc(sizeof(u8) * rom_size);
     if (!cart->rom_banks) {
 

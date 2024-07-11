@@ -1,13 +1,10 @@
-#include "instructions.h"
-
-#include <stdbool.h>
+#include <cpu/instructions.h>
 
 #include <audio/apu.h>
-#include <gameboy.h>
+#include <logging/logging.h>
 #include <memory/bus.h>
 #include <video/ppu.h>
-
-#include <logging/logging.h>
+#include <gameboy.h>
 
 enum Flags {
     FLAG_ZERO       = 7,

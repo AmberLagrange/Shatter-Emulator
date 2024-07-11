@@ -1,36 +1,46 @@
-#include "gameboy.h"
-#include "cartridge/cartridge.h"
-#include "memory/bus.h"
+#include <gameboy.h>
+
 
 #include <cpu/instructions.h>
-
 #include <logging/logging.h>
 
 int init_gameboy(struct Gameboy *gb) {
     
     if (init_bus(&gb->bus)) {
+
         gameboy_log(LOG_CRITICAL, "Failed to initialize Bus!");
         goto bus_init_fail;
     }
 
     if (init_apu(&gb->apu)) {
+
         gameboy_log(LOG_CRITICAL, "Failed to initialize APU!");
         goto apu_init_fail;
     }
 
     if (init_cpu(&gb->cpu)) {
+
         gameboy_log(LOG_CRITICAL, "Failed to initialize CPU!");
         goto cpu_init_fail;
     }
 
     if (init_mmu(&gb->mmu)) {
+
         gameboy_log(LOG_CRITICAL, "Failed to initialize MMU!");
         goto mmu_init_fail;
     }
 
     if (init_ppu(&gb->ppu)) {
+
         gameboy_log(LOG_CRITICAL, "Failed to initialize PPPU!");
         goto ppu_init_fail;
+    }
+
+    init_sdl();
+    if (init_screen(&gb->screen, 5)) {
+
+        gameboy_log(LOG_CRITICAL, "Failed to initialized Screen!");
+        goto screen_init_fail;
     }
 
     set_mmu(&gb->bus, &gb->mmu);
@@ -41,6 +51,9 @@ int init_gameboy(struct Gameboy *gb) {
     gb->running = false;
 
     goto init_success;
+
+    screen_init_fail:
+    cleanup_ppu(&gb->ppu);
 
     ppu_init_fail:
     cleanup_mmu(&gb->mmu);
@@ -64,6 +77,7 @@ int init_gameboy(struct Gameboy *gb) {
 void cleanup_gameboy(struct Gameboy *gb) {
 
     cleanup_cartridge(&gb->cart);
+    cleanup_screen(&gb->screen);
     cleanup_ppu(&gb->ppu);
     cleanup_mmu(&gb->mmu);
     cleanup_cpu(&gb->cpu);
@@ -91,6 +105,10 @@ void step(struct Gameboy *gb) {
     if (!execute_opcode(gb)) {
         gb->running = false; // Temp while setting up opcodes
     }
+
+    // TODO: Proper screen handling. For now update screen on every opcode
+    update_screen(&gb->screen);
+    poll_screen_events(gb);
 
     // TODO: Halting Bug
     // TODO: Interrupts

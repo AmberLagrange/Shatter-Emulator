@@ -1,14 +1,14 @@
 #ifndef GAMEBOY_H
 #define GAMEBOY_H
 
-#include <stdbool.h>
-
 #include <audio/apu.h>
 #include <cpu/cpu.h>
 #include <cartridge/cartridge.h>
 #include <memory/bus.h>
 #include <memory/mmu.h>
+#include <stdbool.h>
 #include <video/ppu.h>
+#include <video/screen.h>
 
 struct Gameboy {
     
@@ -20,6 +20,8 @@ struct Gameboy {
     struct PPU ppu;
     
     struct Cartridge cart;
+
+    struct Screen screen;
 
     bool running;
 };

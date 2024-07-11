@@ -1,4 +1,4 @@
-#include "ppu.h"
+#include <video/ppu.h>
 
 #include <logging/logging.h>
 
