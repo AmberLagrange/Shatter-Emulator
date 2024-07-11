@@ -17,8 +17,8 @@ struct Screen {
 // TODO: Maybe change how this is handled
 struct Gameboy;
 
-int init_sdl();
-void quit_sdl();
+int init_sdl(void);
+void quit_sdl(void);
 
 int init_screen(struct Screen *screen, int scale);
 void cleanup_screen(struct Screen *screen);

@@ -4,16 +4,19 @@
 
 int init_apu(struct APU *apu) {
 
+    (void)apu;
     gameboy_log(LOG_DEBUG, "Initialized APU!");
     return RETURN_OK;
 }
 
 void cleanup_apu(struct APU *apu) {
     
+    (void)apu;
     gameboy_log(LOG_DEBUG, "Destroyed APU!");
 }
 
 void tick_apu(struct APU *apu) {
 
     // TODO:
+    (void)apu;
 }

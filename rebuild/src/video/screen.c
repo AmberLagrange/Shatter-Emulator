@@ -5,7 +5,7 @@
 
 static int sdl_initialized = false;
 
-int init_sdl() {
+int init_sdl(void) {
 
     if (sdl_initialized) {
 
@@ -26,7 +26,7 @@ int init_sdl() {
     return ret;
 }
 
-void quit_sdl() {
+void quit_sdl(void) {
 
     if (!sdl_initialized) {
 

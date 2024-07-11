@@ -5,6 +5,7 @@
 
 struct APU {
 
+    int temp; // Temp value to ignore empty struct warning
 };
 
 /**

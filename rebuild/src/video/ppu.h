@@ -5,6 +5,7 @@
 
 struct PPU {
 
+    int temp; // Temp value to ignore empty struct warning
 };
 
 /**

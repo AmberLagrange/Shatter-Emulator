@@ -5,15 +5,15 @@
 
 enum LogLevel MINIMUM_LOGGING_LEVEL = LOG_OPCODE;
 
-#define ANSI_BLACK      "\e[0;30m"
-#define ANSI_RED        "\e[0;31m"
-#define ANSI_GREEN      "\e[0;32m"
-#define ANSI_YELLOW     "\e[0;33m"
-#define ANSI_BLUE       "\e[0;34m"
-#define ANSI_MAGENTA    "\e[0;35m"
-#define ANSI_CYAN       "\e[0;36m"
-#define ANSI_WHITE      "\e[0;37m"
-#define ANSI_RESET      "\e[0m"
+#define ANSI_BLACK      "\x1b[0;30m"
+#define ANSI_RED        "\x1b[0;31m"
+#define ANSI_GREEN      "\x1b[0;32m"
+#define ANSI_YELLOW     "\x1b[0;33m"
+#define ANSI_BLUE       "\x1b[0;34m"
+#define ANSI_MAGENTA    "\x1b[0;35m"
+#define ANSI_CYAN       "\x1b[0;36m"
+#define ANSI_WHITE      "\x1b[0;37m"
+#define ANSI_RESET      "\x1b[0m"
 
 void gameboy_log(enum LogLevel level, const char *fmt, ...) {
 

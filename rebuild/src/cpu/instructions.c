@@ -270,6 +270,8 @@ bool execute_opcode(struct Gameboy *gb) {
 
 __attribute__((always_inline)) bool execute_cb_opcode(struct Gameboy *gb, enum CB_Opcode cb_opcode) {
     
+    (void)gb;
+
     switch (cb_opcode) {
         
         default:

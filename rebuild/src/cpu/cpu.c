@@ -4,12 +4,14 @@
 
 int init_cpu(struct CPU *cpu) {
 
+    (void)cpu;
     gameboy_log(LOG_DEBUG, "Initialized CPU!");
     return RETURN_OK;
 }
 
 void cleanup_cpu(struct CPU *cpu) {
     
+    (void)cpu;
     gameboy_log(LOG_DEBUG, "Destroyed CPU!");
 }
 

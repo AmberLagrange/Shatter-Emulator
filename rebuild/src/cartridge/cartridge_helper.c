@@ -25,6 +25,8 @@ bool check_cgb_support(u8 cgb_flag, const char **cgb_support_str) {
 }
 
 enum NewLicenseeCode convert_ascii_license_to_enum(u8 *new_licensee_code) {
+
+    (void)new_licensee_code;
     return TODO;
 }
 

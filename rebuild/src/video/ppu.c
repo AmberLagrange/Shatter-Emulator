@@ -4,16 +4,19 @@
 
 int init_ppu(struct PPU *ppu) {
 
+    (void)ppu;
     gameboy_log(LOG_DEBUG, "Initialized PPU!");
     return RETURN_OK;
 }
 
 void cleanup_ppu(struct PPU *ppu) {
     
+    (void)ppu;
     gameboy_log(LOG_DEBUG, "Destroyed PPU!");
 }
 
 void tick_ppu(struct PPU *ppu) {
 
     // TODO:
+    (void)ppu;
 }

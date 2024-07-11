@@ -13,6 +13,7 @@ int init_bus(struct Bus *bus) {
 
 void cleanup_bus(struct Bus *bus) {
 
+    (void)bus;
     gameboy_log(LOG_DEBUG, "Destroyed Bus!");
 }
 
