@@ -130,6 +130,8 @@ void read_byte(struct Bus *bus) {
     bus->data = UINT8_MAX;
 }
 
+#include <stdio.h>
+
 void write_byte(struct Bus *bus, u8 byte) {
 
     u16 translated_address;
@@ -200,6 +202,11 @@ void write_byte(struct Bus *bus, u8 byte) {
 
         gameboy_log(LOG_ERROR, "Invalid write of 0x%02X at address 0x%04X", byte, address);
         return;
+    }
+
+    if (address == 0xFF02) { // Temp serial for Blargg
+    
+        printf("%c", bus->data);
     }
 
     if (address <= IO_REGISTERS_END) {
