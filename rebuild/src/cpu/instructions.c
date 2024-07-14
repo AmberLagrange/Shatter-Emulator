@@ -1,24 +1,12 @@
 #include <cpu/instructions.h>
 
-#include <cpu/instructions_helper.h>
-
 #include <audio/apu.h>
+#include <cpu/flags.h>
+#include <cpu/instructions_helper.h>
 #include <logging/logging.h>
 #include <memory/bus.h>
 #include <video/ppu.h>
 #include <gameboy.h>
-
-enum Flags {
-    FLAG_ZERO       = 7,
-    FLAG_NEGATIVE   = 6,
-    FLAG_HALF       = 5,
-    FLAG_CARRY      = 4,
-};
-
-#define GET_FLAG(flag) ((gb->cpu.registers.f & (1 << flag)) >> flag)
-#define SET_FLAG(flag) (gb->cpu.registers.f |= (1 << flag))
-#define CLEAR_FLAG(flag) (gb->cpu.registers.f &= ~(1 << flag))
-#define TOGGLE_FLAG(flag) (gb->cpu.registers.f ^= (1 << flag))
 
 bool execute_opcode(struct Gameboy *gb) {
 
@@ -27,21 +15,6 @@ bool execute_opcode(struct Gameboy *gb) {
     u8 high_byte;
 
     enum Opcode opcode = (enum Opcode)gb->cpu.registers.ir;
-
-    gameboy_log(LOG_CRITICAL,   "PC: 0x%04X "
-                                    "AF: 0x%04X "
-                                    "BC: 0x%04X "
-                                    "DE: 0x%04X "
-                                    "HL: 0x%04X "
-                                    "SP: 0x%04X "
-                                    "OPCODE: 0x%02X",
-                                    gb->cpu.registers.pc - 1,
-                                    gb->cpu.registers.af,
-                                    gb->cpu.registers.bc,
-                                    gb->cpu.registers.de,
-                                    gb->cpu.registers.hl,
-                                    gb->cpu.registers.sp,
-                                    (u8)opcode);
 
     switch (opcode) {
 
@@ -1066,7 +1039,7 @@ bool execute_opcode(struct Gameboy *gb) {
 
     }
 
-    gameboy_log(LOG_CRITICAL, "Unhandled opcode: 0x%02X", (u8)opcode);
+    gameboy_log(LOG_FATAL, "Unhandled opcode: 0x%02X", (u8)opcode);
     return false;
 }
 
@@ -1077,7 +1050,7 @@ __attribute__((always_inline)) bool execute_cb_opcode(struct Gameboy *gb, enum C
     switch (cb_opcode) {
         
         default:
-            gameboy_log(LOG_CRITICAL, "Unhandled CB opcode: 0x%02X", (u8)cb_opcode);
+            gameboy_log(LOG_FATAL, "Unhandled CB opcode: 0x%02X", (u8)cb_opcode);
     }
 
     return false;

@@ -1,6 +1,8 @@
 #ifndef INSTRUCTIONS_HELPER_H
 #define INSTRUCTIONS_HELPER_H
 
+#include <cpu/flags.h>
+
 //--------------------------------Tick other gameboy components--------------------------------//
 
 #define M_CYCLE_TICK do {                                           \

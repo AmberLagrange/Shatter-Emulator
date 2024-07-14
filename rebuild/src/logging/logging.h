@@ -3,7 +3,7 @@
 
 enum LogLevel
 {
-    LOG_CRITICAL    = 0,
+    LOG_FATAL       = 0,
     LOG_ERROR       = 1,
     LOG_WARN        = 2,
     LOG_INFO        = 3,
@@ -24,5 +24,12 @@ extern enum LogLevel MINIMUM_LOGGING_LEVEL;
  * @param ... 
  */
 void gameboy_log(enum LogLevel level, const char *fmt, ...);
+
+/**
+ * @brief Temp function for logging blargg tests without a screen
+ * 
+ * @param serial_character 
+ */
+void blargg_log(char serial_character);
 
 #endif // LOGGING_H

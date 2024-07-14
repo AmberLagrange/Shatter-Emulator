@@ -50,8 +50,8 @@ void gameboy_log(enum LogLevel level, const char *fmt, ...) {
             printf("[%sERROR%s]\t", ANSI_RED, ANSI_RESET);
             break;
 
-        case LOG_CRITICAL:
-            printf("[%sCRITICAL%s]\t", ANSI_MAGENTA, ANSI_RESET);
+        case LOG_FATAL:
+            printf("[%sFATAL%s]\t", ANSI_MAGENTA, ANSI_RESET);
             break;
 
         default:
@@ -61,4 +61,9 @@ void gameboy_log(enum LogLevel level, const char *fmt, ...) {
     vprintf(fmt, args);
     printf("\n");
     va_end(args);
+}
+
+void blargg_log(char serial_character) {
+
+    printf("%c", serial_character);
 }

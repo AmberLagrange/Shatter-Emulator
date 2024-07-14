@@ -130,8 +130,6 @@ void read_byte(struct Bus *bus) {
     bus->data = UINT8_MAX;
 }
 
-#include <stdio.h>
-
 void write_byte(struct Bus *bus, u8 byte) {
 
     u16 translated_address;
@@ -206,7 +204,8 @@ void write_byte(struct Bus *bus, u8 byte) {
 
     if (address == 0xFF02) { // Temp serial for Blargg
     
-        printf("%c", bus->data);
+        blargg_log(bus->data);
+        return;
     }
 
     if (address <= IO_REGISTERS_END) {

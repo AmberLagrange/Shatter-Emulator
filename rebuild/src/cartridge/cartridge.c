@@ -116,7 +116,7 @@ void cleanup_cartridge(struct Cartridge *cart) {
 
 int load_rom_from_path(struct Cartridge *cart, const char *rom_path) {
 
-    u8 *rom_contents = load_data_from_file(rom_path, LOG_CRITICAL);
+    u8 *rom_contents = load_data_from_file(rom_path, LOG_FATAL);
 
     if (!rom_contents) {
 

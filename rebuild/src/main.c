@@ -1,14 +1,13 @@
-#include <gameboy.h>
-
 #include <cartridge/cartridge.h>
 #include <cartridge/cartridge_helper.h>
 #include <logging/logging.h>
+#include <gameboy.h>
 
 int main(int argc, char **argv) {
 
     if (argc < 2) {
 
-        gameboy_log(LOG_CRITICAL, "No rom path provided.");
+        gameboy_log(LOG_FATAL, "No rom path provided.");
         return -1;
     }
 

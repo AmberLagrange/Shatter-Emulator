@@ -8,7 +8,7 @@ int init_sdl(void) {
     int ret;
     if ((ret = SDL_Init(SDL_INIT_VIDEO))) {
 
-        gameboy_log(LOG_CRITICAL, "Could not initialize SDL: %s", SDL_GetError());
+        gameboy_log(LOG_FATAL, "Could not initialize SDL: %s", SDL_GetError());
     } else {
 
         gameboy_log(LOG_DEBUG, "Initialized SDL!");
@@ -30,14 +30,14 @@ int init_screen(struct Screen *screen, int scale) {
     screen->sdl_window = SDL_CreateWindow("Shatter", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * screen->rendering_scale, SCREEN_HEIGHT * screen->rendering_scale, SDL_WINDOW_SHOWN);
     if (!screen->sdl_window) {
 
-        gameboy_log(LOG_CRITICAL, "Could not create SDL window: %s", SDL_GetError());
+        gameboy_log(LOG_FATAL, "Could not create SDL window: %s", SDL_GetError());
         goto init_window_fail;
     }
 
     screen->sdl_renderer = SDL_CreateRenderer(screen->sdl_window, -1, SDL_RENDERER_ACCELERATED);
     if (!screen->sdl_renderer) {
 
-        gameboy_log(LOG_CRITICAL, "Could not create SDL renderer: %s", SDL_GetError());
+        gameboy_log(LOG_FATAL, "Could not create SDL renderer: %s", SDL_GetError());
         goto init_renderer_fail;
     }
 

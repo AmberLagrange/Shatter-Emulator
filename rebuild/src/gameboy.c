@@ -8,37 +8,37 @@ int init_gameboy(struct Gameboy *gb) {
     
     if (init_bus(&gb->bus)) {
 
-        gameboy_log(LOG_CRITICAL, "Failed to initialize Bus!");
+        gameboy_log(LOG_FATAL, "Failed to initialize Bus!");
         goto bus_init_fail;
     }
 
     if (init_apu(&gb->apu)) {
 
-        gameboy_log(LOG_CRITICAL, "Failed to initialize APU!");
+        gameboy_log(LOG_FATAL, "Failed to initialize APU!");
         goto apu_init_fail;
     }
 
     if (init_cpu(&gb->cpu)) {
 
-        gameboy_log(LOG_CRITICAL, "Failed to initialize CPU!");
+        gameboy_log(LOG_FATAL, "Failed to initialize CPU!");
         goto cpu_init_fail;
     }
 
     if (init_mmu(&gb->mmu)) {
 
-        gameboy_log(LOG_CRITICAL, "Failed to initialize MMU!");
+        gameboy_log(LOG_FATAL, "Failed to initialize MMU!");
         goto mmu_init_fail;
     }
 
     if (init_ppu(&gb->ppu)) {
 
-        gameboy_log(LOG_CRITICAL, "Failed to initialize PPPU!");
+        gameboy_log(LOG_FATAL, "Failed to initialize PPPU!");
         goto ppu_init_fail;
     }
 
     if (init_screen(&gb->screen, 5)) {
 
-        gameboy_log(LOG_CRITICAL, "Failed to initialized Screen!");
+        gameboy_log(LOG_FATAL, "Failed to initialized Screen!");
         goto screen_init_fail;
     }
 
