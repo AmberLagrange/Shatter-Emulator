@@ -86,7 +86,8 @@ int init_cartridge(struct Cartridge *cart, u8 *rom_contents, u8 *ram_contents) {
 
     if (!ram_contents) {
 
-        goto ram_init_fail;
+        gameboy_log(LOG_DEBUG, "No RAM file provided.");
+        goto init_finish;
     }
     memcpy(cart->ram_banks, ram_contents, ram_size);
     
@@ -123,12 +124,17 @@ int load_rom_from_path(struct Cartridge *cart, const char *rom_path) {
         return INIT_FAIL;
     }
 
-    char ram_path[MAX_STR_LEN] = { 0 };
-    strcpy(ram_path, rom_path);
-    strcat(ram_path, ".sav");
-    u8 *ram_contents = load_data_from_file(ram_path, LOG_WARN);
-
     parse_cartridge_header(cart, rom_contents);
+    u8 *ram_contents = NULL;
+
+    if (cart->header.ram_size) {
+        
+        char ram_path[MAX_STR_LEN] = { 0 };
+        strcpy(ram_path, rom_path);
+        strcat(ram_path, ".sav");
+        ram_contents = load_data_from_file(ram_path, LOG_WARN);
+    }
+
     init_cartridge(cart, rom_contents, ram_contents);
 
     free(ram_contents);
