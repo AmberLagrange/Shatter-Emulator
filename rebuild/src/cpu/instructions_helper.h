@@ -21,6 +21,14 @@
     return true; /* Temp while setting up opcodes */                \
 } while (0)
 
+#define FETCH_CB_CYCLE do {                                         \
+                                                                    \
+    set_address(&gb->bus, gb->cpu.registers.pc++);                  \
+    read_byte(&gb->bus);                                            \
+    gb->cpu.registers.ir = gb->bus.data;                            \
+    return execute_cb_opcode(gb); /* Same as above*/                \
+} while (0)
+
 //--------------------------------Read and write macros--------------------------------//
 
 #define READ_BYTE(address, val) do {                                \
@@ -37,6 +45,28 @@
 } while (0)
 
 //--------------------------------8 bit load macros--------------------------------//
+
+#define LD_IND_R_A(reg) do {                                        \
+                                                                    \
+    /* M1 */                                                        \
+    M_CYCLE_TICK;                                                   \
+    WRITE_BYTE(reg, gb->cpu.registers.a);                           \
+                                                                    \
+    /* M2 */                                                        \
+    M_CYCLE_TICK;                                                   \
+    FETCH_CYCLE;                                                    \
+} while (0)
+
+#define LD_A_IND_R(reg) do {                                        \
+                                                                    \
+    /* M1 */                                                        \
+    M_CYCLE_TICK;                                                   \
+    READ_BYTE(reg, gb->cpu.registers.a);                            \
+                                                                    \
+    /* M2 */                                                        \
+    M_CYCLE_TICK;                                                   \
+    FETCH_CYCLE;                                                    \
+} while (0)
 
 #define LD_R_U8(reg) do {                                           \
                                                                     \
@@ -62,9 +92,27 @@
 
 #define LD_IND_HL_R(reg) do { (void)reg; break; } while (0)
 
+//--------------------------------16 bit load macros--------------------------------//
+
+#define LD_RR_U16(reg) do {                                         \
+                                                                    \
+    /* M1 */                                                        \
+    M_CYCLE_TICK;                                                   \
+    READ_BYTE(gb->cpu.registers.pc++, low_byte);                    \
+                                                                    \
+    /* M2 */                                                        \
+    M_CYCLE_TICK;                                                   \
+    READ_BYTE(gb->cpu.registers.pc++, high_byte);                   \
+                                                                    \
+    /* M3 */                                                        \
+    M_CYCLE_TICK;                                                   \
+    reg = (((u16)high_byte << 8) | low_byte);                       \
+    FETCH_CYCLE;                                                    \
+} while (0)
+
 //--------------------------------8 bit arithmetic macros--------------------------------//
 
-#define INC_8_REG(reg) do {                                         \
+#define INC_R(reg) do {                                             \
                                                                     \
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
@@ -75,7 +123,7 @@
     FETCH_CYCLE;                                                    \
 } while (0)
 
-#define DEC_8_REG(reg) do {                                         \
+#define DEC_R(reg) do {                                             \
                                                                     \
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
@@ -140,7 +188,7 @@
 
 //--------------------------------16 bit arithmetic macros--------------------------------//
 
-#define INC_16_REG(reg) do {                                        \
+#define INC_RR(reg) do {                                            \
                                                                     \
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
@@ -151,7 +199,7 @@
     FETCH_CYCLE;                                                    \
 } while (0)
 
-#define DEC_16_REG(reg) do {                                        \
+#define DEC_RR(reg) do {                                            \
                                                                     \
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
@@ -162,7 +210,7 @@
     FETCH_CYCLE;                                                    \
 } while (0)
 
-#define ADD_HL_REG(reg) do {                                        \
+#define ADD_HL_RR(reg) do {                                         \
                                                                     \
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
@@ -247,7 +295,7 @@
 
 //--------------------------------Stack macros--------------------------------//
 
-#define PUSH_REG(reg) do {                                          \
+#define PUSH_RR(reg) do {                                           \
                                                                     \
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
@@ -268,7 +316,7 @@
     FETCH_CYCLE;                                                    \
 } while (0)
 
-#define POP_REG(reg) do {                                           \
+#define POP_RR(reg) do {                                            \
                                                                     \
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
@@ -282,6 +330,22 @@
     M_CYCLE_TICK;                                                   \
     reg = ((u16)high_byte << 8) | low_byte;                         \
     FETCH_CYCLE;                                                    \
+} while (0)
+
+//--------------------------------Misc macros--------------------------------//
+
+#define NOP() do {                                                  \
+                                                                    \
+    /* M1 */                                                        \
+    M_CYCLE_TICK;                                                   \
+    FETCH_CYCLE;                                                    \
+} while (0)
+
+#define CB_PREFIX() do {                                            \
+                                                                    \
+    /* M1 */                                                        \
+    M_CYCLE_TICK;                                                   \
+    FETCH_CB_CYCLE;                                                    \
 } while (0)
 
 #endif

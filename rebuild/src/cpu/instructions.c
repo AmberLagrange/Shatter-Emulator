@@ -23,28 +23,47 @@ bool execute_opcode(struct Gameboy *gb) {
         // 0x00
         case OPCODE_NOP:
 
-            M_CYCLE_TICK;
-            FETCH_CYCLE;
+            NOP();
+
+        // 0x01
+        case OPCODE_LD_BC_U16:
+
+            LD_RR_U16(gb->cpu.registers.bc);
+
+        // 0x02
+        case OPCODE_LD_IND_BC_A:
+
+            LD_IND_R_A(gb->cpu.registers.bc);
 
         // 0x03
         case OPCODE_INC_BC:
 
-            INC_16_REG(gb->cpu.registers.bc);
+            INC_RR(gb->cpu.registers.bc);
+
+        // 0x04
+        case OPCODE_INC_B:
+
+            INC_R(gb->cpu.registers.b);
 
         // 0x05
         case OPCODE_DEC_B:
 
-            DEC_8_REG(gb->cpu.registers.b);
+            DEC_R(gb->cpu.registers.b);
 
         // 0x06
         case OPCODE_LD_B_U8:
 
             LD_R_U8(gb->cpu.registers.b);
 
+        // 0x0C
+        case OPCODE_INC_C:
+
+            INC_R(gb->cpu.registers.c);
+
         // 0x0D
         case OPCODE_DEC_C:
 
-            DEC_8_REG(gb->cpu.registers.c);
+            DEC_R(gb->cpu.registers.c);
 
         // 0x0E
         case OPCODE_LD_C_U8:
@@ -53,10 +72,55 @@ bool execute_opcode(struct Gameboy *gb) {
 
 //--------------------------------0x10--------------------------------//
 
+        // 0x11
+        case OPCODE_LD_DE_U16:
+
+            LD_RR_U16(gb->cpu.registers.de);
+
+        // 0x12
+        case OPCODE_LD_IND_DE_A:
+
+            LD_IND_R_A(gb->cpu.registers.de);
+
+        // 0x13
+        case OPCODE_INC_DE:
+
+            INC_RR(gb->cpu.registers.de);
+
+        // 0x14
+        case OPCODE_INC_D:
+
+            INC_R(gb->cpu.registers.d);
+
+        // 0x15
+        case OPCODE_DEC_D:
+
+            DEC_R(gb->cpu.registers.d);
+
+        // 0x16
+        case OPCODE_LD_D_U8:
+
+            LD_R_U8(gb->cpu.registers.d);
+
         // 0x18
         case OPCODE_JR_I8:
 
             JP_COND_REL(true);
+
+        // 0x1C
+        case OPCODE_INC_E:
+
+            INC_R(gb->cpu.registers.e);
+
+        // 0x1D
+        case OPCODE_DEC_E:
+
+            DEC_R(gb->cpu.registers.e);
+
+        // 0x1E
+        case OPCODE_LD_E_U8:
+
+            LD_R_U8(gb->cpu.registers.e);
 
 //--------------------------------0x20--------------------------------//
 
@@ -68,63 +132,78 @@ bool execute_opcode(struct Gameboy *gb) {
         // 0x21
         case OPCODE_LD_HL_U16:
 
-            // M1
-            M_CYCLE_TICK;
-            READ_BYTE(gb->cpu.registers.pc++, low_byte);
+            LD_RR_U16(gb->cpu.registers.hl);
 
-            // M2
-            M_CYCLE_TICK;
-            READ_BYTE(gb->cpu.registers.pc++, high_byte);
+        // 0x22
+        case OPCODE_LD_IND_HLI_A:
 
-            // M3
-            M_CYCLE_TICK;
-            gb->cpu.registers.hl = (((u16)high_byte << 8) | low_byte);
-            FETCH_CYCLE;
+            LD_IND_R_A(gb->cpu.registers.hl++);
 
         // 0x23
         case OPCODE_INC_HL:
 
-            INC_16_REG(gb->cpu.registers.hl);
+            INC_RR(gb->cpu.registers.hl);
+
+        // 0x24
+        case OPCODE_INC_H:
+
+            INC_R(gb->cpu.registers.h);
+
+        // 0x25
+        case OPCODE_DEC_H:
+
+            DEC_R(gb->cpu.registers.h);
+
+        // 0x26
+        case OPCODE_LD_H_U8:
+
+            LD_R_U8(gb->cpu.registers.h);
 
         // 0x2A
         case OPCODE_LD_A_IND_HLI:
 
-            // M1
-            M_CYCLE_TICK;
-            READ_BYTE(gb->cpu.registers.hl++, byte);
+            LD_A_IND_R(gb->cpu.registers.hl++);
 
-            // M2
-            M_CYCLE_TICK;
-            gb->cpu.registers.a = byte;
-            FETCH_CYCLE;
+        // 0x2C
+        case OPCODE_INC_L:
+
+            INC_R(gb->cpu.registers.l);
+
+        // 0x2D
+        case OPCODE_DEC_L:
+
+            DEC_R(gb->cpu.registers.l);
+
+        // 0x2E
+        case OPCODE_LD_L_U8:
+
+            LD_R_U8(gb->cpu.registers.l);
 
 //--------------------------------0x30--------------------------------//
 
-        // 0x31
-        case OPCODE_INC_DE:
+        case OPCODE_LD_SP_U16:
 
-            INC_16_REG(gb->cpu.registers.de);
+            LD_RR_U16(gb->cpu.registers.sp);
 
         // 0x32
         case OPCODE_LD_IND_HLD_A:
 
-            // M1
-            M_CYCLE_TICK;
-            WRITE_BYTE(gb->cpu.registers.hl--, gb->cpu.registers.a);
-
-            //M2
-            M_CYCLE_TICK;
-            FETCH_CYCLE;
+            LD_IND_R_A(gb->cpu.registers.hl--);
 
         // 0x39
         case OPCODE_ADD_HL_SP:
 
-            ADD_HL_REG(gb->cpu.registers.sp);
+            ADD_HL_RR(gb->cpu.registers.sp);
 
         // 0x3C
         case OPCODE_INC_A:
 
-            INC_8_REG(gb->cpu.registers.a);
+            INC_R(gb->cpu.registers.a);
+
+        // 0x3C
+        case OPCODE_DEC_A:
+
+            DEC_R(gb->cpu.registers.a);
 
         // 0x3E
         case OPCODE_LD_A_U8:
@@ -831,7 +910,7 @@ bool execute_opcode(struct Gameboy *gb) {
         // 0xC1
         case OPCODE_POP_BC:
 
-            POP_REG(gb->cpu.registers.bc);
+            POP_RR(gb->cpu.registers.bc);
 
         // 0xC3
         case OPCODE_JP_U16:
@@ -841,7 +920,7 @@ bool execute_opcode(struct Gameboy *gb) {
         // 0xC5
         case OPCODE_PUSH_BC:
 
-            PUSH_REG(gb->cpu.registers.bc);
+            PUSH_RR(gb->cpu.registers.bc);
 
         // 0xC9
         case OPCODE_RET:
@@ -861,6 +940,11 @@ bool execute_opcode(struct Gameboy *gb) {
             // M4
             M_CYCLE_TICK;
             FETCH_CYCLE;
+
+        // 0xCB
+        case OPCODE_CB_PREFIX:
+
+            CB_PREFIX();
 
         // 0xCD
         case OPCODE_CALL:
@@ -895,7 +979,7 @@ bool execute_opcode(struct Gameboy *gb) {
         // 0xD5
         case OPCODE_PUSH_DE:
 
-            PUSH_REG(gb->cpu.registers.de);
+            PUSH_RR(gb->cpu.registers.de);
 
         // 0xDF
         case OPCODE_RST_0x18:
@@ -923,15 +1007,15 @@ bool execute_opcode(struct Gameboy *gb) {
         // 0xE1
         case OPCODE_POP_HL:
 
-            POP_REG(gb->cpu.registers.hl);
+            POP_RR(gb->cpu.registers.hl);
 
         // 0xE5
         case OPCODE_PUSH_HL:
 
-            PUSH_REG(gb->cpu.registers.hl);
+            PUSH_RR(gb->cpu.registers.hl);
 
         // 0xEA
-        case OPCODE_LD_NN_A:
+        case OPCODE_LD_IND_U16_A:
 
             // M1
             M_CYCLE_TICK;
@@ -971,7 +1055,7 @@ bool execute_opcode(struct Gameboy *gb) {
         // 0xF1
         case OPCODE_POP_AF:
 
-            POP_REG(gb->cpu.registers.af);
+            POP_RR(gb->cpu.registers.af);
 
         // 0xF3
         case OPCODE_DI:
@@ -984,7 +1068,7 @@ bool execute_opcode(struct Gameboy *gb) {
         // 0xF5
         case OPCODE_PUSH_AF:
 
-            PUSH_REG(gb->cpu.registers.af);
+            PUSH_RR(gb->cpu.registers.af);
 
         // 0xF9
         case OPCODE_LD_SP_HL:
@@ -1043,9 +1127,11 @@ bool execute_opcode(struct Gameboy *gb) {
     return false;
 }
 
-__attribute__((always_inline)) bool execute_cb_opcode(struct Gameboy *gb, enum CB_Opcode cb_opcode) {
+__attribute__((always_inline)) bool execute_cb_opcode(struct Gameboy *gb) {
     
     (void)gb;
+
+    enum CB_Opcode cb_opcode = (enum CB_Opcode)gb->cpu.registers.ir;
 
     switch (cb_opcode) {
         

@@ -6,23 +6,44 @@
 
 enum Opcode {
     OPCODE_NOP              = 0x00,
+    OPCODE_LD_BC_U16        = 0x01,
+    OPCODE_LD_IND_BC_A      = 0x02,
     OPCODE_INC_BC           = 0x03,
+    OPCODE_INC_B            = 0x04,
     OPCODE_DEC_B            = 0x05,
     OPCODE_LD_B_U8          = 0x06,
+    OPCODE_INC_C            = 0x0C,
     OPCODE_DEC_C            = 0x0D,
     OPCODE_LD_C_U8          = 0x0E,
 
+    OPCODE_LD_DE_U16        = 0x11,
+    OPCODE_LD_IND_DE_A      = 0x12,
+    OPCODE_INC_DE           = 0x13,
+    OPCODE_INC_D            = 0x14,
+    OPCODE_DEC_D            = 0x15,
+    OPCODE_LD_D_U8          = 0x16,
     OPCODE_JR_I8            = 0x18,
+    OPCODE_INC_E            = 0x1C,
+    OPCODE_DEC_E            = 0x1D,
+    OPCODE_LD_E_U8          = 0x1E,
 
     OPCODE_JP_NZ_I8         = 0x20,
     OPCODE_LD_HL_U16        = 0x21,
+    OPCODE_LD_IND_HLI_A     = 0x22,
     OPCODE_INC_HL           = 0x23,
+    OPCODE_INC_H            = 0x24,
+    OPCODE_DEC_H            = 0x25,
+    OPCODE_LD_H_U8          = 0x26,
     OPCODE_LD_A_IND_HLI     = 0x2A,
+    OPCODE_INC_L            = 0x2C,
+    OPCODE_DEC_L            = 0x2D,
+    OPCODE_LD_L_U8          = 0x2E,
 
-    OPCODE_INC_DE           = 0x31,
+    OPCODE_LD_SP_U16        = 0x31,
     OPCODE_LD_IND_HLD_A     = 0x32,
     OPCODE_ADD_HL_SP        = 0x39,
     OPCODE_INC_A            = 0x3C,
+    OPCODE_DEC_A            = 0x3D,
     OPCODE_LD_A_U8          = 0x3E,
 
     OPCODE_LD_B_B           = 0x40,
@@ -174,7 +195,7 @@ enum Opcode {
     OPCODE_LDH_A_U8         = 0xE0,
     OPCODE_POP_HL           = 0xE1,
     OPCODE_PUSH_HL          = 0xE5,
-    OPCODE_LD_NN_A          = 0xEA,
+    OPCODE_LD_IND_U16_A     = 0xEA,
 
     OPCODE_LDH_U8_A         = 0xF0,
     OPCODE_POP_AF           = 0xF1,
@@ -205,10 +226,9 @@ bool execute_opcode(struct Gameboy *gb);
  * @brief Execute a CB prefixed opcode
  * 
  * @param gb 
- * @param cb_opcode 
  * @return true 
  * @return false 
  */
-bool execute_cb_opcode(struct Gameboy *gb, enum CB_Opcode cb_opcode);
+__attribute__((always_inline)) bool execute_cb_opcode(struct Gameboy *gb);
 
 #endif // INSTRUCTIONS_H
