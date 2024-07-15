@@ -1,7 +1,6 @@
 #include <cpu/instructions.h>
 
 #include <audio/apu.h>
-#include <cpu/flags.h>
 #include <cpu/instructions_helper.h>
 #include <logging/logging.h>
 #include <memory/bus.h>

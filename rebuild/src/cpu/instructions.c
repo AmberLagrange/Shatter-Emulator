@@ -1,7 +1,6 @@
 #include <cpu/instructions.h>
 
 #include <audio/apu.h>
-#include <cpu/flags.h>
 #include <cpu/instructions_helper.h>
 #include <logging/logging.h>
 #include <memory/bus.h>
@@ -135,19 +134,20 @@ bool execute_opcode(struct Gameboy *gb) {
 
             // M1
             M_CYCLE_TICK;
-            byte = GET_FLAG(FLAG_CARRY);
-            GET_BIT(gb->cpu.registers.a, 0) ? SET_FLAG(FLAG_CARRY) : CLEAR_FLAG(FLAG_CARRY);
-            gb->cpu.registers.a = (byte << 7) | (gb->cpu.registers.a >> 1);
-            CLEAR_FLAG(FLAG_ZERO);
-            CLEAR_FLAG(FLAG_NEGATIVE);
-            CLEAR_FLAG(FLAG_HALF);
+            is_carry = GET_FLAG(carry);
+            MODIFY_FLAG(carry, GET_BIT(gb->cpu.registers.a, 0));
+            gb->cpu.registers.a = (is_carry << 7) | (gb->cpu.registers.a >> 1);
+            CLEAR_FLAG(zero);
+            CLEAR_FLAG(negative);
+            CLEAR_FLAG(half_carry);
+            FETCH_CYCLE;
 
 //--------------------------------0x20--------------------------------//
 
         // 0x20
         case OPCODE_JP_NZ_I8:
 
-            JP_COND_REL(!GET_FLAG(FLAG_ZERO));
+            JP_COND_REL(!GET_FLAG(zero));
 
         // 0x21
         case OPCODE_LD_HL_U16:

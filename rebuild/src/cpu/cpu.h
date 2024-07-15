@@ -17,8 +17,8 @@ struct Registers {
                 u8 a;
                 union {
                     struct {
-                        u8 negative:    1;
                         u8 zero:        1;
+                        u8 negative:    1;
                         u8 half_carry:  1;
                         u8 carry:       1;
                         u8 unused:      4;
@@ -61,9 +61,9 @@ struct Registers {
                         u8 unused:      4;
                         u8 carry:       1;
                         u8 half_carry:  1;
-                        u8 zero:        1;
                         u8 negative:    1;
-                    };
+                        u8 zero:        1;
+                    } flags;
                     u8 f;
                 };
                 u8 a;

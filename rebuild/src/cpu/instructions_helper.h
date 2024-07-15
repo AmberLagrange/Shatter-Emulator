@@ -1,7 +1,6 @@
 #ifndef INSTRUCTIONS_HELPER_H
 #define INSTRUCTIONS_HELPER_H
 
-#include <cpu/flags.h>
 #include <cpu/instructions.h>
 
 //--------------------------------Bits--------------------------------//
@@ -12,15 +11,10 @@
 
 //--------------------------------Flags--------------------------------//
 
-#define SET_FLAG_FROM_COND(flag, cond) do {                         \
-                                                                    \
-    (cond) ? SET_FLAG(flag) : CLEAR_FLAG(flag);                     \
-} while (0)
-
-#define SET_ZERO_FROM_VAL(val) do {                                 \
-                                                                    \
-    SET_FLAG_FROM_COND(FLAG_ZERO, (val == 0));                      \
-} while (0)
+#define GET_FLAG(flag)          (gb->cpu.registers.flags.flag)
+#define SET_FLAG(flag)          (gb->cpu.registers.flags.flag = true)
+#define CLEAR_FLAG(flag)        (gb->cpu.registers.flags.flag = false)
+#define MODIFY_FLAG(flag, val)  (gb->cpu.registers.flags.flag = val)
 
 #define GET_CARRIES_POS(reg, val) do {                              \
                                                                     \
@@ -151,8 +145,8 @@
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
     reg += 1;                                                       \
-    SET_ZERO_FROM_VAL(reg);                                         \
-    CLEAR_FLAG(FLAG_NEGATIVE);                                      \
+    MODIFY_FLAG(zero, (reg == 0));                                  \
+    CLEAR_FLAG(negative);                                           \
     /* TODO: Half Carry */                                          \
     FETCH_CYCLE;                                                    \
 } while (0)
@@ -162,8 +156,8 @@
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
     reg -= 1;                                                       \
-    SET_ZERO_FROM_VAL(reg);                                         \
-    SET_FLAG(FLAG_NEGATIVE);                                        \
+    MODIFY_FLAG(zero, (reg == 0));                                  \
+    SET_FLAG(negative);                                             \
     /* TODO: Half Carry */                                          \
     FETCH_CYCLE;                                                    \
 } while (0)
@@ -178,13 +172,12 @@
                                                                     \
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
-    GET_CARRIES_NEG(gb->cpu.registers.a,                            \
-                    val + GET_FLAG(FLAG_CARRY));                    \
+    GET_CARRIES_NEG(gb->cpu.registers.a, val + GET_FLAG(carry));    \
     gb->cpu.registers.a = result;                                   \
-    SET_ZERO_FROM_VAL(gb->cpu.registers.a);                         \
-    SET_FLAG(FLAG_NEGATIVE);                                        \
-    SET_FLAG_FROM_COND(FLAG_CARRY, is_half_carry);                  \
-    SET_FLAG_FROM_COND(FLAG_HALF, is_carry);                        \
+    MODIFY_FLAG(zero, (val == 0));                                  \
+    SET_FLAG(negative);                                             \
+    MODIFY_FLAG(half_carry, is_half_carry);                         \
+    MODIFY_FLAG(carry, is_carry);                                   \
 } while (0)
 
 #define AND(val) do { (void)val; break; } while (0)
@@ -194,10 +187,10 @@
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
     gb->cpu.registers.a ^= val;                                     \
-    SET_ZERO_FROM_VAL(gb->cpu.registers.a);                         \
-    CLEAR_FLAG(FLAG_NEGATIVE);                                      \
-    CLEAR_FLAG(FLAG_HALF);                                          \
-    CLEAR_FLAG(FLAG_CARRY);                                         \
+    MODIFY_FLAG(zero, (val == 0));                                  \
+    CLEAR_FLAG(negative);                                           \
+    CLEAR_FLAG(half_carry);                                         \
+    CLEAR_FLAG(carry);                                              \
     FETCH_CYCLE;                                                    \
 } while (0)
 
@@ -208,10 +201,10 @@
     /* Mx */                                                        \
     M_CYCLE_TICK;                                                   \
     GET_CARRIES_NEG(gb->cpu.registers.a, val);                      \
-    SET_ZERO_FROM_VAL(result);                                      \
-    SET_FLAG(FLAG_NEGATIVE);                                        \
-    SET_FLAG_FROM_COND(FLAG_HALF, is_half_carry);                   \
-    SET_FLAG_FROM_COND(FLAG_CARRY, is_carry);                       \
+    MODIFY_FLAG(zero, (val == 0));                                  \
+    SET_FLAG(negative);                                             \
+    MODIFY_FLAG(half_carry, is_half_carry);                         \
+    MODIFY_FLAG(carry, is_carry);                                   \
     FETCH_CYCLE;                                                    \
 } while (0)
 
@@ -245,18 +238,18 @@
     M_CYCLE_TICK;                                                   \
     GET_CARRIES_POS(gb->cpu.registers.l, (u8)(reg >> 0));           \
     gb->cpu.registers.l = result;                                   \
-    CLEAR_FLAG(FLAG_NEGATIVE);                                      \
-    SET_FLAG_FROM_COND(FLAG_HALF, is_half_carry);                   \
-    SET_FLAG_FROM_COND(FLAG_CARRY, is_carry);                       \
+    CLEAR_FLAG(negative);                                           \
+    MODIFY_FLAG(half_carry, is_half_carry);                         \
+    MODIFY_FLAG(carry, is_carry);                                   \
                                                                     \
     /* M2 */                                                        \
     M_CYCLE_TICK;                                                   \
     GET_CARRIES_POS(gb->cpu.registers.h,                            \
-                    (u8)(reg >> 8) + GET_FLAG(FLAG_CARRY));         \
+                    (u8)(reg >> 8) + GET_FLAG(carry));              \
     gb->cpu.registers.h = result;                                   \
-    CLEAR_FLAG(FLAG_NEGATIVE);                                      \
-    SET_FLAG_FROM_COND(FLAG_HALF, is_half_carry);                   \
-    SET_FLAG_FROM_COND(FLAG_CARRY, is_carry);                       \
+    CLEAR_FLAG(negative);                                           \
+    MODIFY_FLAG(half_carry, is_half_carry);                         \
+    MODIFY_FLAG(carry, is_carry);                                   \
     FETCH_CYCLE;                                                    \
 } while (0)
 
@@ -383,12 +376,14 @@
                                                                     \
     /* M2 */                                                        \
     M_CYCLE_TICK;                                                   \
-    is_carry = GET_FLAG(FLAG_CARRY);                                \
-    SET_FLAG_FROM_COND(FLAG_CARRY, GET_BIT(reg, 0));                \
+    is_carry = GET_FLAG(carry);                                     \
+    MODIFY_FLAG(carry, GET_BIT(reg, 0));                            \
     reg = (is_carry << 7) | (reg >> 1);                             \
-    SET_ZERO_FROM_VAL(reg);                                         \
-    CLEAR_FLAG(FLAG_NEGATIVE);                                      \
-    CLEAR_FLAG(FLAG_HALF);                                          \
+    MODIFY_FLAG(zero, (reg == 0));                                  \
+    CLEAR_FLAG(negative);                                           \
+    CLEAR_FLAG(half_carry);                                         \
+    MODIFY_FLAG(carry, is_carry);                                   \
+    FETCH_CYCLE;                                                    \
 } while (0)
 
 #define SRL(reg) do {                                               \
@@ -397,10 +392,10 @@
     M_CYCLE_TICK;                                                   \
     is_carry = GET_BIT(reg, 0);                                     \
     reg >>= 1;                                                      \
-    SET_ZERO_FROM_VAL(reg);                                         \
-    CLEAR_FLAG(FLAG_NEGATIVE);                                      \
-    CLEAR_FLAG(FLAG_HALF);                                          \
-    SET_FLAG_FROM_COND(FLAG_CARRY, is_carry);                       \
+    MODIFY_FLAG(zero, (reg == 0));                                  \
+    CLEAR_FLAG(negative);                                           \
+    CLEAR_FLAG(half_carry);                                         \
+    MODIFY_FLAG(carry, is_carry);                                   \
     FETCH_CYCLE;                                                    \
 } while (0)
 
