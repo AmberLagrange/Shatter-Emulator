@@ -2,6 +2,11 @@
 #define INSTRUCTIONS_HELPER_H
 
 #include <cpu/flags.h>
+#include <cpu/instructions.h>
+
+//--------------------------------Bits--------------------------------//
+
+#define GET_BIT(val, bit) ((val >> bit) & 0x01)
 
 //--------------------------------Tick other gameboy components--------------------------------//
 
@@ -345,7 +350,34 @@
                                                                     \
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
-    FETCH_CB_CYCLE;                                                    \
+    FETCH_CB_CYCLE;                                                 \
 } while (0)
 
-#endif
+//--------------------------------CB Prefix macros--------------------------------//
+
+#define RR(reg) do {                                                \
+                                                                    \
+    /* M2 */                                                        \
+    M_CYCLE_TICK;                                                   \
+    carry = GET_FLAG(FLAG_CARRY);                                   \
+    GET_BIT(reg, 0) ? SET_FLAG(FLAG_CARRY) : CLEAR_FLAG(FLAG_CARRY);\
+    reg = (carry << 7) | (reg >> 1);                                \
+    reg ? CLEAR_FLAG(FLAG_ZERO) : SET_FLAG(FLAG_ZERO);              \
+    CLEAR_FLAG(FLAG_NEGATIVE);                                      \
+    CLEAR_FLAG(FLAG_HALF);                                          \
+} while (0)
+
+#define SRL(reg) do {                                               \
+                                                                    \
+    /* M2 */                                                        \
+    M_CYCLE_TICK;                                                   \
+    carry = GET_BIT(reg, 0);                                        \
+    reg >>= 1;                                                      \
+    reg ? CLEAR_FLAG(FLAG_ZERO) : SET_FLAG(FLAG_ZERO);              \
+    CLEAR_FLAG(FLAG_NEGATIVE);                                      \
+    CLEAR_FLAG(FLAG_HALF);                                          \
+    (carry) ? SET_FLAG(FLAG_CARRY) : CLEAR_FLAG(FLAG_CARRY);        \
+    FETCH_CYCLE;                                                    \
+} while (0)
+
+#endif // INSTRUCTIONS_HELPER_H

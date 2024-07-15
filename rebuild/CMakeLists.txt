@@ -18,6 +18,7 @@ add_executable("${PROJECT_NAME}"
 
     src/cpu/cpu.c
     src/cpu/instructions.c
+    src/cpu/instructions_cb.c
 
     src/memory/mmu.c
     src/memory/bus.c

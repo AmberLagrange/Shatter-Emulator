@@ -122,6 +122,18 @@ bool execute_opcode(struct Gameboy *gb) {
 
             LD_R_U8(gb->cpu.registers.e);
 
+        // 0x1F
+        case OPCODE_RRA: // Same as RR A, except zero flag isn't set
+
+            // M1
+            M_CYCLE_TICK;
+            byte = GET_FLAG(FLAG_CARRY);
+            GET_BIT(gb->cpu.registers.a, 0) ? SET_FLAG(FLAG_CARRY) : CLEAR_FLAG(FLAG_CARRY);
+            gb->cpu.registers.a = (byte << 7) | (gb->cpu.registers.a >> 1);
+            CLEAR_FLAG(FLAG_ZERO);
+            CLEAR_FLAG(FLAG_NEGATIVE);
+            CLEAR_FLAG(FLAG_HALF);
+
 //--------------------------------0x20--------------------------------//
 
         // 0x20
@@ -1124,20 +1136,5 @@ bool execute_opcode(struct Gameboy *gb) {
     }
 
     gameboy_log(LOG_FATAL, "Unhandled opcode: 0x%02X", (u8)opcode);
-    return false;
-}
-
-__attribute__((always_inline)) bool execute_cb_opcode(struct Gameboy *gb) {
-    
-    (void)gb;
-
-    enum CB_Opcode cb_opcode = (enum CB_Opcode)gb->cpu.registers.ir;
-
-    switch (cb_opcode) {
-        
-        default:
-            gameboy_log(LOG_FATAL, "Unhandled CB opcode: 0x%02X", (u8)cb_opcode);
-    }
-
     return false;
 }

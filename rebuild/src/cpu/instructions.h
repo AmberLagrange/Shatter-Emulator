@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 enum Opcode {
+
     OPCODE_NOP              = 0x00,
     OPCODE_LD_BC_U16        = 0x01,
     OPCODE_LD_IND_BC_A      = 0x02,
@@ -26,6 +27,7 @@ enum Opcode {
     OPCODE_INC_E            = 0x1C,
     OPCODE_DEC_E            = 0x1D,
     OPCODE_LD_E_U8          = 0x1E,
+    OPCODE_RRA              = 0x1F,
 
     OPCODE_JP_NZ_I8         = 0x20,
     OPCODE_LD_HL_U16        = 0x21,
@@ -208,7 +210,17 @@ enum Opcode {
 };
 
 enum CB_Opcode {
-    TODO = 0
+    
+    CB_OPCODE_RR_B          = 0x18,
+    CB_OPCODE_RR_C          = 0x19,
+    CB_OPCODE_RR_D          = 0x1A,
+    CB_OPCODE_RR_E          = 0x1B,
+    CB_OPCODE_RR_H          = 0x1C,
+    CB_OPCODE_RR_L          = 0x1D,
+    CB_OPCODE_RR_IND_HL     = 0x1E,
+    CB_OPCODE_RR_A          = 0x1F,
+
+    CB_OPCODE_SRL_B         = 0x38,
 };
 
 struct Gameboy;
