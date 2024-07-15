@@ -6,7 +6,36 @@
 
 //--------------------------------Bits--------------------------------//
 
-#define GET_BIT(val, bit) ((val >> bit) & 0x01)
+#define GET_BIT(num, bit)       ((num >> bit) & 0x01)
+#define SET_BIT(num, bit)       (num |= (1 << bit))
+#define RST_BIT(num, bit)       (num &= ~(1 << bit))
+
+//--------------------------------Flags--------------------------------//
+
+#define SET_FLAG_FROM_COND(flag, cond) do {                         \
+                                                                    \
+    (cond) ? SET_FLAG(flag) : CLEAR_FLAG(flag);                     \
+} while (0)
+
+#define SET_ZERO_FROM_VAL(val) do {                                 \
+                                                                    \
+    SET_FLAG_FROM_COND(FLAG_ZERO, (val == 0));                      \
+} while (0)
+
+#define GET_CARRIES_POS(reg, val) do {                              \
+                                                                    \
+    result = reg + (val);                                           \
+    is_carry = (result < reg);                                      \
+    is_half_carry =                                                 \
+        ((((reg & 0x0F) + (val & 0x0F)) & 0x10) == 0x10);           \
+} while (0)
+
+#define GET_CARRIES_NEG(reg, val) do {                              \
+                                                                    \
+    result = reg - (val);                                           \
+    is_carry = (result > reg);                                      \
+    is_half_carry = ((u16)(reg & 0x0F) - (u16)(val & 0x0F) < 0);    \
+} while (0)
 
 //--------------------------------Tick other gameboy components--------------------------------//
 
@@ -51,7 +80,7 @@
 
 //--------------------------------8 bit load macros--------------------------------//
 
-#define LD_IND_R_A(reg) do {                                        \
+#define LD_IND_RR_A(reg) do {                                        \
                                                                     \
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
@@ -62,7 +91,7 @@
     FETCH_CYCLE;                                                    \
 } while (0)
 
-#define LD_A_IND_R(reg) do {                                        \
+#define LD_A_IND_RR(reg) do {                                        \
                                                                     \
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
@@ -122,7 +151,7 @@
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
     reg += 1;                                                       \
-    reg ? CLEAR_FLAG(FLAG_ZERO) : SET_FLAG(FLAG_ZERO);              \
+    SET_ZERO_FROM_VAL(reg);                                         \
     CLEAR_FLAG(FLAG_NEGATIVE);                                      \
     /* TODO: Half Carry */                                          \
     FETCH_CYCLE;                                                    \
@@ -133,7 +162,7 @@
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
     reg -= 1;                                                       \
-    reg ? CLEAR_FLAG(FLAG_ZERO) : SET_FLAG(FLAG_ZERO);              \
+    SET_ZERO_FROM_VAL(reg);                                         \
     SET_FLAG(FLAG_NEGATIVE);                                        \
     /* TODO: Half Carry */                                          \
     FETCH_CYCLE;                                                    \
@@ -149,15 +178,13 @@
                                                                     \
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
-    gb->cpu.registers.a -= (val + GET_FLAG(FLAG_CARRY));            \
-    (gb->cpu.registers.a == 0)                                      \
-        ? SET_FLAG(FLAG_ZERO)                                       \
-        : CLEAR_FLAG(FLAG_ZERO);                                    \
+    GET_CARRIES_NEG(gb->cpu.registers.a,                            \
+                    val + GET_FLAG(FLAG_CARRY));                    \
+    gb->cpu.registers.a = result;                                   \
+    SET_ZERO_FROM_VAL(gb->cpu.registers.a);                         \
     SET_FLAG(FLAG_NEGATIVE);                                        \
-    /* TODO: Half Carry */                                          \
-    ((i8)gb->cpu.registers.a) < 0                                   \
-        ? SET_FLAG(FLAG_CARRY)                                      \
-        : CLEAR_FLAG(FLAG_CARRY);                                   \
+    SET_FLAG_FROM_COND(FLAG_CARRY, is_half_carry);                  \
+    SET_FLAG_FROM_COND(FLAG_HALF, is_carry);                        \
 } while (0)
 
 #define AND(val) do { (void)val; break; } while (0)
@@ -167,7 +194,7 @@
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
     gb->cpu.registers.a ^= val;                                     \
-    val ? CLEAR_FLAG(FLAG_ZERO) : SET_FLAG(FLAG_ZERO);              \
+    SET_ZERO_FROM_VAL(gb->cpu.registers.a);                         \
     CLEAR_FLAG(FLAG_NEGATIVE);                                      \
     CLEAR_FLAG(FLAG_HALF);                                          \
     CLEAR_FLAG(FLAG_CARRY);                                         \
@@ -180,14 +207,11 @@
                                                                     \
     /* Mx */                                                        \
     M_CYCLE_TICK;                                                   \
-    (gb->cpu.registers.a == val)                                    \
-        ? SET_FLAG(FLAG_ZERO)                                       \
-        : CLEAR_FLAG(FLAG_ZERO);                                    \
+    GET_CARRIES_NEG(gb->cpu.registers.a, val);                      \
+    SET_ZERO_FROM_VAL(result);                                      \
     SET_FLAG(FLAG_NEGATIVE);                                        \
-    /* TODO: Half Carry */                                          \
-    (gb->cpu.registers.a < val)                                     \
-        ? SET_FLAG(FLAG_CARRY)                                      \
-        : CLEAR_FLAG(FLAG_CARRY);                                   \
+    SET_FLAG_FROM_COND(FLAG_HALF, is_half_carry);                   \
+    SET_FLAG_FROM_COND(FLAG_CARRY, is_carry);                       \
     FETCH_CYCLE;                                                    \
 } while (0)
 
@@ -219,20 +243,20 @@
                                                                     \
     /* M1 */                                                        \
     M_CYCLE_TICK;                                                   \
-    gb->cpu.registers.l += (u8)(reg >> 0);                          \
+    GET_CARRIES_POS(gb->cpu.registers.l, (u8)(reg >> 0));           \
+    gb->cpu.registers.l = result;                                   \
     CLEAR_FLAG(FLAG_NEGATIVE);                                      \
-    /* TODO: Half Carry */                                          \
-    ((i8)gb->cpu.registers.l < 0)                                   \
-        ? SET_FLAG(FLAG_CARRY)                                      \
-        : CLEAR_FLAG(FLAG_CARRY);                                   \
+    SET_FLAG_FROM_COND(FLAG_HALF, is_half_carry);                   \
+    SET_FLAG_FROM_COND(FLAG_CARRY, is_carry);                       \
                                                                     \
     /* M2 */                                                        \
     M_CYCLE_TICK;                                                   \
-    gb->cpu.registers.h += (u8)(reg >> 8) + GET_FLAG(FLAG_CARRY);   \
-    /* TODO: Half Carry */                                          \
-    ((i8)gb->cpu.registers.l < 0)                                   \
-        ? SET_FLAG(FLAG_CARRY)                                      \
-        : CLEAR_FLAG(FLAG_CARRY);                                   \
+    GET_CARRIES_POS(gb->cpu.registers.h,                            \
+                    (u8)(reg >> 8) + GET_FLAG(FLAG_CARRY));         \
+    gb->cpu.registers.h = result;                                   \
+    CLEAR_FLAG(FLAG_NEGATIVE);                                      \
+    SET_FLAG_FROM_COND(FLAG_HALF, is_half_carry);                   \
+    SET_FLAG_FROM_COND(FLAG_CARRY, is_carry);                       \
     FETCH_CYCLE;                                                    \
 } while (0)
 
@@ -359,10 +383,10 @@
                                                                     \
     /* M2 */                                                        \
     M_CYCLE_TICK;                                                   \
-    carry = GET_FLAG(FLAG_CARRY);                                   \
-    GET_BIT(reg, 0) ? SET_FLAG(FLAG_CARRY) : CLEAR_FLAG(FLAG_CARRY);\
-    reg = (carry << 7) | (reg >> 1);                                \
-    reg ? CLEAR_FLAG(FLAG_ZERO) : SET_FLAG(FLAG_ZERO);              \
+    is_carry = GET_FLAG(FLAG_CARRY);                                \
+    SET_FLAG_FROM_COND(FLAG_CARRY, GET_BIT(reg, 0));                \
+    reg = (is_carry << 7) | (reg >> 1);                             \
+    SET_ZERO_FROM_VAL(reg);                                         \
     CLEAR_FLAG(FLAG_NEGATIVE);                                      \
     CLEAR_FLAG(FLAG_HALF);                                          \
 } while (0)
@@ -371,12 +395,12 @@
                                                                     \
     /* M2 */                                                        \
     M_CYCLE_TICK;                                                   \
-    carry = GET_BIT(reg, 0);                                        \
+    is_carry = GET_BIT(reg, 0);                                     \
     reg >>= 1;                                                      \
-    reg ? CLEAR_FLAG(FLAG_ZERO) : SET_FLAG(FLAG_ZERO);              \
+    SET_ZERO_FROM_VAL(reg);                                         \
     CLEAR_FLAG(FLAG_NEGATIVE);                                      \
     CLEAR_FLAG(FLAG_HALF);                                          \
-    (carry) ? SET_FLAG(FLAG_CARRY) : CLEAR_FLAG(FLAG_CARRY);        \
+    SET_FLAG_FROM_COND(FLAG_CARRY, is_carry);                       \
     FETCH_CYCLE;                                                    \
 } while (0)
 

@@ -87,6 +87,7 @@ int init_cartridge(struct Cartridge *cart, u8 *rom_contents, u8 *ram_contents) {
     if (!ram_contents) {
 
         gameboy_log(LOG_DEBUG, "No RAM file provided.");
+        memset(cart->ram_banks, 0, ram_size);
         goto init_finish;
     }
     memcpy(cart->ram_banks, ram_contents, ram_size);

@@ -13,6 +13,9 @@ bool execute_opcode(struct Gameboy *gb) {
     u8 byte;
     u8 low_byte;
     u8 high_byte;
+    u8 result;
+    bool is_carry;
+    bool is_half_carry;
 
     enum Opcode opcode = (enum Opcode)gb->cpu.registers.ir;
 
@@ -33,7 +36,7 @@ bool execute_opcode(struct Gameboy *gb) {
         // 0x02
         case OPCODE_LD_IND_BC_A:
 
-            LD_IND_R_A(gb->cpu.registers.bc);
+            LD_IND_RR_A(gb->cpu.registers.bc);
 
         // 0x03
         case OPCODE_INC_BC:
@@ -54,6 +57,11 @@ bool execute_opcode(struct Gameboy *gb) {
         case OPCODE_LD_B_U8:
 
             LD_R_U8(gb->cpu.registers.b);
+
+        // 0x0A
+        case OPCODE_LD_A_IND_BC:
+
+            LD_A_IND_RR(gb->cpu.registers.bc);
 
         // 0x0C
         case OPCODE_INC_C:
@@ -80,7 +88,7 @@ bool execute_opcode(struct Gameboy *gb) {
         // 0x12
         case OPCODE_LD_IND_DE_A:
 
-            LD_IND_R_A(gb->cpu.registers.de);
+            LD_IND_RR_A(gb->cpu.registers.de);
 
         // 0x13
         case OPCODE_INC_DE:
@@ -149,7 +157,7 @@ bool execute_opcode(struct Gameboy *gb) {
         // 0x22
         case OPCODE_LD_IND_HLI_A:
 
-            LD_IND_R_A(gb->cpu.registers.hl++);
+            LD_IND_RR_A(gb->cpu.registers.hl++);
 
         // 0x23
         case OPCODE_INC_HL:
@@ -171,10 +179,16 @@ bool execute_opcode(struct Gameboy *gb) {
 
             LD_R_U8(gb->cpu.registers.h);
 
+        // 0x27
+        case OPCODE_DAA:
+
+            // TODO: Proper DAA
+            NOP();
+
         // 0x2A
         case OPCODE_LD_A_IND_HLI:
 
-            LD_A_IND_R(gb->cpu.registers.hl++);
+            LD_A_IND_RR(gb->cpu.registers.hl++);
 
         // 0x2C
         case OPCODE_INC_L:
@@ -200,7 +214,7 @@ bool execute_opcode(struct Gameboy *gb) {
         // 0x32
         case OPCODE_LD_IND_HLD_A:
 
-            LD_IND_R_A(gb->cpu.registers.hl--);
+            LD_IND_RR_A(gb->cpu.registers.hl--);
 
         // 0x39
         case OPCODE_ADD_HL_SP:

@@ -5,6 +5,8 @@
 
 #include <SDL2/SDL.h>
 
+#define GRAPHICS_DISABLED
+
 struct Screen {
 
     SDL_Window      *sdl_window;

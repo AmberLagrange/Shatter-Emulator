@@ -12,7 +12,7 @@ __attribute__((always_inline)) bool execute_cb_opcode(struct Gameboy *gb) {
 
     enum CB_Opcode cb_opcode = (enum CB_Opcode)gb->cpu.registers.ir;
 
-    u8 carry;
+    bool is_carry;
 
     switch (cb_opcode) {
         
