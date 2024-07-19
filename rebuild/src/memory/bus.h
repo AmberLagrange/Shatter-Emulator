@@ -4,15 +4,14 @@
 #include <core.h>
 
 struct Cartridge;
-struct MMU;
-
+struct Gameboy;
 struct Bus {
 
     u8 data;
     u16 address;
 
     struct Cartridge *cart;
-    struct MMU *mmu;
+    struct Gameboy *gb;
 };
 
 /**
@@ -39,12 +38,12 @@ void cleanup_bus(struct Bus *bus);
 void set_cart(struct Bus *bus, struct Cartridge *cart);
 
 /**
- * @brief Set the MMU the bus can use
+ * @brief Set the Gameboy the bus can use
  * 
  * @param bus 
- * @param mmu 
+ * @param gb 
  */
-void set_mmu(struct Bus *bus, struct MMU *mmu);
+void bus_set_gameboy(struct Bus *bus, struct Gameboy *gb);
 
 /**
  * @brief Sets the address of the bus
@@ -69,4 +68,4 @@ void read_byte(struct Bus *bus);
  */
 void write_byte(struct Bus *bus, u8 byte);
 
-#endif // BUS_H
+#endif /* BUS_H */

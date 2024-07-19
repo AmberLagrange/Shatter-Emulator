@@ -7,19 +7,19 @@ struct MMU {
 
     u16 address;
 
-    // TODO: Cart
+    /* TODO: Cart */
     u8 *video_ram;
     u8 video_ram_bank;
-    // external ram is on cart
+    /* external ram is on cart */
     u8 *work_ram_0;
     u8 *work_ram_swappable;
     u8 work_ram_bank;
-    // echo ram maps to work ram
+    /* echo ram maps to work ram */
     u8 *oam;
-    // not usable
-    // io maps to other functions
+    /* not usable */
+    /* io maps to other functions */
     u8 *high_ram;
-    // ie maps to other functions
+    /* ie maps to other functions */
 };
 
 /**
@@ -37,4 +37,4 @@ int init_mmu(struct MMU *mmu);
  */
 void cleanup_mmu(struct MMU *mmu);
 
-#endif // MMU_H
+#endif /* MMU_H */

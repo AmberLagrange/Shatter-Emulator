@@ -17,6 +17,6 @@ void cleanup_apu(struct APU *apu) {
 
 void tick_apu(struct APU *apu) {
 
-    // TODO:
+    /* TODO: */
     (void)apu;
 }

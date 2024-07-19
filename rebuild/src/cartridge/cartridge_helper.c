@@ -473,7 +473,7 @@ const char *get_licensee_str(u8 old_licensee_code, u8 *new_licensee_code) {
             return "LJN";
 
         default:
-            // Fallthrough to check for new licensee code
+            /* Fallthrough to check for new licensee code */
             break;
     }
 
@@ -581,15 +581,15 @@ const char *get_cart_type_str(u8 cart_type) {
             return "HuC-1 + Ram + Battery";
 
         default:
-            // Fallthrough
+            /* Fallthrough */
             break;
     }
 
     gameboy_log(LOG_WARN, "Invalid cartridge type given: 0x%02X", cart_type);
 }
 
-// Note: This doesn't account for the 72, 80 and 96 ROMS banks
-// However, no known ROMS have these, and no official documents list them
+/* Note: This doesn't account for the 72, 80 and 96 ROMS banks */
+/* However, no known ROMS have these, and no official documents list them */
 __attribute__((always_inline)) int get_rom_bank_count(u8 rom_size) {
 
     return 2 << rom_size;
@@ -627,7 +627,7 @@ const char *get_rom_size_str(u8 rom_size) {
             return "8 MiB";
 
         default:
-            // Fallthrough
+            /* Fallthrough */
             break;
     }
 
@@ -659,7 +659,7 @@ int get_ram_bank_count(u8 ram_size) {
             return 8;
 
         default:
-            // Fallthrough
+            /* Fallthrough */
             break;
     }
 
@@ -691,7 +691,7 @@ const char *get_ram_size_str(u8 ram_size) {
             return "64 KiB";
 
         default:
-            // Fallthrough
+            /* Fallthrough */
             break;
     }
 
@@ -710,7 +710,7 @@ const char *get_destination_str(u8 destination_code) {
             return "Overseas";
 
         default:
-            // Fallthrough
+            /* Fallthrough */
             break;
     }
 

@@ -275,4 +275,4 @@ const char *get_destination_str(u8 destination_code);
  */
 u8 *load_data_from_file(const char *file_path, enum LogLevel level);
 
-#endif // CARTRIDGE_HELPER_H
+#endif /* CARTRIDGE_HELPER_H */

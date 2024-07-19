@@ -5,7 +5,7 @@
 
 struct APU {
 
-    int temp; // Temp value to ignore empty struct warning
+    int temp; /* Temp value to ignore empty struct warning */
 };
 
 /**
@@ -30,4 +30,4 @@ void cleanup_apu(struct APU *apu);
  */
 void tick_apu(struct APU *apu);
 
-#endif // APU_H
+#endif /* APU_H */

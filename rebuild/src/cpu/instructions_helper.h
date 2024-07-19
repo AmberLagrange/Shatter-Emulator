@@ -3,13 +3,17 @@
 
 #include <cpu/instructions.h>
 
-//--------------------------------Bits--------------------------------//
+/*----------------------------------------------------------------*/
+/*                              Bits                              */
+/*----------------------------------------------------------------*/
 
 #define GET_BIT(num, bit)       ((num >> bit) & 0x01)
 #define SET_BIT(num, bit)       (num |= (1 << bit))
 #define RST_BIT(num, bit)       (num &= ~(1 << bit))
 
-//--------------------------------Flags--------------------------------//
+/*----------------------------------------------------------------*/
+/*                              Flags                             */
+/*----------------------------------------------------------------*/
 
 #define GET_FLAG(flag)          (gb->cpu.registers.flags.flag)
 #define SET_FLAG(flag)          (gb->cpu.registers.flags.flag = true)
@@ -31,7 +35,9 @@
     is_half_carry = ((u16)(reg & 0x0F) - (u16)(val & 0x0F) < 0);    \
 } while (0)
 
-//--------------------------------Tick other gameboy components--------------------------------//
+/*----------------------------------------------------------------*/
+/*                  Tick other gameboy components                 */
+/*----------------------------------------------------------------*/
 
 #define M_CYCLE_TICK do {                                           \
                                                                     \
@@ -39,7 +45,9 @@
     tick_ppu(&gb->ppu);                                             \
 } while(0)
 
-//--------------------------------Fetch the next opcode--------------------------------//
+/*----------------------------------------------------------------*/
+/*                      Fetch the next opcode                     */
+/*----------------------------------------------------------------*/
 
 #define FETCH_CYCLE do {                                            \
                                                                     \
@@ -57,7 +65,9 @@
     return execute_cb_opcode(gb); /* Same as above*/                \
 } while (0)
 
-//--------------------------------Read and write macros--------------------------------//
+/*----------------------------------------------------------------*/
+/*                      Read and write macros                     */
+/*----------------------------------------------------------------*/
 
 #define READ_BYTE(address, val) do {                                \
                                                                     \
@@ -72,7 +82,9 @@
     write_byte(&gb->bus, val);                                      \
 } while (0)
 
-//--------------------------------8 bit load macros--------------------------------//
+/*----------------------------------------------------------------*/
+/*                        8 bit load macros                       */
+/*----------------------------------------------------------------*/
 
 #define LD_IND_RR_A(reg) do {                                        \
                                                                     \
@@ -120,7 +132,9 @@
 
 #define LD_IND_HL_R(reg) do { (void)reg; break; } while (0)
 
-//--------------------------------16 bit load macros--------------------------------//
+/*----------------------------------------------------------------*/
+/*                       16 bit load macros                       */
+/*----------------------------------------------------------------*/
 
 #define LD_RR_U16(reg) do {                                         \
                                                                     \
@@ -138,7 +152,9 @@
     FETCH_CYCLE;                                                    \
 } while (0)
 
-//--------------------------------8 bit arithmetic macros--------------------------------//
+/*----------------------------------------------------------------*/
+/*                     8 bit arithmetic macros                    */
+/*----------------------------------------------------------------*/
 
 #define INC_R(reg) do {                                             \
                                                                     \
@@ -162,7 +178,18 @@
     FETCH_CYCLE;                                                    \
 } while (0)
 
-#define ADD(val) do { (void)val; break; } while (0)
+#define ADD(val) do {                                               \
+                                                                    \
+    /* M1 */                                                        \
+    M_CYCLE_TICK;                                                   \
+    GET_CARRIES_POS(gb->cpu.registers.a, val);                      \
+    gb->cpu.registers.a += val;                                     \
+    MODIFY_FLAG(zero, (gb->cpu.registers.a == 0));                  \
+    CLEAR_FLAG(negative);                                           \
+    MODIFY_FLAG(half_carry, is_half_carry);                         \
+    MODIFY_FLAG(carry, is_carry);                                   \
+    FETCH_CYCLE;                                                    \
+} while (0)
 
 #define ADC(val) do { (void)val; break; } while (0)
 
@@ -180,7 +207,17 @@
     MODIFY_FLAG(carry, is_carry);                                   \
 } while (0)
 
-#define AND(val) do { (void)val; break; } while (0)
+#define AND(val) do {                                               \
+                                                                    \
+    /* M1 */                                                        \
+    M_CYCLE_TICK;                                                   \
+    gb->cpu.registers.a &= val;                                     \
+    MODIFY_FLAG(zero, (val == 0));                                  \
+    CLEAR_FLAG(negative);                                           \
+    SET_FLAG(half_carry);                                           \
+    CLEAR_FLAG(carry);                                              \
+    FETCH_CYCLE;                                                    \
+} while (0)
 
 #define XOR(val) do {                                               \
                                                                     \
@@ -208,7 +245,9 @@
     FETCH_CYCLE;                                                    \
 } while (0)
 
-//--------------------------------16 bit arithmetic macros--------------------------------//
+/*----------------------------------------------------------------*/
+/*                    16 bit arithmetic macros                    */
+/*----------------------------------------------------------------*/
 
 #define INC_RR(reg) do {                                            \
                                                                     \
@@ -253,7 +292,9 @@
     FETCH_CYCLE;                                                    \
 } while (0)
 
-//--------------------------------Control flow macros--------------------------------//
+/*----------------------------------------------------------------*/
+/*                       Control flow macros                      */
+/*----------------------------------------------------------------*/
 
 #define JP_COND_ABS(cond) do {                                      \
                                                                     \
@@ -315,7 +356,9 @@
     FETCH_CYCLE;                                                    \
 } while (0)
 
-//--------------------------------Stack macros--------------------------------//
+/*----------------------------------------------------------------*/
+/*                          Stack macros                          */
+/*----------------------------------------------------------------*/
 
 #define PUSH_RR(reg) do {                                           \
                                                                     \
@@ -354,7 +397,9 @@
     FETCH_CYCLE;                                                    \
 } while (0)
 
-//--------------------------------Misc macros--------------------------------//
+/*----------------------------------------------------------------*/
+/*                          Misc macros                           */
+/*----------------------------------------------------------------*/
 
 #define NOP() do {                                                  \
                                                                     \
@@ -370,7 +415,9 @@
     FETCH_CB_CYCLE;                                                 \
 } while (0)
 
-//--------------------------------CB Prefix macros--------------------------------//
+/*----------------------------------------------------------------*/
+/*                        CB Prefix macros                        */
+/*----------------------------------------------------------------*/
 
 #define RR(reg) do {                                                \
                                                                     \
@@ -383,6 +430,20 @@
     CLEAR_FLAG(negative);                                           \
     CLEAR_FLAG(half_carry);                                         \
     MODIFY_FLAG(carry, is_carry);                                   \
+    FETCH_CYCLE;                                                    \
+} while (0)
+
+#define SWAP(reg) do {                                              \
+                                                                    \
+    /* M2 */                                                        \
+    M_CYCLE_TICK;                                                   \
+    low_nibble = (reg & 0x0F);                                      \
+    high_nibble = (reg & 0xF0);                                     \
+    reg = (low_nibble << 4) | (high_nibble >> 4);                   \
+    MODIFY_FLAG(zero, (reg == 0));                                    \
+    CLEAR_FLAG(negative);                                           \
+    CLEAR_FLAG(half_carry);                                         \
+    CLEAR_FLAG(carry);                                              \
     FETCH_CYCLE;                                                    \
 } while (0)
 
@@ -399,4 +460,4 @@
     FETCH_CYCLE;                                                    \
 } while (0)
 
-#endif // INSTRUCTIONS_HELPER_H
+#endif /* INSTRUCTIONS_HELPER_H */

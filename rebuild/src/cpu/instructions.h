@@ -1,7 +1,7 @@
 #ifndef INSTRUCTIONS_H
 #define INSTRUCTIONS_H
 
-// Temp
+/* Temp */
 #include <stdbool.h>
 
 enum Opcode {
@@ -30,7 +30,7 @@ enum Opcode {
     OPCODE_LD_E_U8          = 0x1E,
     OPCODE_RRA              = 0x1F,
 
-    OPCODE_JP_NZ_I8         = 0x20,
+    OPCODE_JR_NZ_I8         = 0x20,
     OPCODE_LD_HL_U16        = 0x21,
     OPCODE_LD_IND_HLI_A     = 0x22,
     OPCODE_INC_HL           = 0x23,
@@ -43,8 +43,11 @@ enum Opcode {
     OPCODE_DEC_L            = 0x2D,
     OPCODE_LD_L_U8          = 0x2E,
 
+    OPCODE_JR_NC_I8         = 0x30,
     OPCODE_LD_SP_U16        = 0x31,
     OPCODE_LD_IND_HLD_A     = 0x32,
+    OPCODE_SCF              = 0x37,
+    OPCODE_JR_C_I8          = 0x38,
     OPCODE_ADD_HL_SP        = 0x39,
     OPCODE_INC_A            = 0x3C,
     OPCODE_DEC_A            = 0x3D,
@@ -189,16 +192,19 @@ enum Opcode {
     OPCODE_POP_BC           = 0xC1,
     OPCODE_JP_U16           = 0xC3,
     OPCODE_PUSH_BC          = 0xC5,
+    OPCODE_ADD_U8           = 0xC6,
     OPCODE_RET              = 0xC9,
     OPCODE_CB_PREFIX        = 0xCB,
     OPCODE_CALL             = 0xCD,
 
+    OPCODE_POP_DE           = 0xD1,
     OPCODE_PUSH_DE          = 0xD5,
     OPCODE_RST_0x18         = 0xDF,
 
     OPCODE_LDH_A_U8         = 0xE0,
     OPCODE_POP_HL           = 0xE1,
     OPCODE_PUSH_HL          = 0xE5,
+    OPCODE_AND_U8           = 0xE6,
     OPCODE_LD_IND_U16_A     = 0xEA,
 
     OPCODE_LDH_U8_A         = 0xF0,
@@ -222,6 +228,7 @@ enum CB_Opcode {
     CB_OPCODE_RR_IND_HL     = 0x1E,
     CB_OPCODE_RR_A          = 0x1F,
 
+    CB_OPCODE_SWAP_A        = 0x37,
     CB_OPCODE_SRL_B         = 0x38,
 };
 
@@ -245,4 +252,4 @@ bool execute_opcode(struct Gameboy *gb);
  */
 __attribute__((always_inline)) bool execute_cb_opcode(struct Gameboy *gb);
 
-#endif // INSTRUCTIONS_H
+#endif /* INSTRUCTIONS_H */

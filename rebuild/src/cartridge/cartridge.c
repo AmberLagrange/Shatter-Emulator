@@ -107,7 +107,7 @@ int init_cartridge(struct Cartridge *cart, u8 *rom_contents, u8 *ram_contents) {
 
 void cleanup_cartridge(struct Cartridge *cart) {
 
-    if (cart->rom_banks) {          // If rom_banks is allocated, then the rest are as well
+    if (cart->rom_banks) {          /* If rom_banks is allocated, then the rest are as well */
 
         free(cart->ram_banks);
         free(cart->rom_banks);
@@ -145,8 +145,8 @@ int load_rom_from_path(struct Cartridge *cart, const char *rom_path) {
 
 u8 read_byte_from_cart(struct Cartridge *cart, u16 address) {
 
-    // TODO: ROM/RAM banks
-    // This is just for testing Tetris
+    /* TODO: ROM/RAM banks */
+    /* This is just for testing Tetris */
 
     return cart->rom_banks[address];
 }

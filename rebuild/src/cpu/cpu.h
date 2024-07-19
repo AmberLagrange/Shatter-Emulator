@@ -129,4 +129,4 @@ void cleanup_cpu(struct CPU *cpu);
  */
 void reset_cpu(struct CPU *cpu);
 
-#endif // CPU_H
+#endif /* CPU_H */

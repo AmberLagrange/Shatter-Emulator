@@ -43,7 +43,7 @@ struct Cartridge {
     u8 *ram_banks;
     u8 ram_bank_index;
 
-    // TODO: Rest of cartridge features
+    /* TODO: Rest of cartridge features */
 };
 
 /**
@@ -91,4 +91,4 @@ int load_rom_from_path(struct Cartridge *cart, const char *rom_path);
  */
 u8 read_byte_from_cart(struct Cartridge *cart, u16 address);
 
-#endif // CART_H
+#endif /* CART_H */

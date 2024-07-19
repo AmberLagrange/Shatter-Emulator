@@ -81,7 +81,7 @@ void cleanup_screen(struct Screen *screen) {
 void update_screen(struct Screen *screen) {
 
     #ifndef GRAPHICS_DISABLED
-    // TODO: Proper screen
+    /* TODO: Proper screen */
     SDL_SetRenderDrawColor(screen->sdl_renderer, 255, 255, 255, 255);
     SDL_RenderClear(screen->sdl_renderer);
     SDL_RenderPresent(screen->sdl_renderer);
@@ -93,7 +93,7 @@ void update_screen(struct Screen *screen) {
 void poll_screen_events(struct Gameboy *gb) {
 
     #ifndef GRAPHICS_DISABLED
-    // TODO: Proper polling
+    /* TODO: Proper polling */
     SDL_PollEvent(&gb->screen.sdl_event);
     if (gb->screen.sdl_event.type == SDL_QUIT) {
         gb->running = false;

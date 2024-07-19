@@ -17,6 +17,6 @@ void cleanup_ppu(struct PPU *ppu) {
 
 void tick_ppu(struct PPU *ppu) {
 
-    // TODO:
+    /* TODO: */
     (void)ppu;
 }

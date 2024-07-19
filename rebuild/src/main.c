@@ -3,6 +3,16 @@
 #include <logging/logging.h>
 #include <gameboy.h>
 
+#include <signal.h>
+
+static struct Gameboy gb;
+
+void stop_gameboy(int sig) {
+
+    (void)sig;
+    gb.running = false;
+}
+
 int main(int argc, char **argv) {
 
     if (argc < 2) {
@@ -16,7 +26,6 @@ int main(int argc, char **argv) {
         goto cleanup;
     }
 
-    struct Gameboy gb;
     init_gameboy(&gb);
 
     if (load_rom_from_path(&gb.cart, argv[1])) {
@@ -25,6 +34,7 @@ int main(int argc, char **argv) {
     }
 
     start_gameboy(&gb);
+    signal(SIGINT, stop_gameboy);
     while (gb.running) {
 
         step(&gb);

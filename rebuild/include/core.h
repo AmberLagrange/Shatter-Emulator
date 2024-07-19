@@ -1,22 +1,22 @@
 #ifndef CORE_H
 #define CORE_H
 
-// General C Macros
+/* General C Macros */
 #define NULL ((void*)0)
 #define MAX_STR_LEN 256
 
-// Return type values
+/* Return type values */
 #define RETURN_OK 0
 #define INIT_FAIL -1
 
-// Endianness for register type punning
+/* Endianness for register type punning */
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
     #define IS_BIG_ENDIAN
 #else
     #define IS_LITTLE_ENDIAN
 #endif
 
-// Typedefs for common data types
+/* Typedefs for common data types */
 #include <stdint.h>
 
 typedef uint8_t     u8;
@@ -29,11 +29,11 @@ typedef int16_t     i16;
 typedef int32_t     i32;
 typedef int64_t     i64;
 
-// Defines for Gameboy screen
+/* Defines for Gameboy screen */
 #define SCREEN_WIDTH                160
 #define SCREEN_HEIGHT               144
 
-// DMG Reset values
+/* DMG Reset values */
 #define AF_RESET                    0x01B0
 #define BC_RESET                    0x0013
 #define DE_RESET                    0x00D8
@@ -41,7 +41,7 @@ typedef int64_t     i64;
 #define SP_RESET                    0xFFFE
 #define PC_RESET                    0x0100
 
-// Memory addresses
+/* Memory addresses */
 #define MEMORY_SIZE                 0x10000
 #define ROM_SIZE                    0x8000
 #define RAM_SIZE                    0x8000
@@ -55,7 +55,7 @@ typedef int64_t     i64;
 #define VIDEO_RAM_START             0x8000
 #define VIDEO_RAM_END               0x9FFF
 #define VIDEO_RAM_SIZE              0x2000
-#define VIDEO_RAM_BANK_COUNT        0x0002  // CGB Mode allows for 2 vram banks
+#define VIDEO_RAM_BANK_COUNT        0x0002  /* CGB Mode allows for 2 vram banks */
 
 #define EXTERNAL_RAM_START          0xA000
 #define EXTERNAL_RAM_END            0xBFFF
@@ -65,16 +65,16 @@ typedef int64_t     i64;
 #define WORK_RAM_0_END              0xCFFF
 #define WORK_RAM_0_SIZE             0x1000
 
-#define WORK_RAM_SWAPPABLE_START    0xD000  // CGB Mode allows swapping banks
+#define WORK_RAM_SWAPPABLE_START    0xD000  /* CGB Mode allows swapping banks */
 #define WORK_RAM_SWAPPABLE_END      0xDFFF
 #define WORK_RAM_SWAPPABLE_SIZE     0x1000
 #define WORK_RAM_SWAPPABLE_COUNT    0x0007
 
-#define ECHO_RAM_0_START            0xE000  // Prohibited by Nintendo
+#define ECHO_RAM_0_START            0xE000  /* Prohibited by Nintendo */
 #define ECHO_RAM_0_END              0xEFFF
 #define ECHO_RAM_0_SIZE             0x1000
 
-#define ECHO_RAM_SWAPPABLE_START    0xF000  // Swappable echo ram just maps to swappable work ram
+#define ECHO_RAM_SWAPPABLE_START    0xF000  /* Swappable echo ram just maps to swappable work ram */
 #define ECHO_RAM_SWAPPABLE_END      0xFDFF
 #define ECHO_RAM_SWAPPABLE_SIZE     0x0E00
 
@@ -82,7 +82,7 @@ typedef int64_t     i64;
 #define OAM_END                     0xFE9F
 #define OAM_SIZE                    0x00A0
 
-#define NOT_USABLE_START            0xFEA0  // Prohibited by Nintendo
+#define NOT_USABLE_START            0xFEA0  /* Prohibited by Nintendo */
 #define NOT_USABLE_END              0xFEFF
 #define NOT_USABLE_SIZE             0x0060
 
@@ -94,9 +94,9 @@ typedef int64_t     i64;
 #define HIGH_RAM_END                0xFFFE
 #define HIGH_RAM_SIZE               0x007F
 
-#define IE_REGISTER_ADDRESS         0xFFFF  // No need for size as it's one byte
+#define IE_REGISTER_ADDRESS         0xFFFF  /* No need for size as it's one byte */
 
-// Cartridge Header
+/* Cartridge Header */
 #define HEADER_START                0x0100
 #define HEADER_END                  0x0150
 #define HEADER_SIZE                 0x0050
@@ -117,11 +117,11 @@ typedef int64_t     i64;
 #define CGB_CARTRIDGE_TITLE_END     0x013E
 #define CGB_CARTRIDGE_TITLE_SIZE    0x000B
 
-#define MANUFACTURER_CODE_START     0x013F  // Note: In older cartridges, this is
-#define MANUFACTURER_CODE_END       0x0142  // Part of the title.
-#define MANUFACTURER_CODE_SIZE      0x0004  // TODO: Proper handling of this
+#define MANUFACTURER_CODE_START     0x013F  /* Note: In older cartridges, this is */
+#define MANUFACTURER_CODE_END       0x0142  /* Part of the title.                 */
+#define MANUFACTURER_CODE_SIZE      0x0004  /* TODO: Proper handling of this      */
 
-#define CGB_FLAG_ADDRESS            0x0143  // See above
+#define CGB_FLAG_ADDRESS            0x0143  /* See above */
 
 #define NEW_LICENSEE_CODE_START     0x0144
 #define NEW_LICENSEE_CODE_END       0x0145
@@ -147,7 +147,7 @@ typedef int64_t     i64;
 #define GLOBAL_CHECKSUM_END         0x014F
 #define GLOBAL_CHECKSUM_SIZE        0x0002
 
-// SGB
+/* SGB */
 #define CGB_SUPPORT_FLAG            0x80
 #define CGB_REQUIRE_FLAG            0xC0
 #define SGB_ENABLE_FLAG             0x03

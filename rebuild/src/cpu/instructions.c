@@ -20,119 +20,119 @@ bool execute_opcode(struct Gameboy *gb) {
 
     switch (opcode) {
 
-//--------------------------------0x00--------------------------------//
+/*--------------------------------0x00--------------------------------*/
 
-        // 0x00
+        /* 0x00 */
         case OPCODE_NOP:
 
             NOP();
 
-        // 0x01
+        /* 0x01 */
         case OPCODE_LD_BC_U16:
 
             LD_RR_U16(gb->cpu.registers.bc);
 
-        // 0x02
+        /* 0x02 */
         case OPCODE_LD_IND_BC_A:
 
             LD_IND_RR_A(gb->cpu.registers.bc);
 
-        // 0x03
+        /* 0x03 */
         case OPCODE_INC_BC:
 
             INC_RR(gb->cpu.registers.bc);
 
-        // 0x04
+        /* 0x04 */
         case OPCODE_INC_B:
 
             INC_R(gb->cpu.registers.b);
 
-        // 0x05
+        /* 0x05 */
         case OPCODE_DEC_B:
 
             DEC_R(gb->cpu.registers.b);
 
-        // 0x06
+        /* 0x06 */
         case OPCODE_LD_B_U8:
 
             LD_R_U8(gb->cpu.registers.b);
 
-        // 0x0A
+        /* 0x0A */
         case OPCODE_LD_A_IND_BC:
 
             LD_A_IND_RR(gb->cpu.registers.bc);
 
-        // 0x0C
+        /* 0x0C */
         case OPCODE_INC_C:
 
             INC_R(gb->cpu.registers.c);
 
-        // 0x0D
+        /* 0x0D */
         case OPCODE_DEC_C:
 
             DEC_R(gb->cpu.registers.c);
 
-        // 0x0E
+        /* 0x0E */
         case OPCODE_LD_C_U8:
 
             LD_R_U8(gb->cpu.registers.c);
 
-//--------------------------------0x10--------------------------------//
+/*--------------------------------0x10--------------------------------*/
 
-        // 0x11
+        /* 0x11 */
         case OPCODE_LD_DE_U16:
 
             LD_RR_U16(gb->cpu.registers.de);
 
-        // 0x12
+        /* 0x12 */
         case OPCODE_LD_IND_DE_A:
 
             LD_IND_RR_A(gb->cpu.registers.de);
 
-        // 0x13
+        /* 0x13 */
         case OPCODE_INC_DE:
 
             INC_RR(gb->cpu.registers.de);
 
-        // 0x14
+        /* 0x14 */
         case OPCODE_INC_D:
 
             INC_R(gb->cpu.registers.d);
 
-        // 0x15
+        /* 0x15 */
         case OPCODE_DEC_D:
 
             DEC_R(gb->cpu.registers.d);
 
-        // 0x16
+        /* 0x16 */
         case OPCODE_LD_D_U8:
 
             LD_R_U8(gb->cpu.registers.d);
 
-        // 0x18
+        /* 0x18 */
         case OPCODE_JR_I8:
 
             JP_COND_REL(true);
 
-        // 0x1C
+        /* 0x1C */
         case OPCODE_INC_E:
 
             INC_R(gb->cpu.registers.e);
 
-        // 0x1D
+        /* 0x1D */
         case OPCODE_DEC_E:
 
             DEC_R(gb->cpu.registers.e);
 
-        // 0x1E
+        /* 0x1E */
         case OPCODE_LD_E_U8:
 
             LD_R_U8(gb->cpu.registers.e);
 
-        // 0x1F
-        case OPCODE_RRA: // Same as RR A, except zero flag isn't set
+        /* 0x1F */
+        case OPCODE_RRA: /* Same as RR A, except zero flag isn't set */
 
-            // M1
+            /* M1 */
             M_CYCLE_TICK;
             is_carry = GET_FLAG(carry);
             MODIFY_FLAG(carry, GET_BIT(gb->cpu.registers.a, 0));
@@ -142,1004 +142,1049 @@ bool execute_opcode(struct Gameboy *gb) {
             CLEAR_FLAG(half_carry);
             FETCH_CYCLE;
 
-//--------------------------------0x20--------------------------------//
+/*--------------------------------0x20--------------------------------*/
 
-        // 0x20
-        case OPCODE_JP_NZ_I8:
+        /* 0x20 */
+        case OPCODE_JR_NZ_I8:
 
             JP_COND_REL(!GET_FLAG(zero));
 
-        // 0x21
+        /* 0x21 */
         case OPCODE_LD_HL_U16:
 
             LD_RR_U16(gb->cpu.registers.hl);
 
-        // 0x22
+        /* 0x22 */
         case OPCODE_LD_IND_HLI_A:
 
             LD_IND_RR_A(gb->cpu.registers.hl++);
 
-        // 0x23
+        /* 0x23 */
         case OPCODE_INC_HL:
 
             INC_RR(gb->cpu.registers.hl);
 
-        // 0x24
+        /* 0x24 */
         case OPCODE_INC_H:
 
             INC_R(gb->cpu.registers.h);
 
-        // 0x25
+        /* 0x25 */
         case OPCODE_DEC_H:
 
             DEC_R(gb->cpu.registers.h);
 
-        // 0x26
+        /* 0x26 */
         case OPCODE_LD_H_U8:
 
             LD_R_U8(gb->cpu.registers.h);
 
-        // 0x27
+        /* 0x27 */
         case OPCODE_DAA:
 
-            // TODO: Proper DAA
+            /* TODO: Proper DAA */
             NOP();
 
-        // 0x2A
+        /* 0x2A */
         case OPCODE_LD_A_IND_HLI:
 
             LD_A_IND_RR(gb->cpu.registers.hl++);
 
-        // 0x2C
+        /* 0x2C */
         case OPCODE_INC_L:
 
             INC_R(gb->cpu.registers.l);
 
-        // 0x2D
+        /* 0x2D */
         case OPCODE_DEC_L:
 
             DEC_R(gb->cpu.registers.l);
 
-        // 0x2E
+        /* 0x2E */
         case OPCODE_LD_L_U8:
 
             LD_R_U8(gb->cpu.registers.l);
 
-//--------------------------------0x30--------------------------------//
+/*--------------------------------0x30--------------------------------*/
+
+        /* 0x30 */
+        case OPCODE_JR_NC_I8:
+
+            JP_COND_REL(!GET_FLAG(carry));
 
         case OPCODE_LD_SP_U16:
 
             LD_RR_U16(gb->cpu.registers.sp);
 
-        // 0x32
+        /* 0x32 */
         case OPCODE_LD_IND_HLD_A:
 
             LD_IND_RR_A(gb->cpu.registers.hl--);
 
-        // 0x39
+        /* 0x37 */
+        case OPCODE_SCF:
+
+            M_CYCLE_TICK;
+            SET_FLAG(carry);
+            FETCH_CYCLE;
+
+        /* 0x38 */
+        case OPCODE_JR_C_I8:
+
+            JP_COND_REL(GET_FLAG(carry));
+
+        /* 0x39 */
         case OPCODE_ADD_HL_SP:
 
             ADD_HL_RR(gb->cpu.registers.sp);
 
-        // 0x3C
+        /* 0x3C */
         case OPCODE_INC_A:
 
             INC_R(gb->cpu.registers.a);
 
-        // 0x3C
+        /* 0x3C */
         case OPCODE_DEC_A:
 
             DEC_R(gb->cpu.registers.a);
 
-        // 0x3E
+        /* 0x3E */
         case OPCODE_LD_A_U8:
 
             LD_R_U8(gb->cpu.registers.a);
 
-//--------------------------------0x40--------------------------------//
+/*--------------------------------0x40--------------------------------*/
 
-        // 0x40
+        /* 0x40 */
         case OPCODE_LD_B_B:
 
             LD_R_R(gb->cpu.registers.b, gb->cpu.registers.b);
 
-        // 0x41
+        /* 0x41 */
         case OPCODE_LD_B_C:
 
             LD_R_R(gb->cpu.registers.b, gb->cpu.registers.c);
 
-        // 0x42
+        /* 0x42 */
         case OPCODE_LD_B_D:
 
             LD_R_R(gb->cpu.registers.b, gb->cpu.registers.d);
 
-        // 0x43
+        /* 0x43 */
         case OPCODE_LD_B_E:
 
             LD_R_R(gb->cpu.registers.b, gb->cpu.registers.e);
 
-        // 0x44
+        /* 0x44 */
         case OPCODE_LD_B_H:
 
             LD_R_R(gb->cpu.registers.b, gb->cpu.registers.h);
 
-        // 0x45
+        /* 0x45 */
         case OPCODE_LD_B_L:
 
             LD_R_R(gb->cpu.registers.b, gb->cpu.registers.l);
 
-        // 0x46
+        /* 0x46 */
         case OPCODE_LD_B_IND_HL:
 
             LD_R_IND_HL(gb->cpu.registers.b);
 
-        // 0x47
+        /* 0x47 */
         case OPCODE_LD_B_A:
 
             LD_R_R(gb->cpu.registers.b, gb->cpu.registers.a);
 
-        // 0x48
+        /* 0x48 */
         case OPCODE_LD_C_B:
 
             LD_R_R(gb->cpu.registers.c, gb->cpu.registers.b);
 
-        // 0x49
+        /* 0x49 */
         case OPCODE_LD_C_C:
 
             LD_R_R(gb->cpu.registers.c, gb->cpu.registers.c);
 
-        // 0x4A
+        /* 0x4A */
         case OPCODE_LD_C_D:
 
             LD_R_R(gb->cpu.registers.c, gb->cpu.registers.d);
 
-        // 0x4B
+        /* 0x4B */
         case OPCODE_LD_C_E:
 
             LD_R_R(gb->cpu.registers.c, gb->cpu.registers.e);
 
-        // 0x4C
+        /* 0x4C */
         case OPCODE_LD_C_H:
 
             LD_R_R(gb->cpu.registers.c, gb->cpu.registers.h);
 
-        // 0x4D
+        /* 0x4D */
         case OPCODE_LD_C_L:
 
             LD_R_R(gb->cpu.registers.c, gb->cpu.registers.l);
 
-        // 0x4E
+        /* 0x4E */
         case OPCODE_LD_C_IND_HL:
 
             LD_R_IND_HL(gb->cpu.registers.c);
 
-        // 0x4F
+        /* 0x4F */
         case OPCODE_LD_C_A:
 
             LD_R_R(gb->cpu.registers.c, gb->cpu.registers.a);
 
-//--------------------------------0x50--------------------------------//
+/*--------------------------------0x50--------------------------------*/
 
-        // 0x50
+        /* 0x50 */
         case OPCODE_LD_D_B:
 
             LD_R_R(gb->cpu.registers.d, gb->cpu.registers.b);
 
-        // 0x51
+        /* 0x51 */
         case OPCODE_LD_D_C:
 
             LD_R_R(gb->cpu.registers.d, gb->cpu.registers.c);
 
-        // 0x52
+        /* 0x52 */
         case OPCODE_LD_D_D:
 
             LD_R_R(gb->cpu.registers.d, gb->cpu.registers.d);
 
-        // 0x53
+        /* 0x53 */
         case OPCODE_LD_D_E:
 
             LD_R_R(gb->cpu.registers.d, gb->cpu.registers.e);
 
-        // 0x54
+        /* 0x54 */
         case OPCODE_LD_D_H:
 
             LD_R_R(gb->cpu.registers.d, gb->cpu.registers.h);
 
-        // 0x55
+        /* 0x55 */
         case OPCODE_LD_D_L:
 
             LD_R_R(gb->cpu.registers.d, gb->cpu.registers.l);
 
-        // 0x56
+        /* 0x56 */
         case OPCODE_LD_D_IND_HL:
 
             LD_R_IND_HL(gb->cpu.registers.d);
 
-        // 0x57
+        /* 0x57 */
         case OPCODE_LD_D_A:
 
             LD_R_R(gb->cpu.registers.d, gb->cpu.registers.a);
 
-        // 0x58
+        /* 0x58 */
         case OPCODE_LD_E_B:
 
             LD_R_R(gb->cpu.registers.e, gb->cpu.registers.b);
 
-        // 0x59
+        /* 0x59 */
         case OPCODE_LD_E_C:
 
             LD_R_R(gb->cpu.registers.e, gb->cpu.registers.c);
 
-        // 0x5A
+        /* 0x5A */
         case OPCODE_LD_E_D:
 
             LD_R_R(gb->cpu.registers.e, gb->cpu.registers.d);
 
-        // 0x5B
+        /* 0x5B */
         case OPCODE_LD_E_E:
 
             LD_R_R(gb->cpu.registers.e, gb->cpu.registers.e);
 
-        // 0x5C
+        /* 0x5C */
         case OPCODE_LD_E_H:
 
             LD_R_R(gb->cpu.registers.e, gb->cpu.registers.h);
 
-        // 0x5D
+        /* 0x5D */
         case OPCODE_LD_E_L:
 
             LD_R_R(gb->cpu.registers.e, gb->cpu.registers.l);
 
-        // 0x5E
+        /* 0x5E */
         case OPCODE_LD_E_IND_HL:
 
             LD_R_IND_HL(gb->cpu.registers.e);
 
-        // 0x5F
+        /* 0x5F */
         case OPCODE_LD_E_A:
 
             LD_R_R(gb->cpu.registers.e, gb->cpu.registers.a);
 
-//--------------------------------0x60--------------------------------//
+/*--------------------------------0x60--------------------------------*/
 
-        // 0x60
+        /* 0x60 */
         case OPCODE_LD_H_B:
 
             LD_R_R(gb->cpu.registers.h, gb->cpu.registers.b);
 
-        // 0x61
+        /* 0x61 */
         case OPCODE_LD_H_C:
 
             LD_R_R(gb->cpu.registers.h, gb->cpu.registers.c);
 
-        // 0x62
+        /* 0x62 */
         case OPCODE_LD_H_D:
 
             LD_R_R(gb->cpu.registers.h, gb->cpu.registers.d);
 
-        // 0x63
+        /* 0x63 */
         case OPCODE_LD_H_E:
 
             LD_R_R(gb->cpu.registers.h, gb->cpu.registers.e);
 
-        // 0x64
+        /* 0x64 */
         case OPCODE_LD_H_H:
 
             LD_R_R(gb->cpu.registers.h, gb->cpu.registers.h);
 
-        // 0x65
+        /* 0x65 */
         case OPCODE_LD_H_L:
 
             LD_R_R(gb->cpu.registers.h, gb->cpu.registers.l);
 
-        // 0x66
+        /* 0x66 */
         case OPCODE_LD_H_IND_HL:
 
             LD_R_IND_HL(gb->cpu.registers.h);
 
-        // 0x67
+        /* 0x67 */
         case OPCODE_LD_H_A:
 
             LD_R_R(gb->cpu.registers.h, gb->cpu.registers.a);
 
-        // 0x68
+        /* 0x68 */
         case OPCODE_LD_L_B:
 
             LD_R_R(gb->cpu.registers.l, gb->cpu.registers.b);
 
-        // 0x69
+        /* 0x69 */
         case OPCODE_LD_L_C:
 
             LD_R_R(gb->cpu.registers.l, gb->cpu.registers.c);
 
-        // 0x6A
+        /* 0x6A */
         case OPCODE_LD_L_D:
 
             LD_R_R(gb->cpu.registers.l, gb->cpu.registers.d);
 
-        // 0x6B
+        /* 0x6B */
         case OPCODE_LD_L_E:
 
             LD_R_R(gb->cpu.registers.l, gb->cpu.registers.e);
 
-        // 0x6C
+        /* 0x6C */
         case OPCODE_LD_L_H:
 
             LD_R_R(gb->cpu.registers.l, gb->cpu.registers.h);
 
-        // 0x6D
+        /* 0x6D */
         case OPCODE_LD_L_L:
 
             LD_R_R(gb->cpu.registers.l, gb->cpu.registers.l);
 
-        // 0x6E
+        /* 0x6E */
         case OPCODE_LD_L_IND_HL:
 
             LD_R_IND_HL(gb->cpu.registers.l);
 
-        // 0x6F
+        /* 0x6F */
         case OPCODE_LD_L_A:
 
             LD_R_R(gb->cpu.registers.l, gb->cpu.registers.a);
 
-//--------------------------------0x70--------------------------------//
+/*--------------------------------0x70--------------------------------*/
 
-        // 0x70
+        /* 0x70 */
         case OPCODE_LD_IND_HL_B:
 
             LD_IND_HL_R(gb->cpu.registers.b);
 
-        // 0x71
+        /* 0x71 */
         case OPCODE_LD_IND_HL_C:
 
             LD_IND_HL_R(gb->cpu.registers.c);
 
-        // 0x72
+        /* 0x72 */
         case OPCODE_LD_IND_HL_D:
 
             LD_IND_HL_R(gb->cpu.registers.d);
 
-        // 0x73
+        /* 0x73 */
         case OPCODE_LD_IND_HL_E:
 
             LD_IND_HL_R(gb->cpu.registers.e);
 
-        // 0x74
+        /* 0x74 */
         case OPCODE_LD_IND_HL_H:
 
             LD_IND_HL_R(gb->cpu.registers.h);
 
-        // 0x75
+        /* 0x75 */
         case OPCODE_LD_IND_HL_L:
 
             LD_IND_HL_R(gb->cpu.registers.l);
 
-        // 0x76
+        /* 0x76 */
 
-        // 0x77
+        /* 0x77 */
         case OPCODE_LD_IND_HL_A:
 
             LD_IND_HL_R(gb->cpu.registers.a);
 
-        // 0x78
+        /* 0x78 */
         case OPCODE_LD_A_B:
 
             LD_R_R(gb->cpu.registers.a, gb->cpu.registers.b);
 
-        // 0x79
+        /* 0x79 */
         case OPCODE_LD_A_C:
 
             LD_R_R(gb->cpu.registers.a, gb->cpu.registers.c);
 
-        // 0x7A
+        /* 0x7A */
         case OPCODE_LD_A_D:
 
             LD_R_R(gb->cpu.registers.a, gb->cpu.registers.d);
 
-        // 0x7B
+        /* 0x7B */
         case OPCODE_LD_A_E:
 
             LD_R_R(gb->cpu.registers.a, gb->cpu.registers.e);
 
-        // 0x7C
+        /* 0x7C */
         case OPCODE_LD_A_H:
 
             LD_R_R(gb->cpu.registers.a, gb->cpu.registers.h);
 
-        // 0x7D
+        /* 0x7D */
         case OPCODE_LD_A_L:
 
             LD_R_R(gb->cpu.registers.a, gb->cpu.registers.l);
 
-        // 0x7E
+        /* 0x7E */
         case OPCODE_LD_A_IND_HL:
 
             LD_R_IND_HL(gb->cpu.registers.a);
 
-        // 0x7F
+        /* 0x7F */
         case OPCODE_LD_A_A:
 
             LD_R_R(gb->cpu.registers.a, gb->cpu.registers.a);
 
-//--------------------------------0x80--------------------------------//
+/*--------------------------------0x80--------------------------------*/
 
-        // 0x80
+        /* 0x80 */
         case OPCODE_ADD_B:
 
             ADD(gb->cpu.registers.b);
 
-        // 0x81
+        /* 0x81 */
         case OPCODE_ADD_C:
 
             ADD(gb->cpu.registers.c);
 
-        // 0x82
+        /* 0x82 */
         case OPCODE_ADD_D:
 
             ADD(gb->cpu.registers.d);
 
-        // 0x83
+        /* 0x83 */
         case OPCODE_ADD_E:
 
             ADD(gb->cpu.registers.e);
 
-        // 0x84
+        /* 0x84 */
         case OPCODE_ADD_H:
 
             ADD(gb->cpu.registers.h);
 
-        // 0x85
+        /* 0x85 */
         case OPCODE_ADD_L:
 
             ADD(gb->cpu.registers.l);
 
-        // 0x86
+        /* 0x86 */
         case OPCODE_ADD_IND_HL:
 
-            // M1
+            /* M1 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.hl, byte);
 
-            // M2
+            /* M2 */
             ADD(byte);
 
-        // 0x87
+        /* 0x87 */
         case OPCODE_ADD_A:
 
             ADD(gb->cpu.registers.a);
 
-        // 0x88
+        /* 0x88 */
         case OPCODE_ADC_B:
 
             ADC(gb->cpu.registers.a);
 
-        // 0x89
+        /* 0x89 */
         case OPCODE_ADC_C:
 
             ADC(gb->cpu.registers.c);
 
-        // 0x8A
+        /* 0x8A */
         case OPCODE_ADC_D:
 
             ADC(gb->cpu.registers.d);
 
-        // 0x8B
+        /* 0x8B */
         case OPCODE_ADC_E:
 
             ADC(gb->cpu.registers.e);
 
-        // 0x8C
+        /* 0x8C */
         case OPCODE_ADC_H:
 
             ADC(gb->cpu.registers.h);
 
-        // 0x8D
+        /* 0x8D */
         case OPCODE_ADC_L:
 
             ADC(gb->cpu.registers.l);
 
-        // 0x8E
+        /* 0x8E */
         case OPCODE_ADC_IND_HL:
 
-            // M1
+            /* M1 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.hl, byte);
 
-            // M2
+            /* M2 */
             ADC(byte);
 
-        // 0x8F
+        /* 0x8F */
         case OPCODE_ADC_A:
 
             ADC(gb->cpu.registers.a);
 
 
-//--------------------------------0x90--------------------------------//
+/*--------------------------------0x90--------------------------------*/
 
-        // 0x90
+        /* 0x90 */
         case OPCODE_SUB_B:
 
             SUB(gb->cpu.registers.b);
 
-        // 0x91
+        /* 0x91 */
         case OPCODE_SUB_C:
 
             SUB(gb->cpu.registers.c);
 
-        // 0x92
+        /* 0x92 */
         case OPCODE_SUB_D:
 
             SUB(gb->cpu.registers.d);
 
-        // 0x93
+        /* 0x93 */
         case OPCODE_SUB_E:
 
             SUB(gb->cpu.registers.e);
 
-        // 0x94
+        /* 0x94 */
         case OPCODE_SUB_H:
 
             SUB(gb->cpu.registers.h);
 
-        // 0x95
+        /* 0x95 */
         case OPCODE_SUB_L:
 
             SUB(gb->cpu.registers.l);
 
-        // 0x96
+        /* 0x96 */
         case OPCODE_SUB_IND_HL:
 
-            // M1
+            /* M1 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.hl, byte);
 
-            // M2
+            /* M2 */
             SUB(byte);
 
-        // 0x97
+        /* 0x97 */
         case OPCODE_SUB_A:
 
             SUB(gb->cpu.registers.a);
 
-        // 0x98
+        /* 0x98 */
         case OPCODE_SBC_B:
 
             SBC(gb->cpu.registers.b);
 
-        // 0x99
+        /* 0x99 */
         case OPCODE_SBC_C:
 
             SBC(gb->cpu.registers.c);
 
-        // 0x9A
+        /* 0x9A */
         case OPCODE_SBC_D:
 
             SBC(gb->cpu.registers.d);
 
-        // 0x9B
+        /* 0x9B */
         case OPCODE_SBC_E:
 
             SBC(gb->cpu.registers.e);
 
-        // 0x9C
+        /* 0x9C */
         case OPCODE_SBC_H:
 
             SBC(gb->cpu.registers.h);
 
-        // 0x9D
+        /* 0x9D */
         case OPCODE_SBC_L:
 
             SBC(gb->cpu.registers.l);
 
-        // 0x9E
+        /* 0x9E */
         case OPCODE_SBC_IND_HL:
 
-            // M1
+            /* M1 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.hl, byte);
 
-            // M2
+            /* M2 */
             SBC(byte);
 
-        // 0x9F
+        /* 0x9F */
         case OPCODE_SBC_A:
 
             SBC(gb->cpu.registers.a);
 
 
-//--------------------------------0xA0--------------------------------//
+/*--------------------------------0xA0--------------------------------*/
 
-        // 0xA0
+        /* 0xA0 */
         case OPCODE_AND_B:
 
             AND(gb->cpu.registers.b);
 
-        // 0xA1
+        /* 0xA1 */
         case OPCODE_AND_C:
 
             AND(gb->cpu.registers.c);
 
-        // 0xA2
+        /* 0xA2 */
         case OPCODE_AND_D:
 
             AND(gb->cpu.registers.d);
 
-        // 0xA3
+        /* 0xA3 */
         case OPCODE_AND_E:
 
             AND(gb->cpu.registers.e);
 
-        // 0xA4
+        /* 0xA4 */
         case OPCODE_AND_H:
 
             AND(gb->cpu.registers.h);
 
-        // 0xA5
+        /* 0xA5 */
         case OPCODE_AND_L:
 
             AND(gb->cpu.registers.l);
 
-        // 0xA6
+        /* 0xA6 */
         case OPCODE_AND_IND_HL:
 
-            // M1
+            /* M1 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.hl, byte);
 
-            // M2
+            /* M2 */
             AND(byte);
 
-        // 0xA7
+        /* 0xA7 */
         case OPCODE_AND_A:
 
             AND(gb->cpu.registers.a);
 
-        // 0xA8
+        /* 0xA8 */
         case OPCODE_XOR_B:
 
             XOR(gb->cpu.registers.b);
 
-        // 0xA9
+        /* 0xA9 */
         case OPCODE_XOR_C:
 
             XOR(gb->cpu.registers.c);
 
-        // 0xAA
+        /* 0xAA */
         case OPCODE_XOR_D:
 
             XOR(gb->cpu.registers.d);
 
-        // 0xAB
+        /* 0xAB */
         case OPCODE_XOR_E:
 
             XOR(gb->cpu.registers.e);
 
-        // 0xAC
+        /* 0xAC */
         case OPCODE_XOR_H:
 
             XOR(gb->cpu.registers.h);
 
-        // 0xAD
+        /* 0xAD */
         case OPCODE_XOR_L:
 
             XOR(gb->cpu.registers.l);
 
-        // 0xAE
+        /* 0xAE */
         case OPCODE_XOR_IND_HL:
 
-            // M1
+            /* M1 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.hl, byte);
 
-            // M2
+            /* M2 */
             XOR(byte);
 
-        // 0xAF
+        /* 0xAF */
         case OPCODE_XOR_A:
 
             XOR(gb->cpu.registers.a);
 
-//--------------------------------0xB0--------------------------------//
+/*--------------------------------0xB0--------------------------------*/
 
-        // 0xB0
+        /* 0xB0 */
         case OPCODE_OR_B:
 
             OR(gb->cpu.registers.b);
 
-        // 0xB1
+        /* 0xB1 */
         case OPCODE_OR_C:
 
             OR(gb->cpu.registers.c);
 
-        // 0xB2
+        /* 0xB2 */
         case OPCODE_OR_D:
 
             OR(gb->cpu.registers.d);
 
-        // 0xB3
+        /* 0xB3 */
         case OPCODE_OR_E:
 
             OR(gb->cpu.registers.e);
 
-        // 0xB4
+        /* 0xB4 */
         case OPCODE_OR_H:
 
             OR(gb->cpu.registers.h);
 
-        // 0xB5
+        /* 0xB5 */
         case OPCODE_OR_L:
 
             OR(gb->cpu.registers.l);
 
-        // 0xB6
+        /* 0xB6 */
         case OPCODE_OR_IND_HL:
 
-            // M1
+            /* M1 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.hl, byte);
 
-            // M2
+            /* M2 */
             OR(byte);
 
-        // 0xB7
+        /* 0xB7 */
         case OPCODE_OR_A:
 
             OR(gb->cpu.registers.a);
 
-        // 0xB8
+        /* 0xB8 */
         case OPCODE_CP_B:
 
             CP(gb->cpu.registers.b);
 
-        // 0xB9
+        /* 0xB9 */
         case OPCODE_CP_C:
 
             CP(gb->cpu.registers.c);
 
-        // 0xBA
+        /* 0xBA */
         case OPCODE_CP_D:
 
             CP(gb->cpu.registers.d);
 
-        // 0xBB
+        /* 0xBB */
         case OPCODE_CP_E:
 
             CP(gb->cpu.registers.e);
 
-        // 0xBC
+        /* 0xBC */
         case OPCODE_CP_H:
 
             CP(gb->cpu.registers.h);
 
-        // 0xBD
+        /* 0xBD */
         case OPCODE_CP_L:
 
             CP(gb->cpu.registers.l);
 
-        // 0xBE
+        /* 0xBE */
         case OPCODE_CP_IND_HL:
 
-            // M1
+            /* M1 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.hl, byte);
 
-            // M2
+            /* M2 */
             CP(byte);
 
-        // 0xBF
+        /* 0xBF */
         case OPCODE_CP_A:
 
             CP(gb->cpu.registers.a);
 
-//--------------------------------0xC0--------------------------------//
+/*--------------------------------0xC0--------------------------------*/
 
-        // 0xC1
+        /* 0xC1 */
         case OPCODE_POP_BC:
 
             POP_RR(gb->cpu.registers.bc);
 
-        // 0xC3
+        /* 0xC3 */
         case OPCODE_JP_U16:
 
             JP_COND_ABS(true);
 
-        // 0xC5
+        /* 0xC5 */
         case OPCODE_PUSH_BC:
 
             PUSH_RR(gb->cpu.registers.bc);
 
-        // 0xC9
+        /* 0xC6 */
+        case OPCODE_ADD_U8:
+
+            /* M1 */
+            FETCH_CYCLE;
+            READ_BYTE(gb->cpu.registers.pc++, byte);
+
+            /* M2 */
+            ADD(byte);
+
+        /* 0xC9 */
         case OPCODE_RET:
 
-            // M1
+            /* M1 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.sp++, low_byte);
 
-            // M2
+            /* M2 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.sp++, high_byte);
 
-            // M3
+            /* M3 */
             M_CYCLE_TICK;
             gb->cpu.registers.pc = (((u16)(high_byte)) << 8) | low_byte;
 
-            // M4
+            /* M4 */
             M_CYCLE_TICK;
             FETCH_CYCLE;
 
-        // 0xCB
+        /* 0xCB */
         case OPCODE_CB_PREFIX:
 
             CB_PREFIX();
 
-        // 0xCD
+        /* 0xCD */
         case OPCODE_CALL:
 
-            // M1
+            /* M1 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.pc++, low_byte);
 
-            // M2
+            /* M2 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.pc++, high_byte);
 
-            // M3
+            /* M3 */
             M_CYCLE_TICK;
             gb->cpu.registers.sp--;
 
-            // M4
+            /* M4 */
             M_CYCLE_TICK;
             WRITE_BYTE(gb->cpu.registers.sp--, (u8)((gb->cpu.registers.pc & 0xFF00) >> 8));
 
-            // M5
+            /* M5 */
             M_CYCLE_TICK;
             WRITE_BYTE(gb->cpu.registers.sp, (u8)((gb->cpu.registers.pc & 0x00FF) >> 0));
             gb->cpu.registers.pc = (((u16)(high_byte) << 8) | low_byte);
 
-            // M6
+            /* M6 */
             M_CYCLE_TICK;
             FETCH_CYCLE;
 
-//--------------------------------0xD0--------------------------------//
+/*--------------------------------0xD0--------------------------------*/
 
-        // 0xD5
+        /* 0xD1 */
+        case OPCODE_POP_DE:
+
+            POP_RR(gb->cpu.registers.de);
+
+        /* 0xD5 */
         case OPCODE_PUSH_DE:
 
             PUSH_RR(gb->cpu.registers.de);
 
-        // 0xDF
+        /* 0xDF */
         case OPCODE_RST_0x18:
 
             RST(0x0018);
 
-//--------------------------------0xE0--------------------------------//
+/*--------------------------------0xE0--------------------------------*/
 
-        // 0xE0
+        /* 0xE0 */
         case OPCODE_LDH_A_U8:
 
-            // M1
+            /* M1 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.pc++, low_byte);
 
-            // M2
+            /* M2 */
             M_CYCLE_TICK;
             high_byte = UINT8_MAX;
             WRITE_BYTE(((u16)high_byte << 8) | low_byte, gb->cpu.registers.a);
 
-            // M3
+            /* M3 */
             M_CYCLE_TICK;
             FETCH_CYCLE;
 
-        // 0xE1
+        /* 0xE1 */
         case OPCODE_POP_HL:
 
             POP_RR(gb->cpu.registers.hl);
 
-        // 0xE5
+        /* 0xE5 */
         case OPCODE_PUSH_HL:
 
             PUSH_RR(gb->cpu.registers.hl);
 
-        // 0xEA
+        /* 0xE6 */
+        case OPCODE_AND_U8:
+
+            /* M1 */
+            M_CYCLE_TICK;
+            READ_BYTE(gb->cpu.registers.pc++, byte);
+
+            /* M2 */
+            AND(byte);
+
+        /* 0xEA */
         case OPCODE_LD_IND_U16_A:
 
-            // M1
+            /* M1 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.pc++, low_byte);
 
-            // M2
+            /* M2 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.pc++, high_byte);
 
-            // M3
+            /* M3 */
             M_CYCLE_TICK;
             WRITE_BYTE((((u16)high_byte << 8) | low_byte), gb->cpu.registers.a);
 
-            // M4
+            /* M4 */
             M_CYCLE_TICK;
             FETCH_CYCLE;
 
-//--------------------------------0xF0--------------------------------//
+/*--------------------------------0xF0--------------------------------*/
 
-        // 0xF0
+        /* 0xF0 */
         case OPCODE_LDH_U8_A:
 
-            // M1
+            /* M1 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.pc++, low_byte);
 
-            // M2
+            /* M2 */
             M_CYCLE_TICK;
             high_byte = UINT8_MAX;
             set_address(&gb->bus, (((u16)high_byte << 8)) | low_byte);
             gb->cpu.registers.a = gb->bus.data;
 
-            // M3
+            /* M3 */
             M_CYCLE_TICK;
             FETCH_CYCLE;
 
-        // 0xF1
+        /* 0xF1 */
         case OPCODE_POP_AF:
 
             POP_RR(gb->cpu.registers.af);
 
-        // 0xF3
+        /* 0xF3 */
         case OPCODE_DI:
 
-            // M1
+            /* M1 */
             M_CYCLE_TICK;
             gb->cpu.ime = false;
-            FETCH_CYCLE;
+            set_address(&gb->bus, gb->cpu.registers.pc++);
+            read_byte(&gb->bus);
+            gb->cpu.registers.ir = gb->bus.data;
+            return true;
 
-        // 0xF5
+        /* 0xF5 */
         case OPCODE_PUSH_AF:
 
             PUSH_RR(gb->cpu.registers.af);
 
-        // 0xF9
+        /* 0xF9 */
         case OPCODE_LD_SP_HL:
 
-            // M1
+            /* M1 */
             M_CYCLE_TICK;
             gb->cpu.registers.sp = gb->cpu.registers.hl;
 
-            // M2
+            /* M2 */
             M_CYCLE_TICK;
             FETCH_CYCLE;
 
-        // 0xFA
+        /* 0xFA */
         case OPCODE_LD_A_NN:
 
-            // M1
+            /* M1 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.pc++, low_byte);
 
-            // M2
+            /* M2 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.pc++, high_byte);
 
-            // M3
+            /* M3 */
             M_CYCLE_TICK;
             set_address(&gb->bus, (((u16)high_byte) << 8) | low_byte);
             read_byte(&gb->bus);
             byte = gb->bus.data;
 
-            // M4
+            /* M4 */
             M_CYCLE_TICK;
             gb->cpu.registers.a = byte;
             FETCH_CYCLE;
 
-        // 0xFE
+        /* 0xFE */
         case OPCODE_CP_U8:
 
-            // M1
+            /* M1 */
             M_CYCLE_TICK;
             READ_BYTE(gb->cpu.registers.pc++, byte);
 
-            // M2
+            /* M2 */
             CP(byte);
         
-        // 0xFF
+        /* 0xFF */
         case OPCODE_RST_0x38:
 
             RST(0x0038);

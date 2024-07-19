@@ -5,7 +5,7 @@
 
 struct PPU {
 
-    int temp; // Temp value to ignore empty struct warning
+    int temp; /* Temp value to ignore empty struct warning */
 };
 
 /**
@@ -30,4 +30,4 @@ void cleanup_ppu(struct PPU *ppu);
  */
 void tick_ppu(struct PPU *ppu);
 
-#endif // PPU_H
+#endif /* PPU_H */

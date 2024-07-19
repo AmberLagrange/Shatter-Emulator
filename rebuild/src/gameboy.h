@@ -55,4 +55,4 @@ void start_gameboy(struct Gameboy *gb);
  */
 void step(struct Gameboy *gb);
 
-#endif // GAMEBOY_H
+#endif /* GAMEBOY_H */

@@ -3,6 +3,7 @@
 #include <cartridge/cartridge.h>
 #include <logging/logging.h>
 #include <memory/mmu.h>
+#include <gameboy.h>
 
 int init_bus(struct Bus *bus) {
 
@@ -22,9 +23,9 @@ void set_cart(struct Bus *bus, struct Cartridge *cart) {
     bus->cart = cart;
 }
 
-void set_mmu(struct Bus *bus, struct MMU *mmu) {
+void bus_set_gameboy(struct Bus *bus, struct Gameboy *gb) {
 
-    bus->mmu = mmu;
+    bus->gb = gb;
 }
 
 void set_address(struct Bus *bus, u16 address) {
@@ -38,7 +39,8 @@ void read_byte(struct Bus *bus) {
     u16 address = bus->address;
 
     struct Cartridge *cart = bus->cart;
-    struct MMU *mmu = bus->mmu;
+    struct Gameboy *gb = bus->gb;
+    struct MMU *mmu = &gb->mmu;
 
     if (address < ROM_SIZE) {
 
@@ -49,7 +51,7 @@ void read_byte(struct Bus *bus) {
     if (address <= VIDEO_RAM_END) {
 
         translated_address = address - VIDEO_RAM_START;
-        translated_address += mmu->video_ram_bank * VIDEO_RAM_SIZE; // Account for multiple vram banks
+        translated_address += mmu->video_ram_bank * VIDEO_RAM_SIZE; /* Account for multiple vram banks */
         bus->data = mmu->video_ram[translated_address];
         return;
     }
@@ -57,7 +59,7 @@ void read_byte(struct Bus *bus) {
     if (address <= EXTERNAL_RAM_END) {
 
         gameboy_log(LOG_ERROR, "External RAM read at address 0x%04X not yet supported!", address);
-        bus->data = 0; // TODO: Cart
+        bus->data = 0; /* TODO: Cart */
         return;
     }
 
@@ -71,7 +73,7 @@ void read_byte(struct Bus *bus) {
     if (address <= WORK_RAM_SWAPPABLE_END) {
 
         translated_address = address - WORK_RAM_SWAPPABLE_START;
-        translated_address += mmu->work_ram_bank * WORK_RAM_SWAPPABLE_SIZE; // Account for multiple work ram banks
+        translated_address += mmu->work_ram_bank * WORK_RAM_SWAPPABLE_SIZE; /* Account for multiple work ram banks */
         bus->data = mmu->work_ram_swappable[translated_address];
         return;
     }
@@ -79,15 +81,15 @@ void read_byte(struct Bus *bus) {
     if (address <= ECHO_RAM_0_END) {
 
         translated_address = address - ECHO_RAM_0_START;
-        bus->data = mmu->work_ram_0[translated_address]; // Echo ram maps to work ram
+        bus->data = mmu->work_ram_0[translated_address]; /* Echo ram maps to work ram */
         return;
     }
 
     if (address <= ECHO_RAM_SWAPPABLE_END) {
 
         translated_address = address - ECHO_RAM_SWAPPABLE_START;
-        translated_address += mmu->work_ram_bank * WORK_RAM_SWAPPABLE_SIZE; // Account for multiple work ram banks
-        bus->data = mmu->work_ram_swappable[translated_address]; // Echo ram maps to work ram
+        translated_address += mmu->work_ram_bank * WORK_RAM_SWAPPABLE_SIZE; /* Account for multiple work ram banks */
+        bus->data = mmu->work_ram_swappable[translated_address]; /* Echo ram maps to work ram */
         return;
     }
 
@@ -108,7 +110,7 @@ void read_byte(struct Bus *bus) {
     if (address <= IO_REGISTERS_END) {
 
         gameboy_log(LOG_ERROR, "IO read at address 0x%04X not yet supported!", address);
-        bus->data = 0; // TODO: IO
+        bus->data = 0; /* TODO: IO */
         return;
     }
 
@@ -122,7 +124,7 @@ void read_byte(struct Bus *bus) {
     if (address == IE_REGISTER_ADDRESS) {
 
         gameboy_log(LOG_ERROR, "IE read at address 0x%04X not yet supported!", address);
-        bus->data = 0; // TODO: IE
+        bus->data = 0; /* TODO: IE */
         return;
     }
 
@@ -136,19 +138,20 @@ void write_byte(struct Bus *bus, u8 byte) {
     u16 address = bus->address;
 
     struct Cartridge *cart = bus->cart;
-    struct MMU *mmu = bus->mmu;
+    struct Gameboy *gb = bus->gb;
+    struct MMU *mmu = &gb->mmu;
 
     if (address < ROM_SIZE) {
 
         gameboy_log(LOG_ERROR, "ROM write at address 0x%04X not yet supported!", address);
         (void)(cart);
-        return; // TODO: Cart
+        return; /* TODO: Cart */
     }
 
     if (address <= VIDEO_RAM_END) {
 
         translated_address = address - VIDEO_RAM_START;
-        translated_address += mmu->video_ram_bank * VIDEO_RAM_SIZE; // Account for multiple vram banks
+        translated_address += mmu->video_ram_bank * VIDEO_RAM_SIZE; /* Account for multiple vram banks */
         mmu->video_ram[translated_address] = byte;
         return;
     }
@@ -156,7 +159,7 @@ void write_byte(struct Bus *bus, u8 byte) {
     if (address <= EXTERNAL_RAM_END) {
 
         gameboy_log(LOG_ERROR, "External RAM write at address 0x%04X not yet supported!", address);
-        return; // TODO: Cart
+        return; /* TODO: Cart */
     }
 
     if (address <= WORK_RAM_0_END) {
@@ -169,7 +172,7 @@ void write_byte(struct Bus *bus, u8 byte) {
     if (address <= WORK_RAM_SWAPPABLE_END) {
 
         translated_address = address - WORK_RAM_SWAPPABLE_START;
-        translated_address += mmu->work_ram_bank * WORK_RAM_SWAPPABLE_SIZE; // Account for multiple work ram banks
+        translated_address += mmu->work_ram_bank * WORK_RAM_SWAPPABLE_SIZE; /* Account for multiple work ram banks */
         mmu->work_ram_swappable[translated_address] = byte;
         return;
     }
@@ -177,15 +180,15 @@ void write_byte(struct Bus *bus, u8 byte) {
     if (address <= ECHO_RAM_0_END) {
 
         translated_address = address - ECHO_RAM_0_START;
-        mmu->work_ram_0[translated_address] = byte; // Echo ram maps to work ram
+        mmu->work_ram_0[translated_address] = byte; /* Echo ram maps to work ram */
         return;
     }
 
     if (address <= ECHO_RAM_SWAPPABLE_END) {
 
         translated_address = address - ECHO_RAM_SWAPPABLE_START;
-        translated_address += mmu->work_ram_bank * WORK_RAM_SWAPPABLE_SIZE; // Account for multiple work ram banks
-        mmu->work_ram_swappable[translated_address] = byte; // Echo ram maps to work ram
+        translated_address += mmu->work_ram_bank * WORK_RAM_SWAPPABLE_SIZE; /* Account for multiple work ram banks */
+        mmu->work_ram_swappable[translated_address] = byte; /* Echo ram maps to work ram */
         return;
     }
 
@@ -202,7 +205,7 @@ void write_byte(struct Bus *bus, u8 byte) {
         return;
     }
 
-    if (address == 0xFF02) { // Temp serial for Blargg
+    if (address == 0xFF02) { /* Temp serial for Blargg */
     
         blargg_log(bus->data);
         return;
@@ -211,7 +214,7 @@ void write_byte(struct Bus *bus, u8 byte) {
     if (address <= IO_REGISTERS_END) {
 
         gameboy_log(LOG_ERROR, "IO write at address 0x%04X not yet supported!", address);
-        return; // TODO: IO
+        return; /* TODO: IO */
     }
 
     if (address <= HIGH_RAM_END) {
@@ -224,7 +227,7 @@ void write_byte(struct Bus *bus, u8 byte) {
     if (address == IE_REGISTER_ADDRESS) {
 
         gameboy_log(LOG_ERROR, "IE write at address 0x%04X not yet supported!", address);
-        return; // TODO: IE
+        return; /* TODO: IE */
     }
 
     gameboy_log(LOG_ERROR, "Invalid write of 0x%02X at address 0x%04X", byte, address);

@@ -52,7 +52,7 @@ void cleanup_screen(struct Screen *screen);
  */
 void update_screen(struct Screen *screen);
 
-// TODO: Maybe change how this is handled
+/* TODO: Maybe change how this is handled */
 struct Gameboy;
 
 /**
@@ -62,4 +62,4 @@ struct Gameboy;
  */
 void poll_screen_events(struct Gameboy *gb);
 
-#endif // SCREEN_H
+#endif /* SCREEN_H */

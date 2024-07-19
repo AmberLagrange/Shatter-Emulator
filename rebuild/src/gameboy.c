@@ -42,7 +42,7 @@ int init_gameboy(struct Gameboy *gb) {
         goto screen_init_fail;
     }
 
-    set_mmu(&gb->bus, &gb->mmu);
+    bus_set_gameboy(&gb->bus, gb);
 
     gb->cart.rom_banks = NULL;
     gb->cart.ram_banks = NULL;
@@ -90,7 +90,7 @@ void start_gameboy(struct Gameboy *gb) {
     
     reset_cpu(&gb->cpu);
 
-    // Prefetch the first instruction
+    /* Prefetch the first instruction */
     set_address(&gb->bus, gb->cpu.registers.pc);
     read_byte(&gb->bus);
     gb->cpu.registers.ir = gb->bus.data;
@@ -102,13 +102,13 @@ void start_gameboy(struct Gameboy *gb) {
 void step(struct Gameboy *gb) {
 
     if (!execute_opcode(gb)) {
-        gb->running = false; // Temp while setting up opcodes
+        gb->running = false; /* Temp while setting up opcodes */
     }
 
-    // TODO: Proper screen handling. For now update screen on every opcode
+    /* TODO: Proper screen handling. For now update screen on every opcode */
     update_screen(&gb->screen);
     poll_screen_events(gb);
 
-    // TODO: Halting Bug
-    // TODO: Interrupts
+    /* TODO: Halting Bug */
+    /* TODO: Interrupts */
 }

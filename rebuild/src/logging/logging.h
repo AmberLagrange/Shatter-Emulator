@@ -32,4 +32,4 @@ void gameboy_log(enum LogLevel level, const char *fmt, ...);
  */
 void blargg_log(char serial_character);
 
-#endif // LOGGING_H
+#endif /* LOGGING_H */
